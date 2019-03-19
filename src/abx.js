@@ -23,6 +23,7 @@ import PCTApp from '@App';
 publishWindowResize(S); // initialize publish window resize with StateMOdule as param/
 
 const model = {
+    
     // any static data should be made properties of the model now
     
 };
@@ -61,16 +62,49 @@ function getRuntimeData(){
                 }
             },
             complete: response => { // arrow function here to keep `this` context as StateDebt
-                console.log(response);
-                views.length = 0;  // HERE YOU NEED TO NEST BY USING THE THE GROUP THAT THE VALUE MAPS TO
-                model.data = response.data.map(d => {
-                    console.log(d);
-                    Object.keys(d).forEach(key => {
-                        d[key] = d[key][0] === '[' ? JSON.parse(d[key]) : d[key];
-                    });
-                    return d;
+                views.length = 0;  
+                model.years = [2014];
+                // find number of years in data. relies on all rows having the same number
+                var loopWhile = true,
+                index = 0;
+
+                while ( loopWhile ){
+                    if ( response.data[0].hasOwnProperty(model.years[0] + index) ) {
+                        model.years.push(model.years[0] + index);   
+                    } else {
+                        loopWhile = false;
+                    }
+                    index++
+                }
+
+                model.data = model.years.map(year => {
+                    return {
+                        year,
+                        values: [1,2,3,4,5].map(phase => {
+                            return {
+                                phase,
+                                values: response.data.filter(d => {
+                                        d[year] = d[year][0] === '[' ? JSON.parse(d[year]) : d[year];
+                                        d.isDiscontinued = ( d[year].toString().indexOf('d') !== -1 ); 
+                                        return parseInt(d[year]) === phase;
+                                    })
+                            };
+                        })
+                    };
                 });
-                console.log(model.data);
+
+                const discontinuedLengths = [];
+                // find the maximum number of nondiscontinued drugs in one column at any time. side effect pushes 
+                // number of discontinued drugs to array for max tbd later
+                // these values will be used to determine when stacked drugs need to be collapsed down
+                // for smaller screens
+                model.maxActive = Math.max(...model.data.map(year => Math.max(...year.values.map(phase => {
+                    discontinuedLengths.push(phase.values.filter(each => each.isDiscontinued).length);
+                    return phase.values.filter(each => !each.isDiscontinued).length;
+                }))));
+                model.maxDiscontinued = Math.max(...discontinuedLengths);
+               
+                console.log(model);
                 //var data = response.data;
                 /* complete model based on fetched data */
 
