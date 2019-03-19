@@ -1,4 +1,4 @@
-/* global PUBLICPATH process module */
+/* global PUBLICPATH process */
 //utils
 //import * as d3 from 'd3-collection';
 import Papa from 'papaparse';
@@ -7,7 +7,7 @@ import { stateModule as S } from 'stateful-dead';
 import { publishWindowResize } from '@Utils';
 
 //data ( CSVs loaded by file-loader for use by Papaparse at build and runtime. that's set in webpack.common.js )
-import data from './data/data.csv';
+import data from './data/abx-data.csv';
 
 //views
 //import ComparisonView from './views/state-comparison/';
@@ -23,10 +23,11 @@ import PCTApp from '@App';
 publishWindowResize(S); // initialize publish window resize with StateMOdule as param/
 
 const model = {
+    // any static data should be made properties of the model now
     
 };
 
-const views = [];
+const views = []; // views get push  nly after model is fully ready, with any runtime data loaded
 
 function getRuntimeData(){
     var publicPath = '';
@@ -41,7 +42,7 @@ function getRuntimeData(){
             download: true,
             dynamicTyping: true,
             header: true,
-            fastMode: true, // no string escapes
+            fastMode: false, // string escapes needed to parse sringified arrays with commas
             skipEmptyLines: true,
             beforeFirstChunk(chunk){ // on prerender, do simple hash of CSV contents and append as attribute of the app container
                                      // at runtime, do same hash of csv contents and compare to original. if hashes match, app will
@@ -60,10 +61,20 @@ function getRuntimeData(){
                 }
             },
             complete: response => { // arrow function here to keep `this` context as StateDebt
-                
+                console.log(response);
                 views.length = 0;  // HERE YOU NEED TO NEST BY USING THE THE GROUP THAT THE VALUE MAPS TO
-                var data = response.data;
+                model.data = response.data.map(d => {
+                    console.log(d);
+                    Object.keys(d).forEach(key => {
+                        d[key] = d[key][0] === '[' ? JSON.parse(d[key]) : d[key];
+                    });
+                    return d;
+                });
+                console.log(model.data);
+                //var data = response.data;
                 /* complete model based on fetched data */
+
+                /* any grouping, summarizing or manipulating of the data to be done here */
              /*   model.data = data;
                 model.types.forEach(type => {
                     if ( type.type !== 'text'){
@@ -95,6 +106,8 @@ function getRuntimeData(){
 
 export default class ABXApp extends PCTApp {
     prerender(){
+
+        //indsert any static content here
 //        this.el.insertAdjacentHTML('beforeend', sections);
 //       this.el.insertAdjacentHTML('beforeend', footer);
         //this.wasPrerendered = false;
@@ -109,7 +122,7 @@ export default class ABXApp extends PCTApp {
     }
     init(){
         super.init();
-        this.attachSectionOpenClose();
+       // this.attachSectionOpenClose();
         getRuntimeData.call(this).then(() => {
             views.forEach(view => {
                view.init(this);                    

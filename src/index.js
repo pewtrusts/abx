@@ -7,7 +7,7 @@ import './css/styles.scss';
 
 
 const container = '#pew-app';
-const App = new StateDebt(container, { // StateDebt extends PCTApp-js. PCTApp-js's constructor method is called, p1 contaiuner, p2 options
+const App = new ABXApp(container, { // StateDebt extends PCTApp-js. PCTApp-js's constructor method is called, p1 contaiuner, p2 options
 	needsRouter: false
 });
 if ( process.env.NODE_ENV === 'development' || window.IS_PRERENDERING ){ // process development means using WebPack dev server. window is prerendering means in
