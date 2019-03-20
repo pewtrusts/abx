@@ -1,6 +1,13 @@
 @import 'variable.scss';
 
 :global(.rich-text #pew-app) {
-
-
+    
+    :global(.abx-legend) {
+        display: flex;
+        flex-wrap: wrap;
+    }
+        :global(.abx-legend--wrapper) {
+            display: flex;
+            flex-wrap: wrap
+        }
 }

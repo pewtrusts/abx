@@ -10,15 +10,17 @@ import { publishWindowResize } from '@Utils';
 import data from './data/abx-data.csv';
 
 //views
-//import ComparisonView from './views/state-comparison/';
+import VizView from './views/viz-view/';
 //import FiftyStateView from './views/fifty-state/';
 
 // app prototype
 import PCTApp from '@App';
 
 //static content
-//import sections from './partials/sections.html';
-//import footer from './partials/footer.html';
+import sections from './partials/sections.html';
+import intro from './partials/intro.md';
+import notes from './partials/notes.md';
+
 
 publishWindowResize(S); // initialize publish window resize with StateMOdule as param/
 
@@ -105,27 +107,11 @@ function getRuntimeData(){
                 model.maxDiscontinued = Math.max(...discontinuedLengths);
                
                 console.log(model);
-                //var data = response.data;
-                /* complete model based on fetched data */
-
-                /* any grouping, summarizing or manipulating of the data to be done here */
-             /*   model.data = data;
-                model.types.forEach(type => {
-                    if ( type.type !== 'text'){
-                        let dataArray = data.map(d => d[type.field]).filter(d => d !== null); 
-                        type.max = Math.max(...dataArray);
-                        type.min = Math.min(...dataArray);
-                        type.spread = type.max - type.min ;
-                    }
-                });
-                model.typesNested = d3.nest().key(d => d.group).entries(model.types);
-                console.log(model);
-                // ....
-               */
+               
                 /* push views now that model is complete */
                 
                 views.push(
-                   // this.createComponent(model, ComparisonView, 'div#comparison-view', {renderToSelector: '#section-comparison .js-inner-content', rerenderOnDataMismatch: true, parent: this}),  
+                   this.createComponent(model, VizView, 'div#viz-view', {renderToSelector: '#abx-visualization', rerenderOnDataMismatch: true, parent: this})
                    // this.createComponent(model, FiftyStateView, 'div#fifty-state-view', {renderToSelector: '#section-states .js-inner-content', rerenderOnDataMismatch: true, parent: this})  
                 );
                 
@@ -142,12 +128,14 @@ export default class ABXApp extends PCTApp {
     prerender(){
 
         //indsert any static content here
-//        this.el.insertAdjacentHTML('beforeend', sections);
-//       this.el.insertAdjacentHTML('beforeend', footer);
+        this.el.insertAdjacentHTML('beforeend', sections);
+        document.querySelector('#intro').insertAdjacentHTML('afterbegin', intro );
+        document.querySelector('#abx-notes').insertAdjacentHTML('afterbegin', notes );
         //this.wasPrerendered = false;
         getRuntimeData.call(this).then(() => { // bind StateDebt as context `this` for getRuntimeData so that it can acceess this.el, etc
             
             views.forEach(view => {
+                console.log(view);
           /* ? */      view.container.appendChild(view.el); // different here from CapeTown: views aren't appended to app container; some static content
                                                      // is present already. views appended to *their* containers
             });

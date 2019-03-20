@@ -1,4 +1,4 @@
-##Antibiotic Innovation
+## Antibiotic Innovation
 
 The Pew Charitable Trusts has tracked the pipeline of antibiotics in clinical development since 2014 and has aggregated the
 updates into an interactive tool that illustrates trends in the pipeline. This longitudinal data visualization underscores the longstanding concerns of scientists, doctors, public health officials, and other stakeholders regarding the dangerously low number of antibiotics in development to address current and future patient needs, particularly for treating the most urgent bacterial threats, such as Gram-negative pathogens.
