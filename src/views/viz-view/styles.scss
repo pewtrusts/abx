@@ -189,6 +189,7 @@
     margin: 0;
     width: 35px;
     height: 30px;
+    cursor: pointer;
 }
 .playButton {
     
@@ -203,5 +204,12 @@
     font-weight: 500;
     &.yearButtonActive {
         font-weight: 900;
+    }
+    &:not(.yearButtonActive):hover, &:not(.yearButtonActive):focus {
+        color: $medium_blue;
+        font-weight: 900;
+    }
+    &:disabled {
+        color: inherit;
     }
 }

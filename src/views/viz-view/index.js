@@ -1,6 +1,6 @@
 import Element from '@UI/element';
 import s from './styles.scss';
-//import { stateModule as S } from 'stateful-dead';
+import { stateModule as S } from 'stateful-dead';
 import PS from 'pubsub-setter';
 console.log(s);
 const minUnitDimension = 30; // minimum px height/width accepted for touchable element
@@ -50,15 +50,19 @@ export default class VizView extends Element {
         var controlContainer = document.createElement('div');
         controlContainer.classList.add(s.controlContainer);
 
-            // playbutton
+            // playButton
             var playButton = document.createElement('button');
             playButton.classList.add(s.playButton);
+            playButton.type = "button";
             controlContainer.appendChild(playButton);
 
             //years
             this.model.years.forEach((year, i) => {
                 var yearButton = document.createElement('button');
                 yearButton.classList.add(s.yearButton, `${ i === 0 ? s.yearButtonActive : 'nope'}`);
+                yearButton.type = "button";
+                yearButton.value = year;
+                yearButton.disabled = ( i === 0 );
                 yearButton.textContent = year;
                 controlContainer.appendChild(yearButton);
             });
@@ -134,11 +138,13 @@ export default class VizView extends Element {
         });
     }
     init() {
+        PS.setSubs([
+            ['resize', this.checkHeight.bind(this)],
+            ['year', this.update.bind(this)]
+        ]);
         this.populatePlaceholders(0);
         this.checkHeight();
-        PS.setSubs([
-            ['resize', this.checkHeight.bind(this)]
-        ]);
+        this.initializeYearButtons();
     }
     checkHeight() {
 
@@ -176,7 +182,25 @@ export default class VizView extends Element {
         }
         adjustCSSVariables.call(this);
     }
-    update( /*msg,data*/ ) {
-
+    initializeYearButtons(){
+        document.querySelectorAll('.' + s.yearButton).forEach(button => {
+            console.log(button);
+            button.addEventListener('click', function(){
+                var toBeDeselected = document.querySelector('.' + s.yearButtonActive);
+                toBeDeselected.disabled = false;
+                toBeDeselected.classList.remove(s.yearButtonActive);
+                this.disabled = true;
+                this.classList.add(s.yearButtonActive);
+                S.setState('year', this.value);
+            });
+        });
+    }
+    update(msg,data) {
+        console.log(msg,data);
+        var drugs = document.querySelectorAll('.' + s.drug);
+        drugs.forEach(drug => {
+            drug.className =  `${s.drug} ${s.drugEmpty}`
+        });
+        this.populatePlaceholders(this.model.years.indexOf(parseInt(data)));
     }
 }
