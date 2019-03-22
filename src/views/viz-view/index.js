@@ -46,6 +46,25 @@ export default class VizView extends Element {
             }
         }
 
+        // controls
+        var controlContainer = document.createElement('div');
+        controlContainer.classList.add(s.controlContainer);
+
+            // playbutton
+            var playButton = document.createElement('button');
+            playButton.classList.add(s.playButton);
+            controlContainer.appendChild(playButton);
+
+            //years
+            this.model.years.forEach((year, i) => {
+                var yearButton = document.createElement('button');
+                yearButton.classList.add(s.yearButton, `${ i === 0 ? s.yearButtonActive : 'nope'}`);
+                yearButton.textContent = year;
+                controlContainer.appendChild(yearButton);
+            });
+
+        view.appendChild(controlContainer);
+
         // container
         var container = document.createElement('div');
         container.classList.add(s.container);
@@ -84,6 +103,19 @@ export default class VizView extends Element {
         return view;
     }
     populatePlaceholders(year) {
+        function addIdsAndClasses(placeholder, drug){
+            function appendDetails(){
+                var drawer = document.createElement('div');
+                drawer.classList.add(s.detailDrawer);
+                drawer.innerHTML = `<strong>${drug.name}</strong><br />
+                                    ${drug.company}`;
+                placeholder.appendChild(drawer);   
+            }
+            placeholder.id = drug.id;
+            placeholder.classList.remove(s.drugEmpty);
+            placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`);
+            appendDetails()
+        }
         var activeContainer = document.querySelector('.' + s.activeContainer),
             discontinuedContainer = document.querySelector('.' + s.discontinuedContainer);
         this.model.data[year].values.forEach((phase, i) => {
@@ -93,15 +125,11 @@ export default class VizView extends Element {
                 discontinuedColumn = discontinuedContainer.querySelectorAll('.' + s.column)[i];
             active.forEach((drug, j) => {
                 var placeholder = activeColumn.querySelectorAll('.' + s.drug)[j];
-                placeholder.id = drug.id;
-                placeholder.classList.remove(s.drugEmpty);
-                placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`);
+                addIdsAndClasses(placeholder, drug);
             });
             discontinued.forEach((drug, j) => {
                 var placeholder = discontinuedColumn.querySelectorAll('.' + s.drug)[j];
-                placeholder.id = drug.id;
-                placeholder.classList.remove(s.drugEmpty);
-                placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`);
+                addIdsAndClasses(placeholder, drug);
             });
         });
     }

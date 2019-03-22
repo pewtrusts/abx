@@ -64,21 +64,39 @@
     }
     .discontinuedContainer & {
         flex-wrap: wrap;
-        opacity: .40;
     }
 }
 .drug {
     width: 100%;
     height: var(--unit-dimension);
     margin-right: var(--unit-padding);
-    background-color: $gray;
+    background-color: transparent;
     position: relative;
-    border: 2px solid $gray;
+    border: 2px solid transparent;
+    transition: transform 0.2s ease-in-out;
+    &:not(.drugEmpty){
+        background-color: $gray;
+        border-collapse: $gray;
+    }
     .activeContainer & {
         margin-bottom: var(--unit-padding);
     }
     .discontinuedContainer & {
         margin-top: var(--unit-padding);
+        &:not(.drugEmpty) {
+            border-color: lighten($gray, 10%);
+            background-color: lighten($gray, 10%);
+        }
+        &.novel {
+            background-color: lighten($green, 15%);
+            border-color: lighten($green, 15%);
+        }
+        &.urgent {
+            border-color: desaturate(lighten($dark_blue, 40%), 40%);
+        }
+        &.gramNegative::after {
+            color: lighten($medium_blue, 15%);
+        }
     }
     .squat & {
         width: calc(50% - var(--unit-padding));
@@ -98,11 +116,35 @@
         right: 10px;
         font-weight: 900;
     }
+    .detailDrawer {
+        position: absolute;
+        width: calc( 100% + 4px );
+        background-color: inherit;
+        border: inherit;
+        border-color: inherit;
+        border-top-width: 0;
+        top: calc( 100% - 2px );
+        left: -2px;
+        opacity: 0;
+        transform-origin: top;
+        transition: opacity .2s ease-in-out, transform .2s ease-in-out;
+        transform: scaleY(0);
+        z-index: 1;
+        padding: 5px;
+        box-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+        font-size: .85em;
+    }
+    &:not(.drugEmpty):hover {
+        z-index: 1;
+        box-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+        transform: scale(1.05);
+        .detailDrawer {
+            opacity: 1;
+            transform: scaleY(1);
+        }
+    }
 }
-.drugEmpty {
-    background-color: transparent;
-    border-color: transparent;
-}
+
 .headerDiv {
     color: #fff;
     font-weight: 900;
@@ -129,5 +171,37 @@
     display: none;
      @media screen and (max-width: 450px) {
         display: inline;
+    }
+}
+
+.controlContainer {
+    display: flex;
+    flex-wrap: wrap;
+    width: 65px;
+    align-content: flex-start;
+
+}
+.playButton, .yearButton {
+    appearance: none;
+    border: none;
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    width: 35px;
+    height: 30px;
+}
+.playButton {
+    
+    background: url('./play-button.min.svg') no-repeat center;
+    background-size: contain;
+    &.isPaused {
+        background-image: url('./play-button--pause.min.svg')
+    }
+}
+.yearButton {
+    font-size: .80em;
+    font-weight: 500;
+    &.yearButtonActive {
+        font-weight: 900;
     }
 }
