@@ -2,7 +2,7 @@ import Element from '@UI/element';
 import s from './styles.scss';
 //import { stateModule as S } from 'stateful-dead';
 import PS from 'pubsub-setter';
-
+console.log(s);
 const minUnitDimension = 30; // minimum px height/width accepted for touchable element
 const headerHeight = 1.5 * minUnitDimension; // the height of the phase-heading bars relative to minUnitDimension
 const unitPadding = 2
@@ -10,7 +10,7 @@ const headers = [
     ['Phase 1', 'P1'],
     ['Phase 2', 'P2'],
     ['Phase 3', 'P3'],
-    ['New Drug Application', 'NDA'],
+    ['Application', 'NDA'],
     ['Approved', '&#10004']
 ];
 
@@ -21,8 +21,9 @@ export default class VizView extends Element {
         this.minUnitDimension = minUnitDimension;
         this.headerHeight = headerHeight;
         this.unitPadding = unitPadding;
-        this.headers = headers;
-        this.heightNeeded = ( this.model.maxActive + this.model.maxDiscontinued ) * ( this.minUnitDimension + this.unitPadding ) + this.headerHeight + this.unitPadding;
+        this.headers = headers;                                             
+                                                                                // plus one to acct fo discontinued header
+        this.heightNeeded = ( this.model.maxActive + this.model.maxDiscontinued + 1 ) * ( this.minUnitDimension + this.unitPadding ) + this.headerHeight + this.unitPadding;
 
         //container
         var view = super.prerender();
@@ -91,10 +92,16 @@ export default class VizView extends Element {
                 activeColumn = activeContainer.querySelectorAll('.' + s.column)[i],
                 discontinuedColumn = discontinuedContainer.querySelectorAll('.' + s.column)[i];
             active.forEach((drug, j) => {
-                activeColumn.querySelectorAll('.' + s.drug)[j].classList.remove(s.drugEmpty);
+                var placeholder = activeColumn.querySelectorAll('.' + s.drug)[j];
+                placeholder.id = drug.id;
+                placeholder.classList.remove(s.drugEmpty);
+                placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`);
             });
             discontinued.forEach((drug, j) => {
-                discontinuedColumn.querySelectorAll('.' + s.drug)[j].classList.remove(s.drugEmpty);
+                var placeholder = discontinuedColumn.querySelectorAll('.' + s.drug)[j];
+                placeholder.id = drug.id;
+                placeholder.classList.remove(s.drugEmpty);
+                placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`);
             });
         });
     }
