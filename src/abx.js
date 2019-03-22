@@ -31,6 +31,7 @@ const model = {
 };
 
 const views = []; // views get push  nly after model is fully ready, with any runtime data loaded
+const startYear = 2014;
 
 function getRuntimeData(){
     var publicPath = '';
@@ -65,14 +66,14 @@ function getRuntimeData(){
             },
             complete: response => { // arrow function here to keep `this` context as StateDebt
                 views.length = 0;  
-                model.years = [2014];
+                model.years = [];
                 // find number of years in data. relies on all rows having the same number
                 var loopWhile = true,
                 index = 0;
 
                 while ( loopWhile ){
-                    if ( response.data[0].hasOwnProperty(model.years[0] + index) ) {
-                        model.years.push(model.years[0] + index);   
+                    if ( response.data[0].hasOwnProperty(startYear + index) ) {
+                        model.years.push(startYear + index);   
                     } else {
                         loopWhile = false;
                     }
