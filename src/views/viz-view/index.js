@@ -21,7 +21,7 @@ export default class VizView extends Element {
         this.minUnitDimension = minUnitDimension;
         this.headerHeight = headerHeight;
         this.unitPadding = unitPadding;
-        this.headers = headers;                                             
+        this.headers = headers;   
                                                                                 // plus one to acct fo discontinued header
         this.heightNeeded = ( this.model.maxActive + this.model.maxDiscontinued + 1 ) * ( this.minUnitDimension + this.unitPadding ) + this.headerHeight + this.unitPadding;
 
@@ -142,6 +142,7 @@ export default class VizView extends Element {
             ['resize', this.checkHeight.bind(this)],
             ['year', this.update.bind(this)]
         ]);
+        this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         this.populatePlaceholders(0);
         this.checkHeight();
         this.initializeYearButtons();
@@ -197,10 +198,42 @@ export default class VizView extends Element {
     }
     update(msg,data) {
         console.log(msg,data);
-        var drugs = document.querySelectorAll('.' + s.drug);
-        drugs.forEach(drug => {
-            drug.className =  `${s.drug} ${s.drugEmpty}`
+        this.FLIP(parseInt(data));
+    }
+    FLIP(data){
+        this.recordFirstPositions(); // first
+        this.populatePlaceholders(this.model.years.indexOf(data)); // last
+        this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
+        console.log(this.firstPositions);
+        //this.invertPositions(); // invert and play
+        // ***** TO DO ****** INVERSION isn't working properly. need to remove classes *and* remove details drawers before repopulating
+        // the placeholders. why is there a transition on the invert? are the id's being assign properly?
+    }
+    recordFirstPositions(){
+        console.log(document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')'));
+        this.firstPositions = Array.from(document.querySelectorAll('.' + s.drug + ':not(' + s.drugEmpty + ')')).reduce((acc, cur) => {
+            
+            acc[cur.id] = cur.getBoundingClientRect();
+            return acc;
+        },{});
+        this.nonEmptyDrugs.forEach(drug => {
+            drug.className =  `${s.drug} ${s.drugEmpty}`;
+            drug.id = '';
         });
-        this.populatePlaceholders(this.model.years.indexOf(parseInt(data)));
+        
+    }
+    invertPositions(){
+        this.nonEmptyDrugs.forEach(drug => {
+            drug.style.transitionDuration = '0';
+            var lastPosition = drug.getBoundingClientRect(),
+                deltaY = this.firstPositions[drug.id] ? this.firstPositions[drug.id].top - lastPosition.top : -1000,
+                deltaX = this.firstPositions[drug.id] ? this.firstPositions[drug.id].left - lastPosition.left : -1000; // drugs that are entering will not have firstPositions
+                                                                                         // recorded. give number that shows them coming from off screen
+            drug.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+           /* setTimeout(function(){ // transition won't happen w/o the settimeout trick
+                drug.style.transitionDuration = '0.8s';
+                drug.style.transform = 'translateY(0)';
+            });*/
+        });
     }
 }
