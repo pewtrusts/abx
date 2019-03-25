@@ -115,7 +115,7 @@ export default class VizView extends Element {
 
         return view;
     }
-    populatePlaceholders(year) {
+    populatePlaceholders(yearIndex, observation) {
         function addIdsAndClasses(placeholder, drug){
             function appendDetails(){
                 var drawer = document.createElement('div');
@@ -133,30 +133,13 @@ export default class VizView extends Element {
         var activeContainer = document.querySelector('.' + s.activeContainer),
             discontinuedContainer = document.querySelector('.' + s.discontinuedContainer);
         [activeContainer, discontinuedContainer].forEach((container, k) => {
-            this.model.data[year].values.forEach((phase, i) => {
-               function getPhaseMembersIndex(id){
+            this.model.data[yearIndex].observations[observation].forEach((phase, i) => {
+               /*function getPhaseMembersIndex(id){
                     return this.phaseMembers[i][ ( k === 0 ? 'active' : 'discontinued' ) ].indexOf(id)   
-                }
+                }*/
                 // filter drugs by whether they're acrive or discontinued; also sort them based on whether they were already in the column
                 //  they are about to be placed in
-                var filtered = phase.values.filter(d => k === 0 ? !d.isDiscontinued : d.isDiscontinued).sort((a, b) => {
-                        var existingIndexA = getPhaseMembersIndex.call(this, a.id),
-                            existingIndexB = getPhaseMembersIndex.call(this, b.id);
-                        console.log('a existing index a, b', existingIndexA, existingIndexB);
-                        if ( existingIndexB < 0 && existingIndexA >= 0 ) { // if drug is entering the column, ie, not already in it
-                            return -1;
-                        }
-                        if (existingIndexA < 0 && existingIndexB >= 0 ) {
-                            return 1;
-                        }
-                        if ( getPhaseMembersIndex.call(this, a.id) < getPhaseMembersIndex.call(this, b.id) ) { 
-                            return -1;
-                        }
-                        if ( getPhaseMembersIndex.call(this, a.id) > getPhaseMembersIndex.call(this, b.id) ) { 
-                            return 1;
-                        }
-                        return 0;
-                    }),
+                var filtered = phase.values.filter(d => k === 0 ? !d[this.model.years[yearIndex]][observation].isDiscontinued : d[this.model.years[yearIndex]][observation].isDiscontinued),
                     column = container.querySelectorAll('.' + s.column)[i];
                 console.log(filtered)
                 // clear the phaseMember array now that its previous contents have been utilized
@@ -174,7 +157,7 @@ export default class VizView extends Element {
             ['resize', this.checkHeight.bind(this)],
             ['year', this.update.bind(this)]
         ]);
-        this.populatePlaceholders(0);
+        this.populatePlaceholders(0,1);
         this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         this.checkHeight();
         this.initializeYearButtons();
@@ -235,7 +218,7 @@ export default class VizView extends Element {
     FLIP(data){
         this.recordFirstPositions(); // first
         this.clearAttributesAndDetails();
-        this.populatePlaceholders(this.model.years.indexOf(data)); // last
+        this.populatePlaceholders(this.model.years.indexOf(data),1); // last
         this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         console.log(this.firstPositions);
         //setTimeout(() => {
