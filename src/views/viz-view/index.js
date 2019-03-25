@@ -115,6 +115,7 @@ export default class VizView extends Element {
                                     ${drug.company}`;
                 placeholder.appendChild(drawer);   
             }
+            placeholder.insertAdjacentHTML('afterbegin', drug.id);
             placeholder.id = drug.id;
             placeholder.classList.remove(s.drugEmpty);
             placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`);
@@ -122,18 +123,14 @@ export default class VizView extends Element {
         }
         var activeContainer = document.querySelector('.' + s.activeContainer),
             discontinuedContainer = document.querySelector('.' + s.discontinuedContainer);
-        this.model.data[year].values.forEach((phase, i) => {
-            var active = phase.values.filter(d => !d.isDiscontinued),
-                discontinued = phase.values.filter(d => d.isDiscontinued),
-                activeColumn = activeContainer.querySelectorAll('.' + s.column)[i],
-                discontinuedColumn = discontinuedContainer.querySelectorAll('.' + s.column)[i];
-            active.forEach((drug, j) => {
-                var placeholder = activeColumn.querySelectorAll('.' + s.drug)[j];
-                addIdsAndClasses(placeholder, drug);
-            });
-            discontinued.forEach((drug, j) => {
-                var placeholder = discontinuedColumn.querySelectorAll('.' + s.drug)[j];
-                addIdsAndClasses(placeholder, drug);
+        [activeContainer, discontinuedContainer].forEach((container, k) => {
+            this.model.data[year].values.forEach((phase, i) => {
+                var filtered = phase.values.filter(d => k === 0 ? !d.isDiscontinued : d.isDiscontinued),
+                    column = container.querySelectorAll('.' + s.column)[i];
+                filtered.forEach((drug, j) => {
+                    var placeholder = column.querySelectorAll('.' + s.drug)[j];
+                    addIdsAndClasses(placeholder, drug);
+                });
             });
         });
     }
@@ -142,8 +139,8 @@ export default class VizView extends Element {
             ['resize', this.checkHeight.bind(this)],
             ['year', this.update.bind(this)]
         ]);
-        this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         this.populatePlaceholders(0);
+        this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         this.checkHeight();
         this.initializeYearButtons();
     }
@@ -205,7 +202,9 @@ export default class VizView extends Element {
         this.populatePlaceholders(this.model.years.indexOf(data)); // last
         this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         console.log(this.firstPositions);
-        //this.invertPositions(); // invert and play
+        //setTimeout(() => {
+            this.invertPositions();
+        //    }, 3000); // invert and play
         // ***** TO DO ****** INVERSION isn't working properly. need to remove classes *and* remove details drawers before repopulating
         // the placeholders. why is there a transition on the invert? are the id's being assign properly?
     }
@@ -217,23 +216,25 @@ export default class VizView extends Element {
             return acc;
         },{});
         this.nonEmptyDrugs.forEach(drug => {
+            var details = drug.querySelector('.' + s.detailDrawer);
             drug.className =  `${s.drug} ${s.drugEmpty}`;
             drug.id = '';
+            drug.removeChild(details);
+            drug.textContent = '';
         });
         
     }
     invertPositions(){
         this.nonEmptyDrugs.forEach(drug => {
-            drug.style.transitionDuration = '0';
+            drug.style.transitionDuration = '0s';
             var lastPosition = drug.getBoundingClientRect(),
                 deltaY = this.firstPositions[drug.id] ? this.firstPositions[drug.id].top - lastPosition.top : -1000,
                 deltaX = this.firstPositions[drug.id] ? this.firstPositions[drug.id].left - lastPosition.left : -1000; // drugs that are entering will not have firstPositions
-                                                                                         // recorded. give number that shows them coming from off screen
             drug.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-           /* setTimeout(function(){ // transition won't happen w/o the settimeout trick
+            setTimeout(function(){ // transition won't happen w/o the settimeout trick
                 drug.style.transitionDuration = '0.8s';
-                drug.style.transform = 'translateY(0)';
-            });*/
+                drug.style.transform = 'translate(0,0)';
+            });
         });
     }
 }

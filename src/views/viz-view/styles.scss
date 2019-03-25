@@ -58,6 +58,7 @@
     display: flex;
     flex-grow: 1;
     margin: 0 2px;
+    max-width: 181px;
     .activeContainer & {
         flex-wrap: wrap-reverse;
         align-items: flex-end;
@@ -73,7 +74,7 @@
     background-color: transparent;
     position: relative;
     border: 2px solid transparent;
-    transition: transform 0.2s ease-in-out;
+    transition: transform 0s ease-in-out;
     &:not(.drugEmpty){
         background-color: $gray;
         border-collapse: $gray;
