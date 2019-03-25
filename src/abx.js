@@ -71,6 +71,7 @@ function getRuntimeData(){
                 var loopWhile = true,
                 index = 0;
 
+                // create array of years present in the data, starting with startYear defined above
                 while ( loopWhile ){
                     if ( response.data[0].hasOwnProperty(startYear + index) ) {
                         model.years.push(startYear + index);   
@@ -79,34 +80,49 @@ function getRuntimeData(){
                     }
                     index++
                 }
-
+                model.unnestedData = response.data.map(d => { // turn each string value like "1-1d" into an array , [1,1d]
+                    model.years.forEach(year => {
+                        d[year] = [0,1].map(observation => {
+                            
+                            return {
+                                column: parseInt(d[year].split('-')[observation]),
+                                isDiscontinued: ( d[year].split('-')[observation].toString().indexOf('d') !== -1 )
+                            };
+                        });
+                    });
+                    return d;
+                });
                 model.data = model.years.map(year => {
                     return {
                         year,
-                        values: [1,2,3,4,5].map(phase => {
-                            return {
-                                phase,
-                                values: response.data.filter(d => {
-                                        d[year] = d[year][0] === '[' ? JSON.parse(d[year]) : d[year];
-                                        d.isDiscontinued = ( d[year].toString().indexOf('d') !== -1 ); 
-                                        return parseInt(d[year]) === phase;
-                                    })
-                            };
+                        observations: [0,1].map(observation => { // each year has two observations
+                            return [1, 2, 3, 4, 5].map(phase => {
+                                
+                                return {
+                                    phase,
+                                    values: model.unnestedData.filter(d => d[year][observation].column === phase) 
+                                };
+                            });
                         })
                     };
                 });
-
+                console.log(model);
+                const activeLengths = [];
                 const discontinuedLengths = [];
                 // find the maximum number of nondiscontinued drugs in one column at any time. side effect pushes 
                 // number of discontinued drugs to array for max tbd later
                 // these values will be used to determine when stacked drugs need to be collapsed down
                 // for smaller screens
-                model.maxActive = Math.max(...model.data.map(year => Math.max(...year.values.map(phase => {
-                    discontinuedLengths.push(phase.values.filter(each => each.isDiscontinued).length);
-                    return phase.values.filter(each => !each.isDiscontinued).length;
-                }))));
+                model.data.forEach(d => {
+                    d.observations.forEach((obs,i) => {
+                        obs.forEach(phase => {
+                            activeLengths.push(phase.values.filter(drug => drug[d.year][i].isDiscontinued !== true).length);
+                            discontinuedLengths.push(phase.values.filter(drug => drug[d.year][i].isDiscontinued === true).length);
+                        });
+                    });
+                });
+                model.maxActive = Math.max(...activeLengths);
                 model.maxDiscontinued = Math.max(...discontinuedLengths);
-               
                 console.log(model);
                
                 /* push views now that model is complete */

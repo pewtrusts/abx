@@ -5,7 +5,7 @@ import PS from 'pubsub-setter';
 console.log(s);
 const minUnitDimension = 30; // minimum px height/width accepted for touchable element
 const headerHeight = 1.5 * minUnitDimension; // the height of the phase-heading bars relative to minUnitDimension
-const unitPadding = 2
+const unitPadding = 2;
 const headers = [
     ['Phase 1', 'P1'],
     ['Phase 2', 'P2'],
@@ -14,6 +14,7 @@ const headers = [
     ['Approved', '&#10004']
 ];
 
+
 export default class VizView extends Element {
     prerender() { // this prerender is called as part of the super constructor
         /* any children need to be instatiated here */
@@ -21,7 +22,15 @@ export default class VizView extends Element {
         this.minUnitDimension = minUnitDimension;
         this.headerHeight = headerHeight;
         this.unitPadding = unitPadding;
-        this.headers = headers;   
+        this.headers = headers;
+        this.phaseMembers = headers.map(() => { // will keep track of which drugs are in which column so that animations can be timed and so that 
+                                                // drugs that stay in their column from one step to another can be placed before those entering the
+                                                // column
+            return {
+                active: [],
+                discontinued: []
+            };
+        });   
                                                                                 // plus one to acct fo discontinued header
         this.heightNeeded = ( this.model.maxActive + this.model.maxDiscontinued + 1 ) * ( this.minUnitDimension + this.unitPadding ) + this.headerHeight + this.unitPadding;
 
@@ -125,11 +134,37 @@ export default class VizView extends Element {
             discontinuedContainer = document.querySelector('.' + s.discontinuedContainer);
         [activeContainer, discontinuedContainer].forEach((container, k) => {
             this.model.data[year].values.forEach((phase, i) => {
-                var filtered = phase.values.filter(d => k === 0 ? !d.isDiscontinued : d.isDiscontinued),
+               function getPhaseMembersIndex(id){
+                    return this.phaseMembers[i][ ( k === 0 ? 'active' : 'discontinued' ) ].indexOf(id)   
+                }
+                // filter drugs by whether they're acrive or discontinued; also sort them based on whether they were already in the column
+                //  they are about to be placed in
+                var filtered = phase.values.filter(d => k === 0 ? !d.isDiscontinued : d.isDiscontinued).sort((a, b) => {
+                        var existingIndexA = getPhaseMembersIndex.call(this, a.id),
+                            existingIndexB = getPhaseMembersIndex.call(this, b.id);
+                        console.log('a existing index a, b', existingIndexA, existingIndexB);
+                        if ( existingIndexB < 0 && existingIndexA >= 0 ) { // if drug is entering the column, ie, not already in it
+                            return -1;
+                        }
+                        if (existingIndexA < 0 && existingIndexB >= 0 ) {
+                            return 1;
+                        }
+                        if ( getPhaseMembersIndex.call(this, a.id) < getPhaseMembersIndex.call(this, b.id) ) { 
+                            return -1;
+                        }
+                        if ( getPhaseMembersIndex.call(this, a.id) > getPhaseMembersIndex.call(this, b.id) ) { 
+                            return 1;
+                        }
+                        return 0;
+                    }),
                     column = container.querySelectorAll('.' + s.column)[i];
+                console.log(filtered)
+                // clear the phaseMember array now that its previous contents have been utilized
+                this.phaseMembers[i][ ( k === 0 ? 'active' : 'discontinued' ) ].length = 0;
                 filtered.forEach((drug, j) => {
                     var placeholder = column.querySelectorAll('.' + s.drug)[j];
                     addIdsAndClasses(placeholder, drug);
+                    this.phaseMembers[i][ ( k === 0 ? 'active' : 'discontinued' ) ].push(drug.id); // place the drug in the proper bucket tracking its column
                 });
             });
         });
@@ -199,6 +234,7 @@ export default class VizView extends Element {
     }
     FLIP(data){
         this.recordFirstPositions(); // first
+        this.clearAttributesAndDetails();
         this.populatePlaceholders(this.model.years.indexOf(data)); // last
         this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         console.log(this.firstPositions);
@@ -209,12 +245,13 @@ export default class VizView extends Element {
         // the placeholders. why is there a transition on the invert? are the id's being assign properly?
     }
     recordFirstPositions(){
-        console.log(document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')'));
         this.firstPositions = Array.from(document.querySelectorAll('.' + s.drug + ':not(' + s.drugEmpty + ')')).reduce((acc, cur) => {
             
             acc[cur.id] = cur.getBoundingClientRect();
             return acc;
         },{});
+    }
+    clearAttributesAndDetails(){
         this.nonEmptyDrugs.forEach(drug => {
             var details = drug.querySelector('.' + s.detailDrawer);
             drug.className =  `${s.drug} ${s.drugEmpty}`;
@@ -222,7 +259,6 @@ export default class VizView extends Element {
             drug.removeChild(details);
             drug.textContent = '';
         });
-        
     }
     invertPositions(){
         this.nonEmptyDrugs.forEach(drug => {

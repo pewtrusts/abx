@@ -1,67 +1,67 @@
 ﻿id,name,urgent,gramNegative,novel,company,2014,2015,2016,2017,2018
-1,ACHN-975,TRUE,TRUE,TRUE,Achaogen,1d,1d,1d,1d,1d
-2,ACX-362E,TRUE,FALSE,TRUE,Acurx Pharmaceuticals LLC,0,0,0,0,1
-3,Afabicin,FALSE,FALSE,TRUE,Debiopharm Group (Formerly Affinium Pharmaceuticals),1,2,2,2,2
-4,AIC499,FALSE,FALSE,FALSE,AiCuris,0,0,0,1,1
-5,Avarofloxacin,FALSE,FALSE,FALSE,Allergan PLC (Formerly Actavis formerly Furiex)Furiex Pharmaceuticals,2,2,2d,2d,2d
-6,Avycaz,TRUE,TRUE,TRUE,AstraZeneca/Forest Laboratories,4,5,5,5,5
-7,BAL30072,TRUE,TRUE,FALSE,Basilea Pharmaceutica,1,1,1d,1d,1d
-8,Baxdela,FALSE,FALSE,FALSE,Melinta Therapeutics,3,3,4,5,5
-9,BOS-228,TRUE,TRUE,FALSE,Boston Pharmaceuticals,0,0,0,"[1,2]",2
-10,Brilacidin,FALSE,FALSE,TRUE,Innovation Pharmaceuticals Inc. (Formerly Cellceutix Corp.),2,2,2,2,2
-11,Cadazolid,TRUE,FALSE,FALSE,Actelion Pharmaceuticals,3,3,3,3,3d
-12,Cefepime + AAI1019,FALSE,TRUE,FALSE,Allecra,0,0,0,2,3
-13,Cefepime + VNRX-5133,TRUE,TRUE,FALSE,VenatoRx Pharmaceuticals,0,0,0,1,1
-14,Cefepime + Zidebactam,TRUE,TRUE,FALSE,Wockhardt Ltd.,0,0,1,1,1
-15,Cefiderocol,TRUE,TRUE,FALSE,Shionogi,2,2,3,3,3
-16,Cefilavacin,FALSE,FALSE,FALSE,R-Pharm/ Theravance Biopharma Inc.,"[2,""2d""]",2d,2d,3,3
-17,Ceftaroline + Avibactam,TRUE,TRUE,TRUE,AstraZeneca/Forest Laboratories,2,2,2,2d,2d
-18,Ceftobiprole,FALSE,TRUE,FALSE,Basilea Pharmaceutica,"[2,""2d""]",2d,2d,3,3
-19,CG400549,FALSE,FALSE,TRUE,"CrystalGenomics, Inc.",2,2,2,2,2
-20,CRS3123,TRUE,FALSE,TRUE,"Crestone, Inc.",1,1,1,1,1
-21,Dalbavancin,FALSE,FALSE,FALSE,Actavis (Formerly Durata Therapeutics),5,5,5,5,5
-22,Delpazolid,FALSE,FALSE,FALSE,LegoChem Biosciences (S. Korea),1,1,1,1,1
-23,DS-2969,TRUE,FALSE,TRUE,Daiichi Sankyo,0,0,0,1,1d
-24,EDP-788,FALSE,FALSE,FALSE,Enanta Pharmaceuticals,1d,1d,1d,1d,1d
-25,Eravacycline,FALSE,TRUE,FALSE,Tetraphase Pharmaceuticals,3,3,3,3,5
-26,ETX2514SUL,FALSE,TRUE,FALSE,Entasis Therapeutics,0,0,0,1,2
-27,Finafloxacin,FALSE,TRUE,FALSE,MerLion  Pharmaceuticals,2,2,2,2,2
-28,Gepotidacin,TRUE,FALSE,TRUE,GlaxoSmithKline,2,2,2,2,2
-29,GSK-1322322,FALSE,FALSE,TRUE,GlaxoSmithKline,2d,2d,2d,2d,2d
-30,GSK-3342830,TRUE,TRUE,FALSE,GlaxoSmithKline PLC (Shionogi licensee),0,0,1,1,0
-31,Iclaprim,FALSE,FALSE,FALSE,Motif Bio plc,0,3,3,3,4
-32,Imipenem/Cilastatin + Relebactam,TRUE,TRUE,FALSE,Merck & Co.,2,3,3,3,3
-33,KBP-7072,FALSE,FALSE,FALSE,KBP BioSciences Pharmaceutical Technical Co. Ltd.,0,0,1,1,1
-34,Lascufloxacin,FALSE,FALSE,FALSE,Kyorin Pharmaceutical Co. Ltd.,0,0,0,3,4
-35,Lefamulin,FALSE,FALSE,TRUE,Nabriva Therapeutics,2,3,3,3,4
-36,LFF571,TRUE,FALSE,TRUE,Novartis,2d,2d,2d,2d,2d
-37,DNV3837 ,TRUE,FALSE,FALSE,Deinove (Formerly Morphochem AG),0,0,1,1,1
-38,Meropenem+Nacubactam,TRUE,TRUE,FALSE,Meiji Seika Pharma Co. Ltd./Fedora Pharmaceuticals Inc. (Roche licensee)12,1,1,1,1,1
-39,MGB-BP-3,TRUE,FALSE,TRUE,MGB Biopharma Ltd.,0,1,1,1,1
-40,MRX-I/MRX-4,FALSE,FALSE,FALSE,MicuRx Pharmaceuticals,1,2,2,3,3
-41,Murepavadin,FALSE,TRUE,TRUE,Polyphor (Roche licensee),2,2,2,2,3
-42,Nafithromycin,FALSE,FALSE,FALSE,Wockhardt,0,1,1,2,2
-43,Nemonoxacin,FALSE,FALSE,FALSE,TaiGen Biotechnology,2,2,2,2,2
-44,Omadacycline,FALSE,TRUE,FALSE,Paratek Pharmaceuticals,2,3,3,3,5
-45,OPS-2071,TRUE,FALSE,FALSE,Otsuka Pharmaceutical Co. Ltd.,0,0,0,2,2
-46,Oritavancin,FALSE,FALSE,FALSE,The Medicines Company,5,5,5,5,5
-47,Plazomicin,TRUE,TRUE,FALSE,Achaogen,3,3,3,4,5
-48,Radezolid,FALSE,FALSE,FALSE,Melinta Therapeutics,2,2,2d,2d,2d
-49,Ramoplanin,TRUE,FALSE,TRUE,Nanotherapeutics,2,2,2,2d,2d
-50,Ridinilazole,TRUE,FALSE,TRUE,Summit Therapeutics PLC.,2,2,2,2,3
-51,Solithera,TRUE,FALSE,FALSE,Melinta Therapeutics (Formerly Cempra Pharmaceuticals),3,3,4,3,3
-52,SPR206,TRUE,TRUE,FALSE,Spero Therapeutics,0,0,0,0,1
-53,SPR741,FALSE,FALSE,FALSE,Spero Therapeutics,0,0,0,1,1
-54,SPR994,FALSE,TRUE,FALSE,Spero Therapeutics,0,0,0,1,3
-55,Sulopenem,FALSE,TRUE,FALSE,Iterum Therapeutics Ltd.,0,0,0,3,3
-56,Surotomycin,TRUE,FALSE,FALSE,Cubist Pharmaceuticals,3,3,3d,3d,3d
-57,Taksta,FALSE,FALSE,FALSE,Melinta Therapeutics (Formerly Cempra Pharmaceuticals),3,3,3,3,3
-58,TD-1607,FALSE,FALSE,FALSE,Theravance Biopharma Inc.,1,1,1,1d,1d
-59,Tedizolid,FALSE,FALSE,FALSE,Cubist Pharmaceuticals,5,5,5,5,5
-60,TP-271,FALSE,FALSE,FALSE,Tetraphase Pharmaceuticals Inc.,0,0,1,1,1
-61,TP-6076,TRUE,TRUE,FALSE,Tetraphase Pharmaceuticals Inc.,0,0,1,1,1
-62,Vabomere,TRUE,TRUE,TRUE,Rempex Pharmaceuticals/The Medicines Company,3,3,3,"[4,5]",5
-63,WCK 771/WCK 2349,FALSE,FALSE,FALSE,Wockhardt,1,1,1,2,3
-64,Zabofloxacin,FALSE,FALSE,FALSE,Dong Wha Pharmaceutical,2,2,3,3,3d
-65,Zerbaxa,FALSE,TRUE,FALSE,Cubist Pharmaceuticals,5,5,5,5,5
-66,Zoliflodacin,TRUE,FALSE,TRUE,Entasis Therapeutics,2,2,2,2,2
+1,ACHN-975,TRUE,TRUE,TRUE,Achaogen,1d-1d,1d-1d,1d-1d,1d-1d,1d-1d
+2,ACX-362E,TRUE,FALSE,TRUE,Acurx Pharmaceuticals LLC,0-0,0-0,0-0,0-0,1-1
+3,Afabicin,FALSE,FALSE,TRUE,Debiopharm Group (Formerly Affinium Pharmaceuticals),1-1,2-2,2-2,2-2,2-2
+4,AIC499,FALSE,FALSE,FALSE,AiCuris,0-0,0-0,0-0,1-1,1-1
+5,Avarofloxacin,FALSE,FALSE,FALSE,Allergan PLC (Formerly Actavis formerly Furiex)Furiex Pharmaceuticals,2-2,2-2,2d-2d,2d-2d,2d-2d
+6,Avycaz,TRUE,TRUE,TRUE,AstraZeneca/Forest Laboratories,4-4,5-5,5-5,5-5,5-5
+7,BAL30072,TRUE,TRUE,FALSE,Basilea Pharmaceutica,1-1,1-1,1d-1d,1d-1d,1d-1d
+8,Baxdela,FALSE,FALSE,FALSE,Melinta Therapeutics,3-3,3-3,4-4,5-5,5-5
+9,BOS-228,TRUE,TRUE,FALSE,Boston Pharmaceuticals,0-0,0-0,0-0,1-2,2-2
+10,Brilacidin,FALSE,FALSE,TRUE,Innovation Pharmaceuticals Inc. (Formerly Cellceutix Corp.),2-2,2-2,2-2,2-2,2-2
+11,Cadazolid,TRUE,FALSE,FALSE,Actelion Pharmaceuticals,3-3,3-3,3-3,3-3,3d-3d
+12,Cefepime + AAI1019,FALSE,TRUE,FALSE,Allecra,0-0,0-0,0-0,2-2,3-3
+13,Cefepime + VNRX-5133,TRUE,TRUE,FALSE,VenatoRx Pharmaceuticals,0-0,0-0,0-0,1-1,1-1
+14,Cefepime + Zidebactam,TRUE,TRUE,FALSE,Wockhardt Ltd.,0-0,0-0,1-1,1-1,1-1
+15,Cefiderocol,TRUE,TRUE,FALSE,Shionogi,2-2,2-2,3-3,3-3,3-3
+16,Cefilavacin,FALSE,FALSE,FALSE,R-Pharm/ Theravance Biopharma Inc.,2-2d,2d-2d,2d-2d,3-3,3-3
+17,Ceftaroline + Avibactam,TRUE,TRUE,TRUE,AstraZeneca/Forest Laboratories,2-2,2-2,2-2,2d-2d,2d-2d
+18,Ceftobiprole,FALSE,TRUE,FALSE,Basilea Pharmaceutica,2-2d,2d-2d,2d-2d,3-3,3-3
+19,CG400549,FALSE,FALSE,TRUE,"CrystalGenomics, Inc.",2-2,2-2,2-2,2-2,2-2
+20,CRS3123,TRUE,FALSE,TRUE,"Crestone, Inc.",1-1,1-1,1-1,1-1,1-1
+21,Dalbavancin,FALSE,FALSE,FALSE,Actavis (Formerly Durata Therapeutics),5-5,5-5,5-5,5-5,5-5
+22,Delpazolid,FALSE,FALSE,FALSE,LegoChem Biosciences (S. Korea),1-1,1-1,1-1,1-1,1-1
+23,DS-2969,TRUE,FALSE,TRUE,Daiichi Sankyo,0-0,0-0,0-0,1-1,1d-1d
+24,EDP-788,FALSE,FALSE,FALSE,Enanta Pharmaceuticals,1d-1d,1d-1d,1d-1d,1d-1d,1d-1d
+25,Eravacycline,FALSE,TRUE,FALSE,Tetraphase Pharmaceuticals,3-3,3-3,3-3,3-3,5-5
+26,ETX2514SUL,FALSE,TRUE,FALSE,Entasis Therapeutics,0-0,0-0,0-0,1-1,2-2
+27,Finafloxacin,FALSE,TRUE,FALSE,MerLion  Pharmaceuticals,2-2,2-2,2-2,2-2,2-2
+28,Gepotidacin,TRUE,FALSE,TRUE,GlaxoSmithKline,2-2,2-2,2-2,2-2,2-2
+29,GSK-1322322,FALSE,FALSE,TRUE,GlaxoSmithKline,2d-2d,2d-2d,2d-2d,2d-2d,2d-2d
+30,GSK-3342830,TRUE,TRUE,FALSE,GlaxoSmithKline PLC (Shionogi licensee),0-0,0-0,1-1,1-1,0-0
+31,Iclaprim,FALSE,FALSE,FALSE,Motif Bio plc,0-0,3-3,3-3,3-3,4-4
+32,Imipenem/Cilastatin + Relebactam,TRUE,TRUE,FALSE,Merck & Co.,2-2,3-3,3-3,3-3,3-3
+33,KBP-7072,FALSE,FALSE,FALSE,KBP BioSciences Pharmaceutical Technical Co. Ltd.,0-0,0-0,1-1,1-1,1-1
+34,Lascufloxacin,FALSE,FALSE,FALSE,Kyorin Pharmaceutical Co. Ltd.,0-0,0-0,0-0,3-3,4-4
+35,Lefamulin,FALSE,FALSE,TRUE,Nabriva Therapeutics,2-2,3-3,3-3,3-3,4-4
+36,LFF571,TRUE,FALSE,TRUE,Novartis,2d-2d,2d-2d,2d-2d,2d-2d,2d-2d
+37,DNV3837 ,TRUE,FALSE,FALSE,Deinove (Formerly Morphochem AG),0-0,0-0,1-1,1-1,1-1
+38,Meropenem+Nacubactam,TRUE,TRUE,FALSE,Meiji Seika Pharma Co. Ltd./Fedora Pharmaceuticals Inc. (Roche licensee)12,1-1,1-1,1-1,1-1,1-1
+39,MGB-BP-3,TRUE,FALSE,TRUE,MGB Biopharma Ltd.,0-0,1-1,1-1,1-1,1-1
+40,MRX-I/MRX-4,FALSE,FALSE,FALSE,MicuRx Pharmaceuticals,1-1,2-2,2-2,3-3,3-3
+41,Murepavadin,FALSE,TRUE,TRUE,Polyphor (Roche licensee),2-2,2-2,2-2,2-2,3-3
+42,Nafithromycin,FALSE,FALSE,FALSE,Wockhardt,0-0,1-1,1-1,2-2,2-2
+43,Nemonoxacin,FALSE,FALSE,FALSE,TaiGen Biotechnology,2-2,2-2,2-2,2-2,2-2
+44,Omadacycline,FALSE,TRUE,FALSE,Paratek Pharmaceuticals,2-2,3-3,3-3,3-3,5-5
+45,OPS-2071,TRUE,FALSE,FALSE,Otsuka Pharmaceutical Co. Ltd.,0-0,0-0,0-0,2-2,2-2
+46,Oritavancin,FALSE,FALSE,FALSE,The Medicines Company,5-5,5-5,5-5,5-5,5-5
+47,Plazomicin,TRUE,TRUE,FALSE,Achaogen,3-3,3-3,3-3,4-4,5-5
+48,Radezolid,FALSE,FALSE,FALSE,Melinta Therapeutics,2-2,2-2,2d-2d,2d-2d,2d-2d
+49,Ramoplanin,TRUE,FALSE,TRUE,Nanotherapeutics,2-2,2-2,2-2,2d-2d,2d-2d
+50,Ridinilazole,TRUE,FALSE,TRUE,Summit Therapeutics PLC.,2-2,2-2,2-2,2-2,3-3
+51,Solithera,TRUE,FALSE,FALSE,Melinta Therapeutics (Formerly Cempra Pharmaceuticals),3-3,3-3,4-4,3-3,3-3
+52,SPR206,TRUE,TRUE,FALSE,Spero Therapeutics,0-0,0-0,0-0,0-0,1-1
+53,SPR741,FALSE,FALSE,FALSE,Spero Therapeutics,0-0,0-0,0-0,1-1,1-1
+54,SPR994,FALSE,TRUE,FALSE,Spero Therapeutics,0-0,0-0,0-0,1-1,3-3
+55,Sulopenem,FALSE,TRUE,FALSE,Iterum Therapeutics Ltd.,0-0,0-0,0-0,3-3,3-3
+56,Surotomycin,TRUE,FALSE,FALSE,Cubist Pharmaceuticals,3-3,3-3,3d-3d,3d-3d,3d-3d
+57,Taksta,FALSE,FALSE,FALSE,Melinta Therapeutics (Formerly Cempra Pharmaceuticals),3-3,3-3,3-3,3-3,3-3
+58,TD-1607,FALSE,FALSE,FALSE,Theravance Biopharma Inc.,1-1,1-1,1-1,1d-1d,1d-1d
+59,Tedizolid,FALSE,FALSE,FALSE,Cubist Pharmaceuticals,5-5,5-5,5-5,5-5,5-5
+60,TP-271,FALSE,FALSE,FALSE,Tetraphase Pharmaceuticals Inc.,0-0,0-0,1-1,1-1,1-1
+61,TP-6076,TRUE,TRUE,FALSE,Tetraphase Pharmaceuticals Inc.,0-0,0-0,1-1,1-1,1-1
+62,Vabomere,TRUE,TRUE,TRUE,Rempex Pharmaceuticals/The Medicines Company,3-3,3-3,3-3,4-5,5-5
+63,WCK 771/WCK 2349,FALSE,FALSE,FALSE,Wockhardt,1-1,1-1,1-1,2-2,3-3
+64,Zabofloxacin,FALSE,FALSE,FALSE,Dong Wha Pharmaceutical,2-2,2-2,3-3,3-3,3d-3d
+65,Zerbaxa,FALSE,TRUE,FALSE,Cubist Pharmaceuticals,5-5,5-5,5-5,5-5,5-5
+66,Zoliflodacin,TRUE,FALSE,TRUE,Entasis Therapeutics,2-2,2-2,2-2,2-2,2-2
