@@ -287,6 +287,23 @@ export default class VizView extends Element {
         }
         btn.classList.add(s.observation, s['observation' + data[2]])
         this.FLIP(parseInt(data[0]), data[1], data[2]);
+        this.updateText();
+    }
+    updateText(){
+        // phaseMembers[1] is the current state; [0] is the previous state
+        
+        var totalActive = this.phaseMembers[1][this.phaseMembers[1].length - 1].active.length,
+            totalDiscontinued = this.phaseMembers[1].reduce((acc,cur) => {
+                return acc + cur.discontinued.length;
+            },0),
+            approvedSpan = document.querySelector('#total-approved'),
+            discontinuedSpan = document.querySelector('#total-discontinued');
+        if ( approvedSpan.innerHTML != totalActive) {
+            document.querySelector('#total-approved').fadeInContent(totalActive);
+        }
+        if ( discontinuedSpan.innerHTML != totalDiscontinued ) {
+            document.querySelector('#total-discontinued').fadeInContent(totalDiscontinued);
+        }
     }
     FLIP(data, resolve, observation = 1){ // obnservation defaults to 1 for the initial page load animation
         this.recordFirstPositions(); // first
