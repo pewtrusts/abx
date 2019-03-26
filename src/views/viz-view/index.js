@@ -72,7 +72,6 @@ export default class VizView extends Element {
                 yearButton.classList.add(s.yearButton, `${ i === 0 ? s.yearButtonActive : 'nope'}`);
                 yearButton.type = "button";
                 yearButton.value = year;
-                yearButton.disabled = ( i === 0 );
                 yearButton.textContent = year;
                 controlContainer.appendChild(yearButton);
             });
@@ -180,7 +179,7 @@ export default class VizView extends Element {
             ['resize', this.checkHeight.bind(this)],
             ['year', this.update.bind(this)]
         ]);
-        S.setState('year', [this.model.years[0], null]);
+        S.setState('year', [this.model.years[0], null, 1]);
         this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         this.checkHeight();
         this.initializeYearButtons();
@@ -238,23 +237,33 @@ export default class VizView extends Element {
             console.log(button);
             button.addEventListener('click', function(){
                 var currentYear = S.getState('year')[0];
-                var observations = this.value > currentYear ? [0,1] : [1,0];
-                var toBeDeselected = document.querySelector('.' + s.yearButtonActive);
-                toBeDeselected.disabled = false;
-                toBeDeselected.classList.remove(s.yearButtonActive);
-                this.disabled = true;
-                this.classList.add(s.yearButtonActive);
-                new Promise(resolve => {
-                    S.setState('year', [this.value, resolve, observations[0]]);
-                }).then(() => {
-                    S.setState('year', [this.value, null, observations[1]]);
-                });
+                this.blur();
+                if ( currentYear !== this.value ) { // is not the already selected button
+                    let observations = this.value > currentYear ? [0,1] : [1,0];
+                    let toBeDeselected = document.querySelector('.' + s.yearButtonActive);
+                    toBeDeselected.classList.remove(s.yearButtonActive, s.observation, s.observation0, s.observation1);
+                    this.classList.add(s.yearButtonActive);
+                    new Promise(resolve => {
+                        S.setState('year', [this.value, resolve, observations[0]]);
+                    }).then(() => {
+                        S.setState('year', [this.value, null, observations[1]]);
+                    });
+                } else {
+                    let observation = this.classList.contains(s.observation0) ? 1 : 0;
+                    S.setState('year', [this.value, null, observation]);   
+                }
             });
         });
     }
     update(msg,data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
-        console.log(msg,data);
+        var btn = document.querySelector('button.' + s.yearButtonActive);
         this.FLIP(parseInt(data[0]), data[1], data[2]);
+        if ( data[2] === 0 ){
+            btn.classList.remove(s.observation1);
+        } else {
+            btn.classList.remove(s.observation0);
+        }
+        btn.classList.add(s.observation, s['observation' + data[2]])
     }
     FLIP(data, resolve, observation = 1){ // obnservation defaults to 1 for the initial page load animation
         this.recordFirstPositions(); // first

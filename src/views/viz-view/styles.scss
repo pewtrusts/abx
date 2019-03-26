@@ -203,8 +203,29 @@
 .yearButton {
     font-size: .80em;
     font-weight: 500;
+    position: relative;
     &.yearButtonActive {
         font-weight: 900;
+        &.observation {
+            &::before {
+                content: '';
+                display: block;
+                width: 6px;
+                height: 6px;
+                border-radius: 3px;
+                position: absolute;
+                background-color: $medium_blue;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+            &.observation0::before {
+                left: -10px;
+            }
+            &.observation1::before {
+                right: -10px;
+                left: auto;
+            }
+        }
     }
     &:not(.yearButtonActive):hover, &:not(.yearButtonActive):focus {
         color: $medium_blue;
