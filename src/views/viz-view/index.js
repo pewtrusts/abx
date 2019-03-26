@@ -35,7 +35,6 @@ export default class VizView extends Element {
         });   
             console.log(this.phaseMembers);                                                                    // plus one to acct fo discontinued header
         this.heightNeeded = ( this.model.maxActive + this.model.maxDiscontinued + 1 ) * ( this.minUnitDimension + this.unitPadding ) + this.headerHeight + this.unitPadding;
-
         //container
         var view = super.prerender();
         if (this.prerendered && !this.rerender) {
@@ -181,10 +180,22 @@ export default class VizView extends Element {
             ['resize', this.checkHeight.bind(this)],
             ['year', this.update.bind(this)]
         ]);
-        this.populatePlaceholders(0,1);
+        S.setState('year', [this.model.years[0], null]);
         this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         this.checkHeight();
         this.initializeYearButtons();
+        this.initializePlayButton();
+    }
+    initializePlayButton(){
+        var playButton = document.querySelector('.' + s.playButton);
+        playButton.addEventListener('click', this.playYears.bind(this));
+    }
+    playYears(){
+        var currentYear = S.getState('year');
+        new Promise(resolve => {
+            S.setState('year', [currentYear + 1, resolve]);
+        });
+
     }
     checkHeight() {
 
@@ -226,28 +237,36 @@ export default class VizView extends Element {
         document.querySelectorAll('.' + s.yearButton).forEach(button => {
             console.log(button);
             button.addEventListener('click', function(){
+                var currentYear = S.getState('year')[0];
+                var observations = this.value > currentYear ? [0,1] : [1,0];
                 var toBeDeselected = document.querySelector('.' + s.yearButtonActive);
                 toBeDeselected.disabled = false;
                 toBeDeselected.classList.remove(s.yearButtonActive);
                 this.disabled = true;
                 this.classList.add(s.yearButtonActive);
-                S.setState('year', this.value);
+                new Promise(resolve => {
+                    S.setState('year', [this.value, resolve, observations[0]]);
+                }).then(() => {
+                    S.setState('year', [this.value, null, observations[1]]);
+                });
             });
         });
     }
-    update(msg,data) {
+    update(msg,data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
         console.log(msg,data);
-        this.FLIP(parseInt(data));
+        this.FLIP(parseInt(data[0]), data[1], data[2]);
     }
-    FLIP(data){
+    FLIP(data, resolve, observation = 1){ // obnservation defaults to 1 for the initial page load animation
         this.recordFirstPositions(); // first
         this.clearAttributesAndDetails();
-        this.populatePlaceholders(this.model.years.indexOf(data),1); // last
+
+        // params 1. index of the year (2014 -> 0); 2. index of the observation; 
+        this.populatePlaceholders(this.model.years.indexOf(data), observation); // last  
         this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         console.log(this.firstPositions);
         //setTimeout(() => {
             this.invertPositions();
-            this.playAnimation();
+            this.playAnimation(resolve); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
         //    }, 3000); // invert and play
         // ***** TO DO ****** INVERSION isn't working properly. need to remove classes *and* remove details drawers before repopulating
         // the placeholders. why is there a transition on the invert? are the id's being assign properly?
@@ -279,11 +298,17 @@ export default class VizView extends Element {
             }
         });
     }
-    playAnimation(){
+    playAnimation(resolve){
+        const duration = 500;
         this.nonEmptyDrugs.forEach(drug => {
-            drug.style.transitionDuration = '0.5s';
+            drug.style.transitionDuration = ( duration / 1000 ) + 's';
             drug.style.transform = 'translate(0,0)';
         });
+        if (resolve) {
+            setTimeout(function() {
+                resolve(true);
+            }, duration);
+        }
         /*(console.log(this.phaseMembers);
         const increment = 50;
         var delay;
