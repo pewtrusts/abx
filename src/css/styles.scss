@@ -11,3 +11,29 @@
             flex-wrap: wrap
         }
 }
+
+:global(.abx-legend--item){
+    padding-left: 30px;
+    padding-right: 30px;
+    position: relative;
+    &::before {
+        content: '';
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        left: 0;
+        top: 2px;
+    }
+}
+:global(.abx-legend--item--abx)::before {
+    background-color: $gray;
+}
+:global(.abx-legend--item--urgent)::before {
+    border: 2px solid $dark_blue;
+}
+:global(.abx-legend--item--novel)::before {
+    background-color: $green;
+}
+:global(.abx-legend--item--gram)::before {
+    background-color: $medium_blue;
+}
