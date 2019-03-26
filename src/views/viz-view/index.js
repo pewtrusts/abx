@@ -190,10 +190,32 @@ export default class VizView extends Element {
         playButton.addEventListener('click', this.playYears.bind(this));
     }
     playYears(){
-        var currentYear = S.getState('year');
-        new Promise(resolve => {
-            S.setState('year', [currentYear + 1, resolve]);
-        });
+        var currentYear = S.getState('year')[0],
+            currentObservation = document.querySelector('.' + s.yearButtonActive).classList.contains(s.observation0) ? 0 : 1;
+        function nextPromise(){
+            currentYear++;
+            if ( currentYear <= this.model.years[this.model.years.length - 1] ){
+                new Promise(wrapperResolve => {
+                    new Promise(resolve => {
+                        S.setState('year', [currentYear, resolve, 0]); 
+                    }).then(() => {
+                        S.setState('year', [currentYear, wrapperResolve, 1])
+                    });    
+                }).then(() => {
+                    nextPromise.call(this);
+                });
+            
+            }
+        }
+        if ( currentObservation === 0 ){
+            new Promise(resolve => {
+                S.setState('year', [currentYear, resolve, 1]); 
+            }).then(() => {
+                nextPromise.call(this);
+            });
+        } else {
+            nextPromise.call(this);
+        } 
 
     }
     checkHeight() {
@@ -240,9 +262,7 @@ export default class VizView extends Element {
                 this.blur();
                 if ( currentYear !== this.value ) { // is not the already selected button
                     let observations = this.value > currentYear ? [0,1] : [1,0];
-                    let toBeDeselected = document.querySelector('.' + s.yearButtonActive);
-                    toBeDeselected.classList.remove(s.yearButtonActive, s.observation, s.observation0, s.observation1);
-                    this.classList.add(s.yearButtonActive);
+                    
                     new Promise(resolve => {
                         S.setState('year', [this.value, resolve, observations[0]]);
                     }).then(() => {
@@ -256,14 +276,17 @@ export default class VizView extends Element {
         });
     }
     update(msg,data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
-        var btn = document.querySelector('button.' + s.yearButtonActive);
-        this.FLIP(parseInt(data[0]), data[1], data[2]);
+        let toBeDeselected = document.querySelector('.' + s.yearButtonActive);
+        toBeDeselected.classList.remove(s.yearButtonActive, s.observation, s.observation0, s.observation1);
+        var btn = document.querySelector('button[value="' + data[0] +'"]');
+        btn.classList.add(s.yearButtonActive);
         if ( data[2] === 0 ){
             btn.classList.remove(s.observation1);
         } else {
             btn.classList.remove(s.observation0);
         }
         btn.classList.add(s.observation, s['observation' + data[2]])
+        this.FLIP(parseInt(data[0]), data[1], data[2]);
     }
     FLIP(data, resolve, observation = 1){ // obnservation defaults to 1 for the initial page load animation
         this.recordFirstPositions(); // first
