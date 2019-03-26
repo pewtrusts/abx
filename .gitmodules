@@ -9,7 +9,7 @@
 [submodule "submodules/UTILS"]
 	path = submodules/UTILS
 	url = git@github.com:pewtrusts/UTILS.git
-    branch = v1
+    branch = v2
 [submodule "submodules/ROUTR"]
 	path = submodules/ROUTR
 	url = git@github.com:pewtrusts/ROUTR.git
