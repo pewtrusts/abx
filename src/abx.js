@@ -81,6 +81,7 @@ function getRuntimeData(){
                     index++
                 }
                 model.unnestedData = response.data.map(d => { // turn each string value like "1-1d" into an array , [1,1d]
+                    d.id = 'drug-' + d.id;
                     model.years.forEach(year => {
                         d[year] = [0,1].map(observation => {
                             
