@@ -126,7 +126,6 @@ export default class VizView extends Element {
                                     ${drug.company}`;
                 placeholder.appendChild(drawer);   
             }
-            placeholder.insertAdjacentHTML('afterbegin', drug.id);
             placeholder.id = drug.id;
             placeholder.classList.remove(s.drugEmpty);
             placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`);
@@ -266,7 +265,6 @@ export default class VizView extends Element {
             drug.className =  `${s.drug} ${s.drugEmpty}`;
             drug.id = '';
             drug.removeChild(details);
-            drug.textContent = '';
         });
     }
     invertPositions(){
@@ -282,7 +280,11 @@ export default class VizView extends Element {
         });
     }
     playAnimation(){
-        console.log(this.phaseMembers);
+        this.nonEmptyDrugs.forEach(drug => {
+            drug.style.transitionDuration = '0.5s';
+            drug.style.transform = 'translate(0,0)';
+        });
+        /*(console.log(this.phaseMembers);
         const increment = 50;
         var delay;
         [4,3,2,1,0].forEach((phase, index) => {
@@ -305,7 +307,7 @@ export default class VizView extends Element {
         document.querySelectorAll('.' + s.entering).forEach(drug => {
             drug.style.transitionDuration = '0.5s';
             drug.style.transform = 'translate(0,0)';
-        });
+        });*/
         
 /****  TO DO ******
 
