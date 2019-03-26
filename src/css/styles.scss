@@ -1,21 +1,40 @@
 @import 'variable.scss';
 
 :global(.rich-text #pew-app) {
+
+    h2 {
+        font-size: 22px;
+        font-weight: 900;
+        color: $red;
+    }
     
     :global(.abx-legend) {
         display: flex;
         flex-wrap: wrap;
+        margin: 50px 0;
     }
         :global(.abx-legend--wrapper) {
             display: flex;
             flex-wrap: wrap
         }
+
+    section {
+        border: 2px solid $dark_gray;
+        padding: 50px;
+        &:not(:first-child){
+            border-top-width: 0;
+        }
+        &:last-of-type {
+            margin-bottom: 20px;
+        }
+    }
 }
 
-:global(.abx-legend--item){
-    padding-left: 30px;
-    padding-right: 30px;
+:global(.rich-text .abx-legend--item){
+    padding-left: 25px;
+    padding-right: 15px;
     position: relative;
+    font-size: 0.85em;
     &::before {
         content: '';
         width: 20px;
@@ -25,6 +44,7 @@
         top: 2px;
     }
 }
+
 :global(.abx-legend--item--abx)::before {
     background-color: $gray;
 }
@@ -34,6 +54,31 @@
 :global(.abx-legend--item--novel)::before {
     background-color: $green;
 }
-:global(.abx-legend--item--gram)::before {
+:global(.rich-text .abx-legend--item--gram)::before {
     background-color: $medium_blue;
+    height: 2px;
+    top: 50%;
+}
+
+:global(.rich-text #abx-notes p) {
+    font-size: 13px;
+}
+
+:global(.rich-text footer.download-resources) {
+    width: 100%;
+    background-color: $dark_blue;
+    color: #fff;
+    padding: 20px;
+    p {
+        margin: 0;
+    }
+    :global(.pct-download), :global(.pct-download):active, :global(.pct-download):visited {
+        color: #fff;
+           background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3e%3cg fill='none' fill-rule='evenodd' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath stroke='%23fff' d='M1 .5h8v9H1v-9z'%3e%3c/path%3e%3cpath stroke='%23fff' d='M3 3h4'%3e%3c/path%3e%3cpath stroke='%23fff' d='M3 5h4'%3e%3c/path%3e%3cpath stroke='%23fff' d='M3 7h4'%3e%3c/path%3e%3c/g%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            margin-left: 10px;
+            margin-right: 6px;
+            padding-left: 25px;
+    }
+
 }
