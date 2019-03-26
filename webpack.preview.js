@@ -26,7 +26,7 @@ module.exports = env => {
             new CopyWebpackPlugin([{ // this rewrites the /-/ paths to ./ so that the preview can be hosted
                                      // on github pages, which trips up on subdirectories that start with hyphen or other specials
                 from: './**/*.*',
-                to: './'
+                to: './',
                 context: 'src/-/'
             }, {
                 from: 'assets/**/*.*',

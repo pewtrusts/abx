@@ -228,6 +228,11 @@ export default class VizView extends Element {
         } else {
             document.body.classList.remove(s.squat);
         }
+        if ( document.querySelector('#section-comparison .js-inner-content').offsetHeight > window.innerHeight - 100 ) {
+            document.body.classList.add(s.superSquat);
+        } else {
+            document.body.classList.remove(s.superSquat);
+        }
 
         function adjustCSSVariables() {
             var root = document.documentElement;

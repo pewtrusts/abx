@@ -19,6 +19,13 @@
     .squat & {
     }
 }
+
+.superSquat :global(.rich-text #pew-app .abx-legend){
+    margin: 10px 0 0;
+}
+.superSquat :global(.rich-text #abx-totals) {
+    margin-top: 0;
+}
 .activeContainer {
     .squat & {
       //  height: calc(var(--squat-active-proportion) - var(--unit-dimension) / 2);
@@ -32,6 +39,15 @@
     align-items: center;
     position: relative;
     margin-bottom: calc( var(--unit-dimension) + var(--unit-padding) );
+    .superSquat & {
+        height: auto;
+        margin-bottom: calc( var(--unit-dimension) * 0.7 );
+        &::after {
+            height: calc(var(--unit-dimension) * 0.7);
+            line-height: 135%;
+
+        }
+    }
     &::after {
         display: block;
         position: absolute;
@@ -77,6 +93,9 @@
     position: relative;
     border: 2px solid transparent;
     transition: transform 0s ease-in-out;
+    .superSquat & {
+        height: calc(var(--unit-dimension) * 0.9);
+    }
     &:not(.drugEmpty){
         background-color: $gray;
         border-collapse: $gray;
@@ -160,6 +179,11 @@
     justify-content: center;
     height: var(--unit-dimension);
     border-right: 1px solid #fff;
+    .superSquat & {
+        font-size: 0.65em;
+        height: auto;
+        line-height: 200%;
+    }
     &:last-child {
         border-width: 0;
     }
