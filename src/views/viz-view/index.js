@@ -33,8 +33,8 @@ export default class VizView extends Element {
                 };
             });
         });   
-            console.log(this.phaseMembers);                                                                    // plus one to acct fo discontinued header
-        this.heightNeeded = ( this.model.maxActive + this.model.maxDiscontinued + 1 ) * ( this.minUnitDimension + this.unitPadding ) + this.headerHeight + this.unitPadding;
+            console.log(this.phaseMembers);                                                                    // plus one to acct fo discontinued header                     51 for totals  90 for legend 61 for sticky header 40 for toolbar
+        this.heightNeeded = ( this.model.maxActive + this.model.maxDiscontinued + 1 ) * ( this.minUnitDimension + this.unitPadding ) + this.headerHeight + this.unitPadding + 51 + 90 + 61 + 40;
         //container
         var view = super.prerender();
         if (this.prerendered && !this.rerender) {
@@ -222,7 +222,6 @@ export default class VizView extends Element {
 
         console.log('needed', this.heightNeeded);
         console.log('available', window.innerHeight);
-
         /* add 'squat' class to body for small screens */
         if (window.innerHeight < this.heightNeeded) {
             document.body.classList.add(s.squat);
