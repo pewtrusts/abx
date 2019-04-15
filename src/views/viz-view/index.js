@@ -333,7 +333,6 @@ export default class VizView extends Element {
              this.playAnimation(resolve); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
         //});
 
-        // record status of the drugs so that the next cycle can be compared to the previous and the animations sequenced properly
         
      
     }
@@ -397,8 +396,16 @@ export default class VizView extends Element {
         }
         function animateSingleColumn(resolve){
             console.log('foo', column);
-            var matchingDrugIDs = Object.keys(this.previousStatuses).filter(id => this.previousStatuses[id].column === column);
-            var matchingDOMDrugs = Array.from(this.nonEmptyDrugs).filter(DOMDrug => matchingDrugIDs.includes(DOMDrug.id));
+            var matchingDrugIDs = Object.keys(this.previousStatuses).filter(id => this.previousStatuses[id].column === column),
+                matchingDOMDrugs = Array.from(this.nonEmptyDrugs).filter(DOMDrug => matchingDrugIDs.includes(DOMDrug.id)),
+                previousState = S.getPreviousState('year'), 
+                previousYear = previousState[0],
+                previousObservation = previousState[2],
+                //currentObservation = document.querySelector('.' + s.yearButtonActive).classList.contains(s.observation0) ? 0 : 1;
+                willLeaveColumn = this.model.data.find(d => d.year == previousYear).observations[previousObservation].find(p => p.phase === column) ? this.model.data.find(d => d.year == previousYear).observations[previousObservation].find(p => p.phase === column).values.filter(v => !matchingDrugIDs.includes(v.id)) : [],
+                willStayInColumn = this.model.data.find(d => d.year == previousYear).observations[previousObservation].find(p => p.phase === column) ? this.model.data.find(d => d.year == previousYear).observations[previousObservation].find(p => p.phase === column).values.filter(v => matchingDrugIDs.includes(v.id)) : [];
+                
+            console.log(willLeaveColumn, willStayInColumn);
            
             matchingDOMDrugs.forEach(DOMDrug => {
                 transition(DOMDrug);
