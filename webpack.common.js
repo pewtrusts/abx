@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 //const DynamicImport = require('babel-plugin-syntax-dynamic-import');
 
 module.exports = env => { // module.exports is function now to pass in env variable from cli defined in package.json
@@ -11,12 +10,9 @@ module.exports = env => { // module.exports is function now to pass in env varia
             module: {
                 rules: [{
                         test: /\.js$/,
-                        exclude: [/node_modules/, /\.min\./, /vendor/, /autoComplete\.js/],
+                        exclude: [/node_modules/, /\.min\./, /vendor/],
                         use: [{
                                 loader: 'babel-loader',
-                                /*options: {
-                                    plugins: [DynamicImport]
-                                }*/
                             },
                             {
                                 loader: 'eslint-loader'
@@ -44,26 +40,12 @@ module.exports = env => { // module.exports is function now to pass in env varia
                             ]
                         },
                         {
-                            test: /\.svg$/,
-                            use: [{
-                                    loader: 'svg-url-loader',
-                                }]
-                        },
-                        {
                             test: /partials\/.*\.html$/,
                             use: 'html-loader'
                         }
 
                     ]
                 },
-                plugins: [
-                    new MiniCssExtractPlugin({
-                        // Options similar to the same options in webpackOptions.output
-                        // both options are optional
-                        filename: "css/styles.css?v=[hash:6]",
-                        chunkFilename: "[id].css",
-                    })
-                ],
                 resolve: {
                     alias: {
                         "@App": path.join(__dirname, 'submodules/PCTApp-js/'),

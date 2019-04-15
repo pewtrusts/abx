@@ -24,15 +24,20 @@ module.exports = env => { // module.exports is function now to pass in env varia
                             modules: true,
                             localIdentName: '[path]-[local]', // in dev mode hash not necessary to brak caches but incuding path
                             // should avoid collisions of classes with same names
-                            sourceMap: true
+                            sourceMap: true,
+                            importLoaders: 1
                         }
                     },
                     {
-                        loader: 'postcss-loader',
-                        options: {
-                            sourceMap: true
-                        }
-                    }, {
+                           loader: 'postcss-loader',
+                           options: {
+                               sourceMap: true,
+                               ident: 'postcss',
+                               plugins: (loader) => [
+                                   require('postcss-assets')()
+                               ]
+                           }
+                       }, {
                         loader: 'sass-loader',
                         options: {
                             sourceMap: true
@@ -66,7 +71,6 @@ module.exports = env => { // module.exports is function now to pass in env varia
             }, {
                 from: 'assets/**/*.*',
                 context: 'src',
-                ignore: ['assets/countries/*.*']
             }
             ]),
             new webpack.HotModuleReplacementPlugin(),

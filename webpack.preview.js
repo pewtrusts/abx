@@ -8,11 +8,15 @@ const PrerenderSPAPlugin = require('prerender-spa-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const pretty = require('pretty');
 const HtmlReplaceWebpackPlugin = require('html-replace-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+
+const repoName = 'abx';
 
 module.exports = env => {
     return merge(common(), {
         devtool: 'inline-source-map', // may be too slow an option; set to another if so
         plugins: [
+            new CleanWebpackPlugin(['docs']),
             new HtmlWebpackPlugin({
                 title: 'Analysis Shows Continued Deficiencies in Antiobiotic Development',
                 template: './src/index-dev.html',
@@ -36,7 +40,7 @@ module.exports = env => {
                 from: 'assets/Pew/css/*.*',
                 context: 'src',
                 transform(content, path) {
-                    return content.toString().replace(/url\("\/([^/])/g, 'url("/docs/$1');
+                    return content.toString().replace(/url\("\/([^/])/g, 'url("/' + repoName + '/$1').replace(/\/pew\//g,'/Pew/'); // this modifies the content of the files being copied; here making sure url('/...') is changed
                 }
             }]),
             new PrerenderSPAPlugin({

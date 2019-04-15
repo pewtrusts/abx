@@ -1,0 +1,355 @@
+<html style="--unit-dimension:30px; --header-height:45px; --max-container-height:1121px; --active-max-height:NaNpx; --discontinued-max-height:NaNpx;">
+
+  <head></head>
+
+  <body class="has-hover src-views-viz-view--squat src-views-viz-view--superSquat">
+    <main role="main" id="pew-app" class="pct-section no-js" data-data-hash="-420771074">
+      <script>
+        // rollbar code goes here
+      </script>
+      <!--<script src="https://cdn.polyfill.io/v2/polyfill.js?features=fetch,Promise,WebAnimations,Element.prototype.classList,Array.prototype.find"></script>-->
+
+      <link class="emitted-css" href="/~/media/data-visualizations/interactives/2019/ABX/css/styles.css?v=e1265b" rel="stylesheet">
+
+      <section id="intro">
+        <h2 id="antibiotic-innovation">Antibiotic Innovation</h2>
+        <p>The Pew Charitable Trusts has tracked the pipeline of antibiotics in clinical development since 2014 and has aggregated the
+          updates into an interactive tool that illustrates trends in the pipeline. This longitudinal data visualization underscores the longstanding concerns of scientists, doctors, public health officials, and other stakeholders regarding the dangerously low number of antibiotics in development to address current and future patient needs, particularly for treating the most urgent bacterial threats, such as Gram-negative pathogens.</p>
+        <p>Click the play button to see the evolution of the antibiotic pipeline since 2014, or click on an individual year to see the status of the pipeline at a particular point in time. To see additional information about each drug, hover over any of the [rectangles].</p>
+
+        <div class="js-inner-content">
+        </div>
+      </section>
+      <section id="section-comparison">
+        <div class="js-inner-content">
+          <h2>Antibiotics in Development Since 2014</h2>
+          <div class="abx-legend">
+            <div class="abx-legend--wrapper">
+              <p class="abx-legend--item abx-legend--item--abx">Antibiotic</p>
+              <p class="abx-legend--item abx-legend--item--urgent">Potential to treat CDC urgent pathogen</p>
+            </div>
+            <div class="abx-legend--wrapper">
+              <p class="abx-legend--item abx-legend--item--novel">Novel antibiotics</p>
+              <p class="abx-legend--item abx-legend--item--gram">Potential to treat Gram-negative bacteria</p>
+            </div>
+          </div>
+          <div id="abx-visualization">
+            <div id="viz-view">
+              <div class="src-views-viz-view--controlContainer"><button class="src-views-viz-view--playButton" type="button"></button><button class="src-views-viz-view--yearButton src-views-viz-view--yearButtonActive src-views-viz-view--observation src-views-viz-view--observation1" type="button" value="2014">2014</button><button class="src-views-viz-view--yearButton nope" type="button" value="2015">2015</button><button class="src-views-viz-view--yearButton nope" type="button" value="2016">2016</button><button class="src-views-viz-view--yearButton nope" type="button" value="2017">2017</button><button class="src-views-viz-view--yearButton nope" type="button" value="2018">2018</button></div>
+              <div class="src-views-viz-view--container">
+                <div class="src-views-viz-view--activeContainer">
+                  <div class="src-views-viz-view--column">
+                    <div class="src-views-viz-view--drug nope src-views-viz-view--novel undefined" id="drug-3" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Afabicin</strong><br>
+                        Debiopharm Group (Formerly Affinium Pharmaceuticals)</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--urgent undefined" id="drug-7" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>BAL30072</strong><br>
+                        Basilea Pharmaceutica</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-20" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>CRS3123</strong><br>
+                        Crestone, Inc.</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope undefined" id="drug-22" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Delpazolid</strong><br>
+                        LegoChem Biosciences (S. Korea)</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--urgent undefined" id="drug-38" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Meropenem+Nacubactam</strong><br>
+                        Meiji Seika Pharma Co. Ltd./Fedora Pharmaceuticals Inc. (Roche licensee)12</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope undefined" id="drug-40" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>MRX-I/MRX-4</strong><br>
+                        MicuRx Pharmaceuticals</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope undefined" id="drug-58" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>TD-1607</strong><br>
+                        Theravance Biopharma Inc.</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope undefined" id="drug-63" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>WCK 771/WCK 2349</strong><br>
+                        Wockhardt</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                  </div>
+                  <div class="src-views-viz-view--column">
+                    <div class="src-views-viz-view--drug nope undefined" id="drug-5" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Avarofloxacin</strong><br>
+                        Allergan PLC (Formerly Actavis formerly Furiex)Furiex Pharmaceuticals</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope src-views-viz-view--novel undefined" id="drug-10" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Brilacidin</strong><br>
+                        Innovation Pharmaceuticals Inc. (Formerly Cellceutix Corp.)</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--urgent undefined" id="drug-15" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Cefiderocol</strong><br>
+                        Shionogi</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--gramNegative src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-17" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Ceftaroline + Avibactam</strong><br>
+                        AstraZeneca/Forest Laboratories</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope src-views-viz-view--novel undefined" id="drug-19" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>CG400549</strong><br>
+                        CrystalGenomics, Inc.</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope undefined" id="drug-27" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Finafloxacin</strong><br>
+                        MerLion Pharmaceuticals</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-28" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Gepotidacin</strong><br>
+                        GlaxoSmithKline</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--urgent undefined" id="drug-32" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Imipenem/Cilastatin + Relebactam</strong><br>
+                        Merck &amp; Co.</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope src-views-viz-view--novel undefined" id="drug-35" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Lefamulin</strong><br>
+                        Nabriva Therapeutics</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--gramNegative src-views-viz-view--novel nope undefined" id="drug-41" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Murepavadin</strong><br>
+                        Polyphor (Roche licensee)</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope undefined" id="drug-43" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Nemonoxacin</strong><br>
+                        TaiGen Biotechnology</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope undefined" id="drug-44" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Omadacycline</strong><br>
+                        Paratek Pharmaceuticals</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope undefined" id="drug-48" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Radezolid</strong><br>
+                        Melinta Therapeutics</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-49" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Ramoplanin</strong><br>
+                        Nanotherapeutics</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-50" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Ridinilazole</strong><br>
+                        Summit Therapeutics PLC.</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope undefined" id="drug-64" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Zabofloxacin</strong><br>
+                        Dong Wha Pharmaceutical</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-66" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Zoliflodacin</strong><br>
+                        Entasis Therapeutics</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                  </div>
+                  <div class="src-views-viz-view--column">
+                    <div class="src-views-viz-view--drug nope undefined" id="drug-8" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Baxdela</strong><br>
+                        Melinta Therapeutics</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope src-views-viz-view--urgent undefined" id="drug-11" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Cadazolid</strong><br>
+                        Actelion Pharmaceuticals</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope undefined" id="drug-25" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Eravacycline</strong><br>
+                        Tetraphase Pharmaceuticals</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--urgent undefined" id="drug-47" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Plazomicin</strong><br>
+                        Achaogen</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope src-views-viz-view--urgent undefined" id="drug-51" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Solithera</strong><br>
+                        Melinta Therapeutics (Formerly Cempra Pharmaceuticals)</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope src-views-viz-view--urgent undefined" id="drug-56" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Surotomycin</strong><br>
+                        Cubist Pharmaceuticals</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope undefined" id="drug-57" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Taksta</strong><br>
+                        Melinta Therapeutics (Formerly Cempra Pharmaceuticals)</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--gramNegative src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-62" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Vabomere</strong><br>
+                        Rempex Pharmaceuticals/The Medicines Company</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                  </div>
+                  <div class="src-views-viz-view--column">
+                    <div class="src-views-viz-view--drug src-views-viz-view--gramNegative src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-6" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Avycaz</strong><br>
+                        AstraZeneca/Forest Laboratories</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                  </div>
+                  <div class="src-views-viz-view--column">
+                    <div class="src-views-viz-view--drug nope undefined" id="drug-21" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Dalbavancin</strong><br>
+                        Actavis (Formerly Durata Therapeutics)</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope undefined" id="drug-46" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Oritavancin</strong><br>
+                        The Medicines Company</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope undefined" id="drug-59" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Tedizolid</strong><br>
+                        Cubist Pharmaceuticals</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope undefined" id="drug-65" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Zerbaxa</strong><br>
+                        Cubist Pharmaceuticals</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                  </div>
+                </div>
+                <div class="src-views-viz-view--headerContainer">
+                  <div class="src-views-viz-view--headerDiv"><span class="src-views-viz-view--phaseFull">PHASE 1</span><span class="src-views-viz-view--phaseAbbr">P1</span></div>
+                  <div class="src-views-viz-view--headerDiv"><span class="src-views-viz-view--phaseFull">PHASE 2</span><span class="src-views-viz-view--phaseAbbr">P2</span></div>
+                  <div class="src-views-viz-view--headerDiv"><span class="src-views-viz-view--phaseFull">PHASE 3</span><span class="src-views-viz-view--phaseAbbr">P3</span></div>
+                  <div class="src-views-viz-view--headerDiv"><span class="src-views-viz-view--phaseFull">APPLICATION</span><span class="src-views-viz-view--phaseAbbr">NDA</span></div>
+                  <div class="src-views-viz-view--headerDiv"><span class="src-views-viz-view--phaseFull">APPROVED</span><span class="src-views-viz-view--phaseAbbr">✔</span></div>
+                </div>
+                <div class="src-views-viz-view--discontinuedContainer">
+                  <div class="src-views-viz-view--column">
+                    <div class="src-views-viz-view--drug src-views-viz-view--gramNegative src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-1" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>ACHN-975</strong><br>
+                        Achaogen</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope undefined" id="drug-24" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>EDP-788</strong><br>
+                        Enanta Pharmaceuticals</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                  </div>
+                  <div class="src-views-viz-view--column">
+                    <div class="src-views-viz-view--drug nope undefined" id="drug-16" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Cefilavacin</strong><br>
+                        R-Pharm/ Theravance Biopharma Inc.</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope undefined" id="drug-18" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>Ceftobiprole</strong><br>
+                        Basilea Pharmaceutica</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope src-views-viz-view--novel undefined" id="drug-29" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>GSK-1322322</strong><br>
+                        GlaxoSmithKline</div>
+                    </div>
+                    <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-36" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
+                      <div class="src-views-viz-view--detailDrawer"><strong>LFF571</strong><br>
+                        Novartis</div>
+                    </div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                  </div>
+                  <div class="src-views-viz-view--column">
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                  </div>
+                  <div class="src-views-viz-view--column">
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                  </div>
+                  <div class="src-views-viz-view--column">
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                    <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="abx-totals">
+            <p>Total approved antibiotics since 2014 / <span id="total-approved" class="total-span">4</span></p>
+            <p>Total discontinued antibiotics since 2014 / <span id="total-discontinued" class="total-span">6</span></p>
+          </div>
+        </div>
+      </section>
+      <div id="abx-notes">
+        <p><strong>Notes:</strong> Clinical candidates included in this data visualization are consistent with Pew’s methodology for tracking antibiotics in clinical development. More information about the methods and the full underlying data can be found in the latest analysis of the pipeline. Pew’s updates are conducted semiannually, except for 2014, when they were published quarterly, and 2018, when a timeline adjustment resulted in just one update for the year.</p>
+      </div>
+      <footer class="download-resources">
+        <div>
+          <p><strong>Download resources:</strong>
+            <a class="pct-download" href="">Methodology</a>
+            <a class="pct-download" href="">Report</a>
+          </p>
+        </div>
+      </footer>
+    </main>
+    <div class="clearfix"></div>
+
+    <script class="emitted-bundle" src="/~/media/data-visualizations/interactives/2019/ABX/vendors-js/index.js?v=e1265b"></script>
+
+    <script class="emitted-bundle" src="/~/media/data-visualizations/interactives/2019/ABX/js/index.js?v=e1265b"></script>
+
+    <!-- END EMBED -->

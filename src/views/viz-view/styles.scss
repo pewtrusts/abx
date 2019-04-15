@@ -220,10 +220,10 @@
 }
 .playButton {
     
-    background: url('./play-button.min.svg') no-repeat center;
+    background: inline('play-button.min.svg') no-repeat center;
     background-size: contain;
     &.isPaused {
-        background-image: url('./play-button--pause.min.svg')
+        background-image: inline('play-button--pause.min.svg')
     }
 }
 .yearButton {
