@@ -13,6 +13,9 @@ const headers = [
     ['Application', 'NDA'],
     ['Approved', '&#10004']
 ];
+const duration = 200;
+var  isFirstLoad = true;
+
 
 
 export default class VizView extends Element {
@@ -280,9 +283,15 @@ export default class VizView extends Element {
         });
     }
     update(msg,data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
+        
+        // find btn to be deselected and change its appearance
         let toBeDeselected = document.querySelector('.' + s.yearButtonActive);
         toBeDeselected.classList.remove(s.yearButtonActive, s.observation, s.observation0, s.observation1);
+        
+        // find button that matches new selection and change its appearance
         var btn = document.querySelector('button[value="' + data[0] +'"]');
+        
+        //toggle observation 0 or observation 1
         btn.classList.add(s.yearButtonActive);
         if ( data[2] === 0 ){
             btn.classList.remove(s.observation1);
@@ -290,7 +299,7 @@ export default class VizView extends Element {
             btn.classList.remove(s.observation0);
         }
         btn.classList.add(s.observation, s['observation' + data[2]])
-        this.FLIP(parseInt(data[0]), data[1], data[2]);
+        this.FLIP(parseInt(data[0]), data[1], data[2]); // yearIndex, resolve fn, observation
         this.updateText();
     }
     updateText(){
@@ -310,19 +319,36 @@ export default class VizView extends Element {
         }
     }
     FLIP(data, resolve, observation = 1){ // obnservation defaults to 1 for the initial page load animation
-        this.recordFirstPositions(); // first
-        this.clearAttributesAndDetails();
+        this.recordFirstPositions(); // first positions on page
+        this.clearAttributesAndDetails(); // removes classNames and IDs of nonempty drug
 
         // params 1. index of the year (2014 -> 0); 2. index of the observation; 
         this.populatePlaceholders(this.model.years.indexOf(data), observation); // last  
+
         this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
-        console.log(this.firstPositions);
+        console.log(this.nonEmptyDrugs);
+        this.invertPositions();
+        this.recordStatuses(data, observation);
         //setTimeout(() => {
-            this.invertPositions();
-            this.playAnimation(resolve); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
-        //    }, 3000); // invert and play
-        // ***** TO DO ****** INVERSION isn't working properly. need to remove classes *and* remove details drawers before repopulating
-        // the placeholders. why is there a transition on the invert? are the id's being assign properly?
+             this.playAnimation(resolve); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
+        //});
+
+        // record status of the drugs so that the next cycle can be compared to the previous and the animations sequenced properly
+        
+     
+    }
+    recordStatuses(year, observation){
+        console.log(year,observation, this.model);
+        this.previousStatuses = this.model.data[this.model.years.indexOf(year)].observations[observation].reduce((acc, phase) => { // cur is the phase object
+                phase.values.forEach(drug => {
+                    acc[drug.id] = {
+                        column: drug[year][observation].column,
+                        isDiscontinued: drug[year][observation].isDiscontinued
+                    };
+                })
+            return acc;
+        },{});
+        console.log(this.previousStatuses);
     }
     recordFirstPositions(){
         this.firstPositions = Array.from(document.querySelectorAll('.' + s.drug + ':not(' + s.drugEmpty + ')')).reduce((acc, cur) => {
@@ -352,16 +378,69 @@ export default class VizView extends Element {
         });
     }
     playAnimation(resolve){
-        const duration = 500;
-        this.nonEmptyDrugs.forEach(drug => {
-            drug.style.transitionDuration = ( duration / 1000 ) + 's';
-            drug.style.transform = 'translate(0,0)';
-        });
-        if (resolve) {
-            setTimeout(function() {
-                resolve(true);
-            }, duration);
+        var column = headers.length;
+            
+
+       
+        function resolveTrue(duration){
+            if (resolve) {
+                setTimeout(function() {
+                    resolve(true);
+                }, duration);
+            }
         }
+        function transition(DOMDrug){
+            DOMDrug.style.transitionDuration = duration / 1000 + 's';
+            setTimeout(() => {
+              DOMDrug.style.transform = 'translate(0px,0px)';
+            });      
+        }
+        function animateSingleColumn(resolve){
+            console.log('foo', column);
+            var matchingDrugIDs = Object.keys(this.previousStatuses).filter(id => this.previousStatuses[id].column === column);
+            var matchingDOMDrugs = Array.from(this.nonEmptyDrugs).filter(DOMDrug => matchingDrugIDs.includes(DOMDrug.id));
+           
+            matchingDOMDrugs.forEach(DOMDrug => {
+                transition(DOMDrug);
+            });
+            if ( column > 0 ){
+                setTimeout(() => {
+                    column--;
+                    animateSingleColumn.call(this, resolve);
+                }, duration * 2);
+            } else {
+                setTimeout(function(){
+                    console.log('foo', 'resolve!')
+                   resolve(true);  
+                }, duration);
+            }
+        }
+        if ( isFirstLoad ){ // ie is  the first animation on load FIRST ANIMATION
+
+            console.log('first load!', this.nonEmptyDrugs);
+            this.nonEmptyDrugs.forEach((DOMDrug, i) => {
+                setTimeout(function(){
+                    transition(DOMDrug);
+                }, i * 10);
+            });
+            isFirstLoad = false;
+       //     resolveTrue(duration); */
+        } else { // is not the first animation on load, ie drugs have previous statuses SUBSEQUENT ANIMATIONS
+            let enteringDrugs = Array.from(this.nonEmptyDrugs).filter(DOMDrug => !Object.keys(this.previousStatuses).includes(DOMDrug.id));
+            enteringDrugs.forEach(enteringDrug => {
+                this.previousStatuses[enteringDrug.id] = {
+                    column: 0,
+                    isDiscontinued: false
+                };
+            });
+            console.log(column, animateSingleColumn);
+            new Promise(resolve => {
+                animateSingleColumn.call(this, resolve);
+            }).then(function(){
+                resolveTrue(0);
+            });
+        }
+        
         /*(console.log(this.phaseMembers);
         const increment = 50;
         var delay;
