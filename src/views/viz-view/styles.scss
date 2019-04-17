@@ -140,33 +140,8 @@
         right: 10px;
         font-weight: 900;
     }
-    .detailDrawer {
-        position: absolute;
-        width: calc( 100% + 4px );
-        background-color: inherit;
-        border: inherit;
-        border-color: inherit;
-        border-top-width: 0;
-        top: 2px;
-        left: -2px;
-        opacity: 0;
-        transform-origin: top;
-        transition: opacity .2s ease-in-out, transform .2s ease-in-out;
-        transform: scaleY(0);
-        z-index: 1;
-        padding: 5px;
-        box-shadow: 1px 1px 0 rgba(0,0,0,0.5);
-        font-size: .75em;
-    }
-    &:not(.drugEmpty):hover {
-        z-index: 1;
-        box-shadow: 1px 1px 0 rgba(0,0,0,0.5);
-        transform: scale(1.05);
-        .detailDrawer {
-            opacity: 1;
-            transform: scaleY(1);
-        }
-    }
+    
+    
 }
 
 .headerDiv {

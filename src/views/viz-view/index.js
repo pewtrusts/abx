@@ -2,6 +2,8 @@ import Element from '@UI/element';
 import s from './styles.scss';
 import { stateModule as S } from 'stateful-dead';
 import PS from 'pubsub-setter';
+import tippy from 'tippy.js';
+import './tippy-styles.scss';
 
 const minUnitDimension = 30; // minimum px height/width accepted for touchable element
 const headerHeight = 1.5 * minUnitDimension; // the height of the phase-heading bars relative to minUnitDimension
@@ -123,11 +125,10 @@ export default class VizView extends Element {
         function addIdsAndClasses(placeholder, drug, containerIndex){
             console.log(drug);
             function appendDetails(){
-                var drawer = document.createElement('div');
-                drawer.classList.add(s.detailDrawer);
-                drawer.innerHTML = `<strong>${drug.name}</strong><br />
-                                    ${drug.company} ${drug.id}`;
-                placeholder.appendChild(drawer);   
+                //var drawer = document.createElement('div');
+                //drawer.classList.add(s.detailDrawer);
+                placeholder.setAttribute('data-tippy-content',`<strong>${drug.name}</strong><br />${drug.company}`);
+                //placeholder.appendChild(drawer);   
             }
             placeholder.id = drug.id;
            // placeholder.innerText = drug.id.split('-')[1];
@@ -358,6 +359,10 @@ export default class VizView extends Element {
         this.populatePlaceholders(this.model.years.indexOf(data), observation); // last  
 
         this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
+        tippy(this.nonEmptyDrugs,{
+            arrow: true,
+            distance: 3
+        });
         
         this.invertPositions();
         this.playAnimation(resolve); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
@@ -387,10 +392,9 @@ export default class VizView extends Element {
     }
     clearAttributesAndDetails(){
         this.nonEmptyDrugs.forEach(drug => {
-            var details = drug.querySelector('.' + s.detailDrawer);
             drug.className =  `${s.drug} ${s.drugEmpty}`;
             drug.id = '';
-            drug.removeChild(details);
+            drug.setAttribute('data-tippy-content','');
            // drug.innerText = '';
         });
     }

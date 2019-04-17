@@ -1,0 +1,12 @@
+@import '@Project/css/variable.scss';
+
+:global(.tippy-tooltip){
+    background-color: $dark_blue;
+}
+:global(.tippy-arrow){
+    border-top-color: $dark_blue !important;
+}
+:global(.tippy-content){
+    font-weight: 600;
+    padding-bottom: 3px;
+}
