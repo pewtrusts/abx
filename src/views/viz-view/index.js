@@ -13,7 +13,8 @@ const headers = [
     ['Application', 'NDA'],
     ['Approved', '&#10004']
 ];
-const duration = 1000;
+const duration = 500;
+
 var  isFirstLoad = true;
 
 
@@ -27,11 +28,11 @@ export default class VizView extends Element {
         this.unitPadding = unitPadding;
         this.headers = headers;
         this.phaseMembers = [0,1].map(() => {
-            return headers.map(() => { // will keep track of which drugs are in which column so that animations can be timed and so that 
+            return [0, ...headers].map(d => { // will keep track of which drugs are in which column so that animations can be timed and so that 
                                        // drugs that stay in their column from one step to another can be placed before those entering the
                                        // column
                 return {
-                    active: [],
+                    active: d === 0 ? this.model.unnestedData.map(drug => drug.id) : [],
                     discontinued: []
                 };
             });
@@ -119,18 +120,22 @@ export default class VizView extends Element {
         return view;
     }
     populatePlaceholders(yearIndex, observation) {
-        function addIdsAndClasses(placeholder, drug){
+        function addIdsAndClasses(placeholder, drug, containerIndex){
+            console.log(drug);
             function appendDetails(){
                 var drawer = document.createElement('div');
                 drawer.classList.add(s.detailDrawer);
                 drawer.innerHTML = `<strong>${drug.name}</strong><br />
-                                    ${drug.company}`;
+                                    ${drug.company} ${drug.id}`;
                 placeholder.appendChild(drawer);   
             }
             placeholder.id = drug.id;
-            //placeholder.innerText = drug.id.split('-')[1];
+           // placeholder.innerText = drug.id.split('-')[1];
             placeholder.classList.remove(s.drugEmpty);
             placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`);
+            if ( containerIndex === 1 ){
+                placeholder.classList.add(s.isDiscontinued);
+            }
             appendDetails()
         }
         var activeContainer = document.querySelector('.' + s.activeContainer),
@@ -138,42 +143,56 @@ export default class VizView extends Element {
 
         // copy index 1 of phaseMembers to index 0. JSON parse/stringify to make deep copy
         this.phaseMembers[0] = JSON.parse(JSON.stringify(this.phaseMembers[1]));
-        
+        console.log(this.phaseMembers);
         [activeContainer, discontinuedContainer].forEach((container, k) => {
             this.model.data[yearIndex].observations[observation].forEach((phase, i) => {
                 function getPhaseMembersIndex(id){
-                    return this.phaseMembers[1][i][ ( k === 0 ? 'active' : 'discontinued' ) ].indexOf(id)   
+                    return this.phaseMembers[1][i + 1][ ( k === 0 ? 'active' : 'discontinued' ) ].indexOf(id)   
                 }
                 // filter drugs by whether they're active or discontinued; also sort them based on whether they were already in the column
                 //  they are about to be placed in
                 var filtered = phase.values.filter(d => k === 0 ? !d[this.model.years[yearIndex]][observation].isDiscontinued : d[this.model.years[yearIndex]][observation].isDiscontinued).sort((a, b) => {
                         var existingIndexA = getPhaseMembersIndex.call(this, a.id),
                             existingIndexB = getPhaseMembersIndex.call(this, b.id);
-                        
+                          //  console.log('a ', a.id, 'b ', b.id);
+                        if ( this.phaseMembers[0][0].active.includes(a.id) ) { //  if a was previously in column0 (ie off screen / is entering ), sort last
+                            console.log('a is entering', a.id)
+                            return this.phaseMembers[0][0].active.includes(b.id) ? a.id - b.id : 1;
+                        }
+                        if ( this.phaseMembers[0][0].active.includes(b.id) ) {
+                            return -1;
+                        }
                         if ( existingIndexB < 0 && existingIndexA >= 0 ) { // if drug is entering the column, ie, not already in it
+                         //   console.log('a was in column, b was not');
                             return -1;
                         }
                         if (existingIndexA < 0 && existingIndexB >= 0 ) {
+                         //   console.log('a was not in column, b was');
                             return 1;
                         }
                         if ( getPhaseMembersIndex.call(this, a.id) < getPhaseMembersIndex.call(this, b.id) ) { 
+                         //   console.log('both were in column, a before b');
                             return -1;
                         }
                         if ( getPhaseMembersIndex.call(this, a.id) > getPhaseMembersIndex.call(this, b.id) ) { 
+                         //   console.log('both were in column, b before a');
                             return 1;
                         }
-                        return 0;
+                        console.log('returning 0', a.id, b.id);
+                        return a.id - b.id;
                     }),
                     column = container.querySelectorAll('.' + s.column)[i];
                 
                 
                 // clear the phaseMember array now that its previous contents have been utilized
-                this.phaseMembers[1][i][ ( k === 0 ? 'active' : 'discontinued' ) ].length = 0;
+                this.phaseMembers[1][i + 1][ ( k === 0 ? 'active' : 'discontinued' ) ].length = 0;
                 filtered.forEach((drug, j) => {
                     var placeholder = column.querySelectorAll('.' + s.drug)[j];
-                    addIdsAndClasses(placeholder, drug);
-                    this.phaseMembers[1][i][ ( k === 0 ? 'active' : 'discontinued' ) ].push(drug.id); // place the drug in the proper bucket tracking its column
+                    addIdsAndClasses(placeholder, drug, k);
+                    this.phaseMembers[1][i + 1][ ( k === 0 ? 'active' : 'discontinued' ) ].push(drug.id); // place the drug in the proper bucket tracking its column
                 });
+                this.phaseMembers[1][0].active = this.model.unnestedData.filter(d => d[+this.currentYear][this.currentObservation].column === 0).map(each => each.id);
+                console.log(this.phaseMembers);
             });
         });
         
@@ -184,6 +203,9 @@ export default class VizView extends Element {
             this.recordStatuses(stateBeforeChange[0], stateBeforeChange[2]);
         }
         S.setState('year', data);
+        this.currentYear = data[0];
+        this.currentObservation = data[2];
+
     }
     init() {
         PS.setSubs([
@@ -338,9 +360,7 @@ export default class VizView extends Element {
         this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         
         this.invertPositions();
-        //setTimeout(() => {
-             this.playAnimation(resolve); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
-        //});
+        this.playAnimation(resolve); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
 
         
      
@@ -371,6 +391,7 @@ export default class VizView extends Element {
             drug.className =  `${s.drug} ${s.drugEmpty}`;
             drug.id = '';
             drug.removeChild(details);
+           // drug.innerText = '';
         });
     }
     invertPositions(){
@@ -380,6 +401,9 @@ export default class VizView extends Element {
                 deltaY = this.firstPositions[drug.id] ? this.firstPositions[drug.id].top - lastPosition.top : -1000,
                 deltaX = this.firstPositions[drug.id] ? this.firstPositions[drug.id].left - lastPosition.left : -1000; // drugs that are entering will not have firstPositions
             drug.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+            if ( deltaY !== 0 || deltaX !== 0 ){
+                 drug.classList.add(s.isTranslated);
+            }
             if ( !this.firstPositions[drug.id] ){
                 drug.classList.add(s.entering);
             }
@@ -403,21 +427,26 @@ export default class VizView extends Element {
             }
         }
         
-        function transition(DOMDrug, dur = duration){
-            
-            DOMDrug.style.transitionDuration = dur / 1000 + 's';
+        function transition(DOMDrug){
+           // var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ','').split(',');
+           // var distanceToTravel = Math.sqrt( Math.abs(parseInt(translateXY[0])) ** 2 + Math.abs(parseInt(translateXY[0])) ** 2 );
+           // var factor = distanceToTravel / 1414.21;
+            DOMDrug.style.transitionDuration = duration / 1000 + 's';
             DOMDrug.style.transform = 'translate(0px,0px)';
+            setTimeout(function(){
+                DOMDrug.classList.remove(s.isTranslated);
+            }, duration);
         }
         
         function animateSingleColumn(resolve){
             console.log('  column ' + column);
             var matchingDrugIDs = Object.keys(this.previousStatuses).filter(id => this.previousStatuses[id].column === column),
                 matchingDOMDrugs = Array.from(this.nonEmptyDrugs).filter(DOMDrug => matchingDrugIDs.includes(DOMDrug.id));
-                
             var elementsWillStayButMove = matchingDOMDrugs.filter(el => {
                 var currentDatum = this.model.unnestedData.find(d => d.id === el.id)[currentYear][currentObservation];
-                var translateXY = el.style.transform.match(/translate\((.*?)\)/)[1].replace(' ').split(',');
-                return ( this.previousStatuses[el.id].column === currentDatum.column && this.previousStatuses[el.id].isDiscontinued === currentDatum.isDiscontinued && ( translateXY[0] !== '0px' || translateXY[1] === '0px' ) );
+                var translateXY = el.style.transform.match(/translate\((.*?)\)/)[1].replace(' ','').split(',');
+                el.translateXY = translateXY;
+                return ( this.previousStatuses[el.id].column === currentDatum.column && this.previousStatuses[el.id].isDiscontinued === currentDatum.isDiscontinued && ( translateXY[0] !== '0px' || translateXY[1] !== '0px' ) );
             });
             var elementsWillChangeStatus = matchingDOMDrugs.filter(el => this.previousStatuses[el.id].isDiscontinued !== this.model.unnestedData.find(d => d.id === el.id)[currentYear][currentObservation].isDiscontinued );     
             var elementsWillMoveForward = matchingDOMDrugs.filter(el => this.previousStatuses[el.id].column < this.model.unnestedData.find(d => d.id === el.id)[currentYear][currentObservation].column );
@@ -426,6 +455,11 @@ export default class VizView extends Element {
 
             var subsets = [elementsWillMoveForward, elementsWillMoveBackward, elementsWillChangeStatus, elementsWillStayButMove, elementsWillEnter];
            // console.log(elementsWillStayButMove);
+            var lengthOfAllSubsets = subsets.reduce(function(acc,cur){
+                return acc + cur.length;
+            },0);
+            console.log(lengthOfAllSubsets);
+            
             function handleSubset(index){
                 console.log('    subset ' + index );
                 new Promise(resolve => {
@@ -436,7 +470,7 @@ export default class VizView extends Element {
                         subsets[index].forEach((DOMDrug, i, array) => {
                             //var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ').split(',');
                             //var dur = translateXY[0] === 0 && translateXY[1] === 0 ? 0 : duration;
-                            transition(DOMDrug);
+                            transition(DOMDrug); // passing in the existing translate coords so that timing can be base on distance
                             if ( i === array.length - 1 ){
                                 setTimeout(() => {
                                     resolve(true);
@@ -455,12 +489,12 @@ export default class VizView extends Element {
                             //setTimeout(() => {
                                 column--;
                                 animateSingleColumn.call(this, resolve);
-                           // }, duration * 2);
+                            //}, del);
                         } else {
-                            //setTimeout(function(){
-                                
+                            let delayBetweenObservation = lengthOfAllSubsets === 0 ? duration : 0;
+                            setTimeout(function(){
                                resolve(true);  
-                           // }, duration);
+                            }, delayBetweenObservation);
                         }
                     }
                 });
