@@ -55,9 +55,11 @@
     background-color: $green;
 }
 :global(.rich-text .abx-legend--item--gram)::before {
-    background-color: $medium_blue;
-    height: 2px;
-    top: 50%;
+    color: $medium_blue;
+    content: '(—)';
+    top: 0px;
+    font-weight: bold;
+    width: auto;
 }
 
 :global(.rich-text #abx-notes p) {
