@@ -205,6 +205,9 @@
     &.isPaused {
         background-image: inline('play-button--pause.min.svg')
     }
+    &.replay {
+        background-image: inline('replay-button.min.svg');
+    }
 }
 .yearButton {
     font-size: .80em;

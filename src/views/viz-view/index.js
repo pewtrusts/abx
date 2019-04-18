@@ -15,7 +15,7 @@ const headers = [
     ['Application', 'NDA'],
     ['Approved', '&#10004']
 ];
-const duration = 500;
+const duration = 10;
 
 var  isFirstLoad = true;
 
@@ -70,6 +70,7 @@ export default class VizView extends Element {
             var playButton = document.createElement('button');
             playButton.classList.add(s.playButton);
             playButton.type = "button";
+            playButton.title = 'Play';
             controlContainer.appendChild(playButton);
 
             //years
@@ -226,6 +227,15 @@ export default class VizView extends Element {
     playYears(){
         var currentYear = S.getState('year')[0],
             currentObservation = document.querySelector('.' + s.yearButtonActive).classList.contains(s.observation0) ? 0 : 1;
+        if ( this.model.years.indexOf(currentYear) === this.model.years.length - 1 && currentObservation === 1 ){
+            console.log(this.replayBtn.classList);
+            this.replayBtn.classList.remove(s.replay);
+            isFirstLoad = true;
+            this.previousStatuses = undefined;
+            this.setYearState([this.model.years[0], null, 0]);
+            this.playYears();
+           return;
+        }
         function nextPromise(){
             currentYear++;
             if ( currentYear <= this.model.years[this.model.years.length - 1] ){
@@ -239,6 +249,8 @@ export default class VizView extends Element {
                     nextPromise.call(this);
                 });
             
+            } else {
+                this.showReplayOption.call(this);
             }
         }
         if ( currentObservation === 0 ){
@@ -251,6 +263,11 @@ export default class VizView extends Element {
             nextPromise.call(this);
         } 
 
+    }
+    showReplayOption(){
+        this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
+        this.replayBtn.classList.add(s.replay);
+        this.replayBtn.title = "Replay";
     }
     checkHeight() {
 
@@ -402,8 +419,8 @@ export default class VizView extends Element {
         this.nonEmptyDrugs.forEach(drug => {
             drug.style.transitionDuration = '0s';
             var lastPosition = drug.getBoundingClientRect(),
-                deltaY = this.firstPositions[drug.id] ? this.firstPositions[drug.id].top - lastPosition.top : -1000,
-                deltaX = this.firstPositions[drug.id] ? this.firstPositions[drug.id].left - lastPosition.left : -1000; // drugs that are entering will not have firstPositions
+                deltaY = this.firstPositions[drug.id] ? this.firstPositions[drug.id].top - lastPosition.top : -3000,
+                deltaX = this.firstPositions[drug.id] ? this.firstPositions[drug.id].left - lastPosition.left : -3000; // drugs that are entering will not have firstPositions
             drug.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
             if ( deltaY !== 0 || deltaX !== 0 ){
                  drug.classList.add(s.isTranslated);
