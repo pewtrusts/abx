@@ -244,15 +244,30 @@ export default class VizView extends Element {
         playButton.addEventListener('click', this.playYearsBind);
     }
     pausePlay(){
+        this.enableYearButtons();
+        document.querySelector('.' + s.yearButtonPrevious).classList.remove(s.yearButtonPrevious);
         this.playBtn.blur();
         this.playBtn.removeEventListener('click', this.pausePlayBind);
         S.setState('isPaused', true);
         this.playBtn.classList.add(s.willPause);
     }
+    disableYearButtons(){
+        this.yearButtons = this.yearButtons || document.querySelectorAll('.' + s.yearButton);
+        this.yearButtons.forEach(function(btn){
+            btn.setAttribute('disabled','disabled');
+        });
+    }
+    enableYearButtons(){
+        this.yearButtons = this.yearButtons || document.querySelectorAll('.' + s.yearButton);
+        this.yearButtons.forEach(function(btn){
+            btn.removeAttribute('disabled');
+        });
+    }
     playYears(event){
         S.setState('isPaused', false);
         S.setState('isBackward', false);
         S.setState('isSameYear', false);
+        this.disableYearButtons();
         this.playBtn = this.playBtn || document.querySelector('.' + s.playButton);
         this.playBtn.blur();
         function nextPromise(){
@@ -274,6 +289,7 @@ export default class VizView extends Element {
             
             } else {
                 this.showReplayOption.call(this);
+                this.enableYearButtons();
             }
         }
 
@@ -434,7 +450,9 @@ export default class VizView extends Element {
             toBeDeselectedActive.classList.add(s.yearButtonPrevious);
         } else {
             let toBeDeselectedPrevious = document.querySelector('.' + s.yearButtonPrevious);
-            toBeDeselectedPrevious.classList.remove(s.yearButtonPrevious);
+            if (toBeDeselectedPrevious) {
+                toBeDeselectedPrevious.classList.remove(s.yearButtonPrevious);
+            }
         }
         
         // find button that matches new selection and change its appearance

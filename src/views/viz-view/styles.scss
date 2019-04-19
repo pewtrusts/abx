@@ -288,6 +288,6 @@
         font-weight: 900;
     }
     &:disabled {
-        color: inherit;
+        cursor: not-allowed;
     }
 }
