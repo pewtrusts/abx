@@ -649,7 +649,7 @@
 
 
 
-    <link href="css/styles.css?v=14a7f2" rel="stylesheet">
+    <link href="css/styles.css?v=a60df7" rel="stylesheet">
   </head>
 
   <body class="has-hover src-views-viz-view--squat src-views-viz-view--superSquat">
@@ -1017,7 +1017,7 @@ Data Visualization
                 <h2 id="antibiotic-innovation">Antibiotic Innovation</h2>
                 <p>The Pew Charitable Trusts has tracked the pipeline of antibiotics in clinical development since 2014 and has aggregated the
                   updates into an interactive tool that illustrates trends in the pipeline. This longitudinal data visualization underscores the longstanding concerns of scientists, doctors, public health officials, and other stakeholders regarding the dangerously low number of antibiotics in development to address current and future patient needs, particularly for treating the most urgent bacterial threats, such as Gram-negative pathogens.</p>
-                <p>Click the play button to see the evolution of the antibiotic pipeline since 2014, or click on an individual year to see the status of the pipeline at a particular point in time. To see additional information about each drug, hover over any of the [rectangles].</p>
+                <p>Click the play button to see the evolution of the antibiotic pipeline since 2014, or click on an individual year to see the status of the pipeline at a particular point in time. To see additional information about each drug, hover over any of the rectangles.</p>
 
                 <div class="js-inner-content">
                 </div>
@@ -1072,8 +1072,8 @@ Data Visualization
                             <div class="src-views-viz-view--drug src-views-viz-view--gramNegative src-views-viz-view--novel nope undefined" id="drug-42" data-tippy-content="<strong>Murepavadin</strong><br />Polyphor (Roche licensee)" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
                             <div class="src-views-viz-view--drug nope undefined" id="drug-44" data-tippy-content="<strong>Nemonoxacin</strong><br />TaiGen Biotechnology" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope undefined" id="drug-45" data-tippy-content="<strong>Omadacycline</strong><br />Paratek Pharmaceuticals" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
-                            <div class="src-views-viz-view--drug nope src-views-viz-view--isTranslated undefined" id="drug-49" data-tippy-content="<strong>Radezolid</strong><br />Melinta Therapeutics" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
-                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent src-views-viz-view--isTranslated undefined" id="drug-50" data-tippy-content="<strong>Ramoplanin</strong><br />Nanotherapeutics" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope undefined" id="drug-49" data-tippy-content="<strong>Radezolid</strong><br />Melinta Therapeutics" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-50" data-tippy-content="<strong>Ramoplanin</strong><br />Nanotherapeutics" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
                             <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent src-views-viz-view--isTranslated undefined" id="drug-51" data-tippy-content="<strong>Ridinilazole</strong><br />Summit Therapeutics PLC." tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
                             <div class="src-views-viz-view--drug nope src-views-viz-view--isTranslated undefined" id="drug-65" data-tippy-content="<strong>Zabofloxacin</strong><br />Dong Wha Pharmaceutical" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
                             <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent src-views-viz-view--isTranslated undefined" id="drug-67" data-tippy-content="<strong>Zoliflodacin</strong><br />Entasis Therapeutics" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
@@ -1706,6 +1706,36 @@ RELATED		</span>
     </footer>
     <script src="assets/Pew/js/libraries-generated.js"></script>
     <script src="assets/Pew/js/index-generated.js"></script>
+    <div class="selectionSharer" id="selectionSharerPopover" style="position:absolute;">
+      <div id="selectionSharerPopover-inner">
+        <ul>
+          <li><a class="action tweet" href="" title="Share this selection on Twitter" target="_blank">Tweet</a></li>
+          <li><a class="action facebook" href="" title="Share this selection on Facebook" target="_blank">Facebook</a></li>
+          <li><a class="action email" href="" title="Share this selection by email"><svg width="20" height="20">
+                <path stroke="%23FFF" stroke-width="6" d="m16,25h82v60H16zl37,37q4,3 8,0l37-37M16,85l30-30m22,0 30,30"></path>
+              </svg></a></li>
+        </ul>
+      </div>
+      <div class="selectionSharerPopover-clip"><span class="selectionSharerPopover-arrow"></span></div>
+    </div>
+    <div id="selectionSharerPopunder" class="selectionSharer">
+      <div id="selectionSharerPopunder-inner"> <label>Share this selection</label>
+        <ul>
+          <li><a class="action tweet" href="" title="Share this selection on Twitter" target="_blank">Tweet</a></li>
+          <li><a class="action facebook" href="" title="Share this selection on Facebook" target="_blank">Facebook</a></li>
+          <li><a class="action email" href="" title="Share this selection by email"><svg width="20" height="20">
+                <path stroke="%23FFF" stroke-width="6" d="m16,25h82v60H16zl37,37q4,3 8,0l37-37M16,85l30-30m22,0 30,30"></path>
+              </svg></a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="modal-overlay">
+      <div class="modal-overlay__inset-container"><span class="modal-overlay__close-modal js-close-modal"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M18.98 6.42L13.4 12 19 17.58l-1.4 1.4L12 13.4 6.42 19l-1.4-1.4L10.6 12 5 6.42l1.4-1.4L12 10.6 17.58 5z"></path></svg></span>
+        <div class="modal-overlay__content"></div>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="js/index.js"></script>
     <script type="text/javascript" id="">
       (function(e, g, h, d, a, b, c) {
         e.GoogleAnalyticsObject = a;
@@ -1769,38 +1799,8 @@ RELATED		</span>
       };
       gaParams();
     </script>
-    <div class="selectionSharer" id="selectionSharerPopover" style="position:absolute;">
-      <div id="selectionSharerPopover-inner">
-        <ul>
-          <li><a class="action tweet" href="" title="Share this selection on Twitter" target="_blank">Tweet</a></li>
-          <li><a class="action facebook" href="" title="Share this selection on Facebook" target="_blank">Facebook</a></li>
-          <li><a class="action email" href="" title="Share this selection by email"><svg width="20" height="20">
-                <path stroke="%23FFF" stroke-width="6" d="m16,25h82v60H16zl37,37q4,3 8,0l37-37M16,85l30-30m22,0 30,30"></path>
-              </svg></a></li>
-        </ul>
-      </div>
-      <div class="selectionSharerPopover-clip"><span class="selectionSharerPopover-arrow"></span></div>
-    </div>
-    <div id="selectionSharerPopunder" class="selectionSharer">
-      <div id="selectionSharerPopunder-inner"> <label>Share this selection</label>
-        <ul>
-          <li><a class="action tweet" href="" title="Share this selection on Twitter" target="_blank">Tweet</a></li>
-          <li><a class="action facebook" href="" title="Share this selection on Facebook" target="_blank">Facebook</a></li>
-          <li><a class="action email" href="" title="Share this selection by email"><svg width="20" height="20">
-                <path stroke="%23FFF" stroke-width="6" d="m16,25h82v60H16zl37,37q4,3 8,0l37-37M16,85l30-30m22,0 30,30"></path>
-              </svg></a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="modal-overlay">
-      <div class="modal-overlay__inset-container"><span class="modal-overlay__close-modal js-close-modal"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M18.98 6.42L13.4 12 19 17.58l-1.4 1.4L12 13.4 6.42 19l-1.4-1.4L10.6 12 5 6.42l1.4-1.4L12 10.6 17.58 5z"></path></svg></span>
-        <div class="modal-overlay__content"></div>
-      </div>
-    </div>
-
-    <script type="text/javascript" src="js/index.js"></script>
-    <script src="https://px.ads.linkedin.com/collect/?time=1555705245866&amp;pid=230521&amp;url=http%3A%2F%2Flocalhost%3A8000%2F&amp;fmt=js&amp;s=1" type="text/javascript"></script>
     <script src="https://analytics.twitter.com/i/adsct?p_id=Twitter&amp;p_user_id=0&amp;txn_id=nzc7z&amp;events=%5B%5B%22pageview%22%2Cnull%5D%5D&amp;tw_sale_amount=0&amp;tw_order_quantity=0&amp;tw_iframe_status=0&amp;tpx_cb=twttr.conversion.loadPixels&amp;tw_document_href=http%3A%2F%2Flocalhost%3A8000%2F" type="text/javascript"></script>
+    <script src="https://px.ads.linkedin.com/collect/?time=1555705552469&amp;pid=230521&amp;url=http%3A%2F%2Flocalhost%3A8000%2F&amp;fmt=js&amp;s=1" type="text/javascript"></script>
     <div class="explore-module__modal-container">
       <div class="explore-module__modal-inner">
         <div class="explore-module__close-modal js-close-explore-module">
