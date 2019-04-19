@@ -238,6 +238,23 @@
         left: 50%;
         transform: translate(-50%,-50%);
         transition: background-color 0.2s ease-in-out;
+        z-index: 1;
+    }
+    &:not(:last-child)::after {
+        content: '';
+        display: block;
+        width: 2px;
+        height: 13px;
+        position: absolute;
+        background-color: $gray;
+        bottom: 0;
+        left: 50%;
+        transform: translate(-50%,50%);
+        transition: background-color 0.2s ease-in-out;
+        .isMovingBackward & {
+            z-index: 2;
+        }
+
     }
 
     &.yearButtonActive, &.yearButtonPrevious {
@@ -247,10 +264,16 @@
             &::before {
             }
             &.observation0::before {
-                background-color: $medium_red;   
+                background-color: $medium_red;
+                .isSameYearSelected & {
+                    z-index: 3;
+                }   
             }
-            &.observation1::before {
-               
+            &.observation1::after {
+                background-color: $medium_red;
+                .isSameYearSelected & {
+                    z-index: 2;
+                }
             }
         }
     }

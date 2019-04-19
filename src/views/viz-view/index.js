@@ -15,7 +15,7 @@ const headers = [
     ['Application', 'NDA'],
     ['Approved', '&#10004']
 ];
-const duration = 550;
+const duration = 20;
 
 var  isFirstLoad = true;
 
@@ -212,13 +212,31 @@ export default class VizView extends Element {
     init() {
         PS.setSubs([
             ['resize', this.checkHeight.bind(this)],
-            ['year', this.update.bind(this)]
+            ['year', this.update.bind(this)],
+            ['isBackward', this.toggleIsBackward.bind(this)],
+            ['isSameYear', this.toggleIsSameYear.bind(this)]
         ]);
         this.setYearState([this.model.years[0], null, 0]);
         this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         this.checkHeight();
         this.initializeYearButtons();
         this.initializePlayButton();
+    }
+    toggleIsSameYear(msg,data){
+        var container = this.controlContainer || document.querySelector('.' + s.controlContainer);
+        if ( data ){
+            container.classList.add(s.isSameYearSelected);
+        } else {
+            container.classList.remove(s.isSameYearSelected);
+        }
+    }
+    toggleIsBackward(msg, data){
+        var container = this.controlContainer || document.querySelector('.' + s.controlContainer);
+        if ( data ){
+            container.classList.add(s.isMovingBackward);
+        } else {
+            container.classList.remove(s.isMovingBackward);
+        }
     }
     initializePlayButton(){
         this.playYearsBind = this.playYears.bind(this);
@@ -233,6 +251,8 @@ export default class VizView extends Element {
     }
     playYears(event){
         S.setState('isPaused', false);
+        S.setState('isBackward', false);
+        S.setState('isSameYear', false);
         this.playBtn = this.playBtn || document.querySelector('.' + s.playButton);
         this.playBtn.blur();
         function nextPromise(){
@@ -376,11 +396,19 @@ export default class VizView extends Element {
             var _this = this;
             button.addEventListener('click', function(){
                 S.setState('isPaused', false);
+                _this.removeReplayOption();
                 var currentYear = S.getState('year')[0];
                 this.blur();
                 if ( currentYear !== this.value ) { // is not the already selected button
-                    let observations = this.value > currentYear ? [0,1] : [1,0];
-                    
+                    S.setState('isSameYear', false);
+                    let observations;
+                    if ( this.value > currentYear ) {
+                        observations = [0,1];
+                        S.setState('isBackward', false);
+                    } else {
+                        observations = [1,0];
+                        S.setState('isBackward', true);
+                    }
                     new Promise(resolve => {
                         _this.setYearState([this.value, resolve, observations[0]]);
                     }).then(() => {
@@ -388,6 +416,7 @@ export default class VizView extends Element {
                     });
                 } else {
                     let observation = this.classList.contains(s.observation0) ? 1 : 0;
+                    S.setState('isSameYear', true);
                     _this.setYearState([this.value, null, observation]);   
                 }
             });
@@ -396,10 +425,12 @@ export default class VizView extends Element {
     update(msg,data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
         
         // find btn to be deselected and change its appearance
-        var toBeDeselectedActive = document.querySelector('.' + s.yearButtonActive);
-        toBeDeselectedActive.classList.remove(s.yearButtonActive, s.observation, s.observation0, s.observation1);
-        
-        if ( data[2] === 0 ) { // is first observation
+        var toBeDeselectedActive = document.querySelector('.' + s.yearButtonActive),
+        observationToCheckAgainst = !S.getState('isBackward') ? 0 : 1;
+       
+        toBeDeselectedActive.classList.remove(s.yearButtonActive, s.observation, s.observation0, s.observation1)
+
+        if ( data[2] === observationToCheckAgainst ) { // is first observation
             toBeDeselectedActive.classList.add(s.yearButtonPrevious);
         } else {
             let toBeDeselectedPrevious = document.querySelector('.' + s.yearButtonPrevious);
@@ -436,7 +467,7 @@ export default class VizView extends Element {
             document.querySelector('#total-discontinued').fadeInContent(totalDiscontinued);
         }
     }
-    FLIP(data, resolve, observation = 1){ // obnservation defaults to 1 for the initial page load animation
+    FLIP(data, resolve, observation = 1){ // observation defaults to 1 for the initial page load animation
         this.recordFirstPositions(); // first positions on page
         //this.recordStatuses(data, observation);
         this.clearAttributesAndDetails(); // removes classNames and IDs of nonempty drug
