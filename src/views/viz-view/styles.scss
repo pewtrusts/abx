@@ -225,27 +225,39 @@
     font-size: .80em;
     font-weight: 500;
     position: relative;
-    &.yearButtonActive {
-        font-weight: 900;
+    color: $dark_gray;
+    transition: color 0.2s ease-in-out;
+    &:not(:nth-of-type(2))::before {
+        content: '';
+        display: block;
+        width: 2px;
+        height: 13px;
+        position: absolute;
+        background-color: $gray;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    &.yearButtonActive, &.yearButtonPrevious {
+        color: #333;
+       
         &.observation {
             &::before {
-                content: '';
-                display: block;
-                width: 6px;
-                height: 6px;
-                border-radius: 3px;
-                position: absolute;
-                background-color: $medium_blue;
-                top: 50%;
-                transform: translateY(-50%);
             }
             &.observation0::before {
-                left: -10px;
+                background-color: $medium_red;   
             }
             &.observation1::before {
-                right: -10px;
-                left: auto;
+               
             }
+        }
+    }
+    &.yearButtonActive {
+        &::before {
+
+            transform: translate(-50%,-50%) scale(0.8333);
         }
     }
     &:not(.yearButtonActive):hover, &:not(.yearButtonActive):focus {

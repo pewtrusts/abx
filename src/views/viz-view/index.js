@@ -15,7 +15,7 @@ const headers = [
     ['Application', 'NDA'],
     ['Approved', '&#10004']
 ];
-const duration = 20;
+const duration = 550;
 
 var  isFirstLoad = true;
 
@@ -214,7 +214,7 @@ export default class VizView extends Element {
             ['resize', this.checkHeight.bind(this)],
             ['year', this.update.bind(this)]
         ]);
-        this.setYearState([this.model.years[0], null, 1]);
+        this.setYearState([this.model.years[0], null, 0]);
         this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         this.checkHeight();
         this.initializeYearButtons();
@@ -396,8 +396,15 @@ export default class VizView extends Element {
     update(msg,data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
         
         // find btn to be deselected and change its appearance
-        let toBeDeselected = document.querySelector('.' + s.yearButtonActive);
-        toBeDeselected.classList.remove(s.yearButtonActive, s.observation, s.observation0, s.observation1);
+        var toBeDeselectedActive = document.querySelector('.' + s.yearButtonActive);
+        toBeDeselectedActive.classList.remove(s.yearButtonActive, s.observation, s.observation0, s.observation1);
+        
+        if ( data[2] === 0 ) { // is first observation
+            toBeDeselectedActive.classList.add(s.yearButtonPrevious);
+        } else {
+            let toBeDeselectedPrevious = document.querySelector('.' + s.yearButtonPrevious);
+            toBeDeselectedPrevious.classList.remove(s.yearButtonPrevious);
+        }
         
         // find button that matches new selection and change its appearance
         var btn = document.querySelector('button[value="' + data[0] +'"]');
