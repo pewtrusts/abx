@@ -15,7 +15,7 @@ const headers = [
     ['Application', 'NDA'],
     ['Approved', '&#10004']
 ];
-const duration = 20;
+const duration = 500;
 
 var  isFirstLoad = true;
 
@@ -574,12 +574,14 @@ export default class VizView extends Element {
         function transition(DOMDrug){
            // var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ','').split(',');
            // var distanceToTravel = Math.sqrt( Math.abs(parseInt(translateXY[0])) ** 2 + Math.abs(parseInt(translateXY[0])) ** 2 );
-           // var factor = distanceToTravel / 1414.21;
-            DOMDrug.style.transitionDuration = duration / 1000 + 's';
-            DOMDrug.style.transform = 'translate(0px,0px)';
+            var factor = DOMDrug.style.transform === 'translate(-3000px, -3000px)' ? 2 : 1;
+            DOMDrug.style.transitionDuration = factor * duration / 1000 + 's';
+            window.requestAnimationFrame(function(){
+                DOMDrug.style.transform = 'translate(0px,0px)';
+            });
             setTimeout(function(){
                 DOMDrug.classList.remove(s.isTranslated);
-            }, duration);
+            }, factor * duration);
         }
         
         function animateSingleColumn(resolve){
