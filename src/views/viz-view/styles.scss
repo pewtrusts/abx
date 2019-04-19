@@ -198,15 +198,27 @@
     height: 30px;
     cursor: pointer;
 }
+@keyframes pauseSpinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 .playButton {
     
     background: inline('play-button.min.svg') no-repeat center;
     background-size: contain;
-    &.isPaused {
+    &.pause {
         background-image: inline('play-button--pause.min.svg')
     }
     &.replay {
         background-image: inline('replay-button.min.svg');
+    }
+    &.willPause {
+        animation: pauseSpinner 0.5s infinite linear;
+        cursor: wait;
     }
 }
 .yearButton {

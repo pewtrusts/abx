@@ -15,7 +15,7 @@ const headers = [
     ['Application', 'NDA'],
     ['Approved', '&#10004']
 ];
-const duration = 10;
+const duration = 650;
 
 var  isFirstLoad = true;
 
@@ -199,9 +199,9 @@ export default class VizView extends Element {
         });
         
     }
-    setYearState(data){
+    setYearState(data, isRestart){
         var stateBeforeChange = S.getState('year');
-        if ( stateBeforeChange ){
+        if ( stateBeforeChange && !isRestart ){
             this.recordStatuses(stateBeforeChange[0], stateBeforeChange[2]);
         }
         S.setState('year', data);
@@ -224,19 +224,34 @@ export default class VizView extends Element {
         var playButton = document.querySelector('.' + s.playButton);
         playButton.addEventListener('click', this.playYears.bind(this));
     }
+    pausePlay(){
+        this.playBtn.blur();
+        this.playBtn.removeEventListener('click', this.pausePlay.bind(this));
+        S.setState('isPaused', true);
+        this.playBtn.classList.add(s.willPause);
+    }
     playYears(){
+        this.playBtn = this.playBtn || document.querySelector('.' + s.playButton);
+        this.playBtn.blur();
+        S.setState('isPaused', false);
         var currentYear = S.getState('year')[0],
             currentObservation = document.querySelector('.' + s.yearButtonActive).classList.contains(s.observation0) ? 0 : 1;
+        this.showPauseOption();
         if ( this.model.years.indexOf(currentYear) === this.model.years.length - 1 && currentObservation === 1 ){
-            console.log(this.replayBtn.classList);
-            this.replayBtn.classList.remove(s.replay);
+            this.removeReplayOption();
             isFirstLoad = true;
-            this.previousStatuses = undefined;
-            this.setYearState([this.model.years[0], null, 0]);
-            this.playYears();
+            this.clearAttributesAndDetails();
+            this.setYearState([this.model.years[0], null, 0], true);
+            setTimeout(() => {
+                this.playYears();
+            }, duration * 2);
            return;
         }
         function nextPromise(){
+            if ( S.getState('isPaused') ){
+                this.removePauseOption();
+                return;
+            }
             currentYear++;
             if ( currentYear <= this.model.years[this.model.years.length - 1] ){
                 new Promise(wrapperResolve => {
@@ -254,13 +269,23 @@ export default class VizView extends Element {
             }
         }
         if ( currentObservation === 0 ){
-            new Promise(resolve => {
-                this.setYearState([currentYear, resolve, 1]); 
-            }).then(() => {
-                nextPromise.call(this);
+            new Promise((resolve) => {
+                if ( !S.getState('isPaused') ){
+                    resolve(false);
+                } else {
+                    this.setYearState([currentYear, resolve, 1]); 
+                }
+            }).then(resolution => {
+                if ( !S.getState('isPaused') && resolution === true ){
+                    nextPromise.call(this);
+                } //else {
+                    //this.removePauseOption();
+               // }
             });
         } else {
-            nextPromise.call(this);
+            if ( !S.getState('isPaused') ){
+                nextPromise.call(this);
+            }
         } 
 
     }
@@ -268,6 +293,28 @@ export default class VizView extends Element {
         this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
         this.replayBtn.classList.add(s.replay);
         this.replayBtn.title = "Replay";
+    }
+    showPauseOption(){
+        this.removeReplayOption();
+        this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
+        this.replayBtn.removeEventListener('click', this.playYears.bind(this));
+        this.replayBtn.addEventListener('click', this.pausePlay.bind(this));
+        this.replayBtn.classList.add(s.pause);
+        this.replayBtn.title = "Pause";
+    }
+    removePauseOption(){
+        console.log('removing pause option');
+        this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
+        this.replayBtn.removeEventListener('click', this.pausePlay.bind(this));
+        this.replayBtn.addEventListener('click', this.playYears.bind(this));
+        this.replayBtn.classList.remove(s.pause);
+        this.replayBtn.classList.remove(s.willPause);
+        this.replayBtn.title = "Play";
+    }
+    removeReplayOption(){
+        this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
+        this.replayBtn.classList.remove(s.replay);
+        this.replayBtn.title = "Play";
     }
     checkHeight() {
 
@@ -314,6 +361,7 @@ export default class VizView extends Element {
             
             var _this = this;
             button.addEventListener('click', function(){
+                S.setState('isPaused', false);
                 var currentYear = S.getState('year')[0];
                 this.blur();
                 if ( currentYear !== this.value ) { // is not the already selected button
@@ -412,6 +460,9 @@ export default class VizView extends Element {
             drug.className =  `${s.drug} ${s.drugEmpty}`;
             drug.id = '';
             drug.setAttribute('data-tippy-content','');
+            if ( drug._tippy ){
+                drug._tippy.destroy();
+            }
            // drug.innerText = '';
         });
     }
@@ -442,9 +493,11 @@ export default class VizView extends Element {
        
         function resolveTrue(duration){
             if (resolve) {
+                
                 setTimeout(function() {
                     resolve(true);
                 }, duration);
+                
             }
         }
         
@@ -513,8 +566,12 @@ export default class VizView extends Element {
                             //}, del);
                         } else {
                             let delayBetweenObservation = lengthOfAllSubsets === 0 ? duration : 0;
-                            setTimeout(function(){
-                               resolve(true);  
+                            setTimeout(() => {
+                               if ( !S.getState('isPaused') ){
+                                    resolve(true);  
+                                } else {
+                                    this.removePauseOption();
+                                }
                             }, delayBetweenObservation);
                         }
                     }
@@ -522,20 +579,6 @@ export default class VizView extends Element {
             }
             handleSubset.call(this,0);
           
-            /*matchingDOMDrugs.filter(drug => willStayInColumn.includes(drug.id)).forEach(DOMDrug => {
-                transition(DOMDrug, 0);
-            });*/
-          /*  if ( column > 0 ){
-                setTimeout(() => {
-                    column--;
-                    animateSingleColumn.call(this, resolve);
-                }, duration * 2);
-            } else {
-                setTimeout(function(){
-                    
-                   resolve(true);  
-                }, duration);
-            }*/
         } // end animateSingleColumn
         
         // continue playAnimation, which is called once for each observation (2x for each year)
@@ -564,56 +607,5 @@ export default class VizView extends Element {
                 resolveTrue(0);
             });
         }
-        
-        /*(
-        const increment = 50;
-        var delay;
-        [4,3,2,1,0].forEach((phase, index) => {
-            if ( index === 0 ){
-                delay = 0;
-            }
-            else {
-                delay = this.phaseMembers[0][phase + 1].active.concat(this.phaseMembers[0][phase + 1].discontinued).length * increment + 500 + increment;
-            }
-            setTimeout(() => {
-                this.phaseMembers[0][phase].active.concat(this.phaseMembers[0][phase].discontinued).forEach((each, j) => {
-                    var el = document.querySelector('div#' + each );
-                    setTimeout(() => {
-                        el.style.transitionDuration = '0.5s';
-                        el.style.transform = 'translate(0,0)';
-                    }, increment * j);
-                });
-            }, delay);
-        });
-        document.querySelectorAll('.' + s.entering).forEach(drug => {
-            drug.style.transitionDuration = '0.5s';
-            drug.style.transform = 'translate(0,0)';
-        });*/
-        
-/****  TO DO ******
-
-assign classNames to drugs according to which way they are moving. progressing, regressing, discontinuing, entering, reentering
-probably done up in loop starting an ln 141.
-
-        var animate = new Promise(function(resolve) {
-            ['foo','bar'].forEach((baz,i,array) => {
-                setTimeout(function(){
-                    
-                    if ( i === array.length - 1 ){
-                        resolve(true);
-                    }
-                }, 1000 * i);
-            });
-        });
-        
-        animate.then(() => {
-            
-        });
-        /*  setTimeout(function(){ // transition won't happen w/o the setTimeout trick
-              drug.style.transitionDuration = '0.8s';
-              drug.style.transform = 'translate(0,0)';
-              ***** HERE *** CYCLE THROUGH columns one by one
-              document.querySelectorAll('.src-views-viz-view--column')[0].querySelectorAll('.src-views-viz-view--drug').forEach(drug => {drug.style.transitionDuration = '0.8s';drug.style.transform = 'translate(0,0)';});
-          });*/
     }
 }
