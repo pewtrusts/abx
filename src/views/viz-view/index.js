@@ -15,7 +15,7 @@ const headers = [
     ['Application', 'NDA'],
     ['Approved', '&#10004']
 ];
-const duration = 650;
+const duration = 200;
 
 var  isFirstLoad = true;
 
@@ -221,32 +221,20 @@ export default class VizView extends Element {
         this.initializePlayButton();
     }
     initializePlayButton(){
+        this.playYearsBind = this.playYears.bind(this);
         var playButton = document.querySelector('.' + s.playButton);
-        playButton.addEventListener('click', this.playYears.bind(this));
+        playButton.addEventListener('click', this.playYearsBind);
     }
     pausePlay(){
         this.playBtn.blur();
-        this.playBtn.removeEventListener('click', this.pausePlay.bind(this));
+        this.playBtn.removeEventListener('click', this.pausePlayBind);
         S.setState('isPaused', true);
         this.playBtn.classList.add(s.willPause);
     }
-    playYears(){
+    playYears(event){
+        S.setState('isPaused', false);
         this.playBtn = this.playBtn || document.querySelector('.' + s.playButton);
         this.playBtn.blur();
-        S.setState('isPaused', false);
-        var currentYear = S.getState('year')[0],
-            currentObservation = document.querySelector('.' + s.yearButtonActive).classList.contains(s.observation0) ? 0 : 1;
-        this.showPauseOption();
-        if ( this.model.years.indexOf(currentYear) === this.model.years.length - 1 && currentObservation === 1 ){
-            this.removeReplayOption();
-            isFirstLoad = true;
-            this.clearAttributesAndDetails();
-            this.setYearState([this.model.years[0], null, 0], true);
-            setTimeout(() => {
-                this.playYears();
-            }, duration * 2);
-           return;
-        }
         function nextPromise(){
             if ( S.getState('isPaused') ){
                 this.removePauseOption();
@@ -268,45 +256,71 @@ export default class VizView extends Element {
                 this.showReplayOption.call(this);
             }
         }
-        if ( currentObservation === 0 ){
-            new Promise((resolve) => {
-                if ( !S.getState('isPaused') ){
-                    resolve(false);
-                } else {
-                    this.setYearState([currentYear, resolve, 1]); 
-                }
-            }).then(resolution => {
-                if ( !S.getState('isPaused') && resolution === true ){
-                    nextPromise.call(this);
-                } //else {
-                    //this.removePauseOption();
-               // }
-            });
+
+        if ( event !== 'reciprocal' ){
+            this.showPauseOption();
+        }
+        
+        var currentYear = S.getState('year')[0],
+            currentObservation = document.querySelector('.' + s.yearButtonActive).classList.contains(s.observation0) ? 0 : 1;
+
+        // ifn is on last observation of the last year
+        if ( this.model.years.indexOf(currentYear) === this.model.years.length - 1 && currentObservation === 1 ){
+            this.removeReplayOption();
+            isFirstLoad = true;
+            this.clearAttributesAndDetails();
+            this.setYearState([this.model.years[0], null, 0], true);
+            setTimeout(() => {
+                this.playYears('reciprocal');
+            }, 2000);
         } else {
-            if ( !S.getState('isPaused') ){
-                nextPromise.call(this);
-            }
-        } 
+            if ( currentObservation === 0 ){
+                new Promise((resolve) => {
+                    if ( S.getState('isPaused') ){
+                        resolve(false);
+                    } else {
+                        this.setYearState([currentYear, resolve, 1]); 
+                    }
+                }).then(resolution => {
+                    if ( !S.getState('isPaused') && resolution === true ){
+                        nextPromise.call(this);
+                    } //else {
+                        //this.removePauseOption();
+                   // }
+                });
+            } else {
+                if ( !S.getState('isPaused') ){
+                    nextPromise.call(this);
+                }
+            } 
+        }
+        
 
     }
     showReplayOption(){
         this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
+        this.replayBtn.removeEventListener('click', this.pausePlayBind);
+        this.replayBtn.addEventListener('click', this.playYearsBind);
         this.replayBtn.classList.add(s.replay);
+        this.replayBtn.classList.remove(s.pause);
+        this.replayBtn.classList.remove(s.willPause);
         this.replayBtn.title = "Replay";
     }
     showPauseOption(){
-        this.removeReplayOption();
         this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
-        this.replayBtn.removeEventListener('click', this.playYears.bind(this));
-        this.replayBtn.addEventListener('click', this.pausePlay.bind(this));
+        this.pausePlayBind = this.pausePlay.bind(this);
+        this.removeReplayOption();
+        this.replayBtn.removeEventListener('click', this.playYearsBind);
+        this.replayBtn.addEventListener('click', this.pausePlayBind);
         this.replayBtn.classList.add(s.pause);
+        this.replayBtn.classList.remove(s.replay);
         this.replayBtn.title = "Pause";
     }
     removePauseOption(){
         console.log('removing pause option');
         this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
-        this.replayBtn.removeEventListener('click', this.pausePlay.bind(this));
-        this.replayBtn.addEventListener('click', this.playYears.bind(this));
+        this.replayBtn.removeEventListener('click', this.pausePlayBind);
+        this.replayBtn.addEventListener('click', this.playYearsBind);
         this.replayBtn.classList.remove(s.pause);
         this.replayBtn.classList.remove(s.willPause);
         this.replayBtn.title = "Play";
