@@ -1,7 +1,542 @@
 <!DOCTYPE html>
-<html prefix="og: http://ogp.me/ns#" style="--unit-dimension:30px; --header-height:45px; --max-container-height:1121px; --active-max-height:NaNpx; --discontinued-max-height:NaNpx;">
+<html prefix="og: http://ogp.me/ns#" style="--unit-dimension:30px; --header-height:45px; --max-container-height:1057px; --active-max-height:NaNpx; --discontinued-max-height:NaNpx;">
 
   <head>
+    <style type="text/css">
+      .tippy-iOS {
+        cursor: pointer !important;
+        -webkit-tap-highlight-color: transparent
+      }
+
+      .tippy-popper {
+        transition-timing-function: cubic-bezier(.165, .84, .44, 1);
+        max-width: calc(100% - 8px);
+        pointer-events: none;
+        outline: 0
+      }
+
+      .tippy-popper[x-placement^=top] .tippy-backdrop {
+        border-radius: 40% 40% 0 0
+      }
+
+      .tippy-popper[x-placement^=top] .tippy-roundarrow {
+        bottom: -7px;
+        bottom: -6.5px;
+        -webkit-transform-origin: 50% 0;
+        transform-origin: 50% 0;
+        margin: 0 3px
+      }
+
+      .tippy-popper[x-placement^=top] .tippy-roundarrow svg {
+        position: absolute;
+        left: 0;
+        -webkit-transform: rotate(180deg);
+        transform: rotate(180deg)
+      }
+
+      .tippy-popper[x-placement^=top] .tippy-arrow {
+        border-top: 8px solid #333;
+        border-right: 8px solid transparent;
+        border-left: 8px solid transparent;
+        bottom: -7px;
+        margin: 0 3px;
+        -webkit-transform-origin: 50% 0;
+        transform-origin: 50% 0
+      }
+
+      .tippy-popper[x-placement^=top] .tippy-backdrop {
+        -webkit-transform-origin: 0 25%;
+        transform-origin: 0 25%
+      }
+
+      .tippy-popper[x-placement^=top] .tippy-backdrop[data-state=visible] {
+        -webkit-transform: scale(1) translate(-50%, -55%);
+        transform: scale(1) translate(-50%, -55%)
+      }
+
+      .tippy-popper[x-placement^=top] .tippy-backdrop[data-state=hidden] {
+        -webkit-transform: scale(.2) translate(-50%, -45%);
+        transform: scale(.2) translate(-50%, -45%);
+        opacity: 0
+      }
+
+      .tippy-popper[x-placement^=top] [data-animation=shift-toward][data-state=visible] {
+        -webkit-transform: translateY(-10px);
+        transform: translateY(-10px)
+      }
+
+      .tippy-popper[x-placement^=top] [data-animation=shift-toward][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: translateY(-20px);
+        transform: translateY(-20px)
+      }
+
+      .tippy-popper[x-placement^=top] [data-animation=perspective] {
+        -webkit-transform-origin: bottom;
+        transform-origin: bottom
+      }
+
+      .tippy-popper[x-placement^=top] [data-animation=perspective][data-state=visible] {
+        -webkit-transform: perspective(700px) translateY(-10px) rotateX(0);
+        transform: perspective(700px) translateY(-10px) rotateX(0)
+      }
+
+      .tippy-popper[x-placement^=top] [data-animation=perspective][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: perspective(700px) translateY(0) rotateX(60deg);
+        transform: perspective(700px) translateY(0) rotateX(60deg)
+      }
+
+      .tippy-popper[x-placement^=top] [data-animation=fade][data-state=visible] {
+        -webkit-transform: translateY(-10px);
+        transform: translateY(-10px)
+      }
+
+      .tippy-popper[x-placement^=top] [data-animation=fade][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: translateY(-10px);
+        transform: translateY(-10px)
+      }
+
+      .tippy-popper[x-placement^=top] [data-animation=shift-away][data-state=visible] {
+        -webkit-transform: translateY(-10px);
+        transform: translateY(-10px)
+      }
+
+      .tippy-popper[x-placement^=top] [data-animation=shift-away][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: translateY(0);
+        transform: translateY(0)
+      }
+
+      .tippy-popper[x-placement^=top] [data-animation=scale] {
+        -webkit-transform-origin: bottom;
+        transform-origin: bottom
+      }
+
+      .tippy-popper[x-placement^=top] [data-animation=scale][data-state=visible] {
+        -webkit-transform: translateY(-10px) scale(1);
+        transform: translateY(-10px) scale(1)
+      }
+
+      .tippy-popper[x-placement^=top] [data-animation=scale][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: translateY(-10px) scale(.5);
+        transform: translateY(-10px) scale(.5)
+      }
+
+      .tippy-popper[x-placement^=bottom] .tippy-backdrop {
+        border-radius: 0 0 30% 30%
+      }
+
+      .tippy-popper[x-placement^=bottom] .tippy-roundarrow {
+        top: -7px;
+        -webkit-transform-origin: 50% 100%;
+        transform-origin: 50% 100%;
+        margin: 0 3px
+      }
+
+      .tippy-popper[x-placement^=bottom] .tippy-roundarrow svg {
+        position: absolute;
+        left: 0;
+        -webkit-transform: rotate(0);
+        transform: rotate(0)
+      }
+
+      .tippy-popper[x-placement^=bottom] .tippy-arrow {
+        border-bottom: 8px solid #333;
+        border-right: 8px solid transparent;
+        border-left: 8px solid transparent;
+        top: -7px;
+        margin: 0 3px;
+        -webkit-transform-origin: 50% 100%;
+        transform-origin: 50% 100%
+      }
+
+      .tippy-popper[x-placement^=bottom] .tippy-backdrop {
+        -webkit-transform-origin: 0 -50%;
+        transform-origin: 0 -50%
+      }
+
+      .tippy-popper[x-placement^=bottom] .tippy-backdrop[data-state=visible] {
+        -webkit-transform: scale(1) translate(-50%, -45%);
+        transform: scale(1) translate(-50%, -45%)
+      }
+
+      .tippy-popper[x-placement^=bottom] .tippy-backdrop[data-state=hidden] {
+        -webkit-transform: scale(.2) translate(-50%);
+        transform: scale(.2) translate(-50%);
+        opacity: 0
+      }
+
+      .tippy-popper[x-placement^=bottom] [data-animation=shift-toward][data-state=visible] {
+        -webkit-transform: translateY(10px);
+        transform: translateY(10px)
+      }
+
+      .tippy-popper[x-placement^=bottom] [data-animation=shift-toward][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: translateY(20px);
+        transform: translateY(20px)
+      }
+
+      .tippy-popper[x-placement^=bottom] [data-animation=perspective] {
+        -webkit-transform-origin: top;
+        transform-origin: top
+      }
+
+      .tippy-popper[x-placement^=bottom] [data-animation=perspective][data-state=visible] {
+        -webkit-transform: perspective(700px) translateY(10px) rotateX(0);
+        transform: perspective(700px) translateY(10px) rotateX(0)
+      }
+
+      .tippy-popper[x-placement^=bottom] [data-animation=perspective][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: perspective(700px) translateY(0) rotateX(-60deg);
+        transform: perspective(700px) translateY(0) rotateX(-60deg)
+      }
+
+      .tippy-popper[x-placement^=bottom] [data-animation=fade][data-state=visible] {
+        -webkit-transform: translateY(10px);
+        transform: translateY(10px)
+      }
+
+      .tippy-popper[x-placement^=bottom] [data-animation=fade][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: translateY(10px);
+        transform: translateY(10px)
+      }
+
+      .tippy-popper[x-placement^=bottom] [data-animation=shift-away][data-state=visible] {
+        -webkit-transform: translateY(10px);
+        transform: translateY(10px)
+      }
+
+      .tippy-popper[x-placement^=bottom] [data-animation=shift-away][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: translateY(0);
+        transform: translateY(0)
+      }
+
+      .tippy-popper[x-placement^=bottom] [data-animation=scale] {
+        -webkit-transform-origin: top;
+        transform-origin: top
+      }
+
+      .tippy-popper[x-placement^=bottom] [data-animation=scale][data-state=visible] {
+        -webkit-transform: translateY(10px) scale(1);
+        transform: translateY(10px) scale(1)
+      }
+
+      .tippy-popper[x-placement^=bottom] [data-animation=scale][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: translateY(10px) scale(.5);
+        transform: translateY(10px) scale(.5)
+      }
+
+      .tippy-popper[x-placement^=left] .tippy-backdrop {
+        border-radius: 50% 0 0 50%
+      }
+
+      .tippy-popper[x-placement^=left] .tippy-roundarrow {
+        right: -12px;
+        -webkit-transform-origin: 33.33333333% 50%;
+        transform-origin: 33.33333333% 50%;
+        margin: 3px 0
+      }
+
+      .tippy-popper[x-placement^=left] .tippy-roundarrow svg {
+        position: absolute;
+        left: 0;
+        -webkit-transform: rotate(90deg);
+        transform: rotate(90deg)
+      }
+
+      .tippy-popper[x-placement^=left] .tippy-arrow {
+        border-left: 8px solid #333;
+        border-top: 8px solid transparent;
+        border-bottom: 8px solid transparent;
+        right: -7px;
+        margin: 3px 0;
+        -webkit-transform-origin: 0 50%;
+        transform-origin: 0 50%
+      }
+
+      .tippy-popper[x-placement^=left] .tippy-backdrop {
+        -webkit-transform-origin: 50% 0;
+        transform-origin: 50% 0
+      }
+
+      .tippy-popper[x-placement^=left] .tippy-backdrop[data-state=visible] {
+        -webkit-transform: scale(1) translate(-50%, -50%);
+        transform: scale(1) translate(-50%, -50%)
+      }
+
+      .tippy-popper[x-placement^=left] .tippy-backdrop[data-state=hidden] {
+        -webkit-transform: scale(.2) translate(-75%, -50%);
+        transform: scale(.2) translate(-75%, -50%);
+        opacity: 0
+      }
+
+      .tippy-popper[x-placement^=left] [data-animation=shift-toward][data-state=visible] {
+        -webkit-transform: translateX(-10px);
+        transform: translateX(-10px)
+      }
+
+      .tippy-popper[x-placement^=left] [data-animation=shift-toward][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: translateX(-20px);
+        transform: translateX(-20px)
+      }
+
+      .tippy-popper[x-placement^=left] [data-animation=perspective] {
+        -webkit-transform-origin: right;
+        transform-origin: right
+      }
+
+      .tippy-popper[x-placement^=left] [data-animation=perspective][data-state=visible] {
+        -webkit-transform: perspective(700px) translateX(-10px) rotateY(0);
+        transform: perspective(700px) translateX(-10px) rotateY(0)
+      }
+
+      .tippy-popper[x-placement^=left] [data-animation=perspective][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: perspective(700px) translateX(0) rotateY(-60deg);
+        transform: perspective(700px) translateX(0) rotateY(-60deg)
+      }
+
+      .tippy-popper[x-placement^=left] [data-animation=fade][data-state=visible] {
+        -webkit-transform: translateX(-10px);
+        transform: translateX(-10px)
+      }
+
+      .tippy-popper[x-placement^=left] [data-animation=fade][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: translateX(-10px);
+        transform: translateX(-10px)
+      }
+
+      .tippy-popper[x-placement^=left] [data-animation=shift-away][data-state=visible] {
+        -webkit-transform: translateX(-10px);
+        transform: translateX(-10px)
+      }
+
+      .tippy-popper[x-placement^=left] [data-animation=shift-away][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: translateX(0);
+        transform: translateX(0)
+      }
+
+      .tippy-popper[x-placement^=left] [data-animation=scale] {
+        -webkit-transform-origin: right;
+        transform-origin: right
+      }
+
+      .tippy-popper[x-placement^=left] [data-animation=scale][data-state=visible] {
+        -webkit-transform: translateX(-10px) scale(1);
+        transform: translateX(-10px) scale(1)
+      }
+
+      .tippy-popper[x-placement^=left] [data-animation=scale][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: translateX(-10px) scale(.5);
+        transform: translateX(-10px) scale(.5)
+      }
+
+      .tippy-popper[x-placement^=right] .tippy-backdrop {
+        border-radius: 0 50% 50% 0
+      }
+
+      .tippy-popper[x-placement^=right] .tippy-roundarrow {
+        left: -12px;
+        -webkit-transform-origin: 66.66666666% 50%;
+        transform-origin: 66.66666666% 50%;
+        margin: 3px 0
+      }
+
+      .tippy-popper[x-placement^=right] .tippy-roundarrow svg {
+        position: absolute;
+        left: 0;
+        -webkit-transform: rotate(-90deg);
+        transform: rotate(-90deg)
+      }
+
+      .tippy-popper[x-placement^=right] .tippy-arrow {
+        border-right: 8px solid #333;
+        border-top: 8px solid transparent;
+        border-bottom: 8px solid transparent;
+        left: -7px;
+        margin: 3px 0;
+        -webkit-transform-origin: 100% 50%;
+        transform-origin: 100% 50%
+      }
+
+      .tippy-popper[x-placement^=right] .tippy-backdrop {
+        -webkit-transform-origin: -50% 0;
+        transform-origin: -50% 0
+      }
+
+      .tippy-popper[x-placement^=right] .tippy-backdrop[data-state=visible] {
+        -webkit-transform: scale(1) translate(-50%, -50%);
+        transform: scale(1) translate(-50%, -50%)
+      }
+
+      .tippy-popper[x-placement^=right] .tippy-backdrop[data-state=hidden] {
+        -webkit-transform: scale(.2) translate(-25%, -50%);
+        transform: scale(.2) translate(-25%, -50%);
+        opacity: 0
+      }
+
+      .tippy-popper[x-placement^=right] [data-animation=shift-toward][data-state=visible] {
+        -webkit-transform: translateX(10px);
+        transform: translateX(10px)
+      }
+
+      .tippy-popper[x-placement^=right] [data-animation=shift-toward][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: translateX(20px);
+        transform: translateX(20px)
+      }
+
+      .tippy-popper[x-placement^=right] [data-animation=perspective] {
+        -webkit-transform-origin: left;
+        transform-origin: left
+      }
+
+      .tippy-popper[x-placement^=right] [data-animation=perspective][data-state=visible] {
+        -webkit-transform: perspective(700px) translateX(10px) rotateY(0);
+        transform: perspective(700px) translateX(10px) rotateY(0)
+      }
+
+      .tippy-popper[x-placement^=right] [data-animation=perspective][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: perspective(700px) translateX(0) rotateY(60deg);
+        transform: perspective(700px) translateX(0) rotateY(60deg)
+      }
+
+      .tippy-popper[x-placement^=right] [data-animation=fade][data-state=visible] {
+        -webkit-transform: translateX(10px);
+        transform: translateX(10px)
+      }
+
+      .tippy-popper[x-placement^=right] [data-animation=fade][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: translateX(10px);
+        transform: translateX(10px)
+      }
+
+      .tippy-popper[x-placement^=right] [data-animation=shift-away][data-state=visible] {
+        -webkit-transform: translateX(10px);
+        transform: translateX(10px)
+      }
+
+      .tippy-popper[x-placement^=right] [data-animation=shift-away][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: translateX(0);
+        transform: translateX(0)
+      }
+
+      .tippy-popper[x-placement^=right] [data-animation=scale] {
+        -webkit-transform-origin: left;
+        transform-origin: left
+      }
+
+      .tippy-popper[x-placement^=right] [data-animation=scale][data-state=visible] {
+        -webkit-transform: translateX(10px) scale(1);
+        transform: translateX(10px) scale(1)
+      }
+
+      .tippy-popper[x-placement^=right] [data-animation=scale][data-state=hidden] {
+        opacity: 0;
+        -webkit-transform: translateX(10px) scale(.5);
+        transform: translateX(10px) scale(.5)
+      }
+
+      .tippy-tooltip {
+        position: relative;
+        color: #fff;
+        border-radius: .25rem;
+        font-size: .875rem;
+        padding: .3125rem .5625rem;
+        line-height: 1.4;
+        text-align: center;
+        background-color: #333
+      }
+
+      .tippy-tooltip[data-size=small] {
+        padding: .1875rem .375rem;
+        font-size: .75rem
+      }
+
+      .tippy-tooltip[data-size=large] {
+        padding: .375rem .75rem;
+        font-size: 1rem
+      }
+
+      .tippy-tooltip[data-animatefill] {
+        overflow: hidden;
+        background-color: transparent
+      }
+
+      .tippy-tooltip[data-interactive],
+      .tippy-tooltip[data-interactive] path {
+        pointer-events: auto
+      }
+
+      .tippy-tooltip[data-inertia][data-state=visible] {
+        transition-timing-function: cubic-bezier(.54, 1.5, .38, 1.11)
+      }
+
+      .tippy-tooltip[data-inertia][data-state=hidden] {
+        transition-timing-function: ease
+      }
+
+      .tippy-arrow,
+      .tippy-roundarrow {
+        position: absolute;
+        width: 0;
+        height: 0
+      }
+
+      .tippy-roundarrow {
+        width: 18px;
+        height: 7px;
+        fill: #333;
+        pointer-events: none
+      }
+
+      .tippy-backdrop {
+        position: absolute;
+        background-color: #333;
+        border-radius: 50%;
+        width: calc(110% + 2rem);
+        left: 50%;
+        top: 50%;
+        z-index: -1;
+        transition: all cubic-bezier(.46, .1, .52, .98);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden
+      }
+
+      .tippy-backdrop:after {
+        content: "";
+        float: left;
+        padding-top: 100%
+      }
+
+      .tippy-backdrop+.tippy-content {
+        transition-property: opacity;
+        will-change: opacity
+      }
+
+      .tippy-backdrop+.tippy-content[data-state=visible] {
+        opacity: 1
+      }
+
+      .tippy-backdrop+.tippy-content[data-state=hidden] {
+        opacity: 0
+      }
+    </style>
     <title>ABX Development | The Pew Charitable Trusts</title>
 
     <meta charset="UTF-8">
@@ -114,7 +649,7 @@
 
 
 
-    <link href="css/styles.css?v=719e9c" rel="stylesheet">
+    <link href="css/styles.css?v=14a7f2" rel="stylesheet">
   </head>
 
   <body class="has-hover src-views-viz-view--squat src-views-viz-view--superSquat">
@@ -475,8 +1010,8 @@ Data Visualization
 
 
 
-            <main role="main" id="pew-app" class="pct-section no-js" data-data-hash="-420771074">
-              <!--<script crossorigin="anonymous" src="https://cdn.polyfill.io/v2/polyfill.js?features=fetch,Promise,WebAnimations,Element.prototype.classList,Array.prototyp.find"></script>-->
+            <main role="main" id="pew-app" class="pct-section no-js" data-data-hash="-207213147">
+              <script crossorigin="anonymous" src="https://polyfill.io/v3/polyfill.min.js?features=Promise%2CNodeList.prototype.forEach%2CArray.prototype.filter%2CArray.prototype.fill%2CElement.prototype.classList"></script>
 
               <section id="intro">
                 <h2 id="antibiotic-innovation">Antibiotic Innovation</h2>
@@ -502,44 +1037,18 @@ Data Visualization
                   </div>
                   <div id="abx-visualization">
                     <div id="viz-view">
-                      <div class="src-views-viz-view--controlContainer"><button class="src-views-viz-view--playButton" type="button"></button><button class="src-views-viz-view--yearButton src-views-viz-view--yearButtonActive src-views-viz-view--observation src-views-viz-view--observation1" type="button" value="2014">2014</button><button class="src-views-viz-view--yearButton nope" type="button" value="2015">2015</button><button class="src-views-viz-view--yearButton nope" type="button" value="2016">2016</button><button class="src-views-viz-view--yearButton nope" type="button" value="2017">2017</button><button class="src-views-viz-view--yearButton nope" type="button" value="2018">2018</button></div>
+                      <div class="src-views-viz-view--controlContainer"><button class="src-views-viz-view--playButton" type="button" title="Play"></button><button class="src-views-viz-view--yearButton src-views-viz-view--yearButtonPrevious src-views-viz-view--yearButtonActive src-views-viz-view--observation src-views-viz-view--observation0" type="button" value="2014">2014</button><button class="src-views-viz-view--yearButton nope" type="button" value="2015">2015</button><button class="src-views-viz-view--yearButton nope" type="button" value="2016">2016</button><button class="src-views-viz-view--yearButton nope" type="button" value="2017">2017</button><button class="src-views-viz-view--yearButton nope" type="button" value="2018">2018</button></div>
                       <div class="src-views-viz-view--container">
                         <div class="src-views-viz-view--activeContainer">
                           <div class="src-views-viz-view--column">
-                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel undefined" id="drug-3" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Afabicin</strong><br>
-                                Debiopharm Group (Formerly Affinium Pharmaceuticals) drug-3</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--urgent undefined" id="drug-7" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>BAL30072</strong><br>
-                                Basilea Pharmaceutica drug-7</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-20" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>CRS3123</strong><br>
-                                Crestone, Inc. drug-20</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope undefined" id="drug-22" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Delpazolid</strong><br>
-                                LegoChem Biosciences (S. Korea) drug-22</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--urgent undefined" id="drug-38" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Meropenem+Nacubactam</strong><br>
-                                Meiji Seika Pharma Co. Ltd./Fedora Pharmaceuticals Inc. (Roche licensee)12 drug-38</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope undefined" id="drug-40" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>MRX-I/MRX-4</strong><br>
-                                MicuRx Pharmaceuticals drug-40</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope undefined" id="drug-58" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>TD-1607</strong><br>
-                                Theravance Biopharma Inc. drug-58</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope undefined" id="drug-63" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>WCK 771/WCK 2349</strong><br>
-                                Wockhardt drug-63</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel undefined" id="drug-3" data-tippy-content="<strong>Afabicin</strong><br />Debiopharm Group (Formerly Affinium Pharmaceuticals)" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--urgent undefined" id="drug-7" data-tippy-content="<strong>BAL30072</strong><br />Basilea Pharmaceutica" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-20" data-tippy-content="<strong>CRS3123</strong><br />Crestone, Inc." tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope undefined" id="drug-22" data-tippy-content="<strong>Delpazolid</strong><br />LegoChem Biosciences (S. Korea)" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--urgent undefined" id="drug-39" data-tippy-content="<strong>Meropenem+Nacubactam</strong><br />Meiji Seika Pharma Co. Ltd./Fedora Pharmaceuticals Inc. (Roche licensee)12" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope undefined" id="drug-41" data-tippy-content="<strong>MRX-I/MRX-4</strong><br />MicuRx Pharmaceuticals" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope undefined" id="drug-59" data-tippy-content="<strong>TD-1607</strong><br />Theravance Biopharma Inc." tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope undefined" id="drug-64" data-tippy-content="<strong>WCK 771/WCK 2349</strong><br />Wockhardt" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
@@ -551,112 +1060,33 @@ Data Visualization
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                           </div>
                           <div class="src-views-viz-view--column">
-                            <div class="src-views-viz-view--drug nope undefined" id="drug-5" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Avarofloxacin</strong><br>
-                                Allergan PLC (Formerly Actavis formerly Furiex)Furiex Pharmaceuticals drug-5</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel undefined" id="drug-10" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Brilacidin</strong><br>
-                                Innovation Pharmaceuticals Inc. (Formerly Cellceutix Corp.) drug-10</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--urgent undefined" id="drug-15" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Cefiderocol</strong><br>
-                                Shionogi drug-15</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-17" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Ceftaroline + Avibactam</strong><br>
-                                AstraZeneca/Forest Laboratories drug-17</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel undefined" id="drug-19" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>CG400549</strong><br>
-                                CrystalGenomics, Inc. drug-19</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope undefined" id="drug-27" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Finafloxacin</strong><br>
-                                MerLion Pharmaceuticals drug-27</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-28" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Gepotidacin</strong><br>
-                                GlaxoSmithKline drug-28</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--urgent undefined" id="drug-32" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Imipenem/Cilastatin + Relebactam</strong><br>
-                                Merck &amp; Co. drug-32</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel undefined" id="drug-35" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Lefamulin</strong><br>
-                                Nabriva Therapeutics drug-35</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative src-views-viz-view--novel nope undefined" id="drug-41" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Murepavadin</strong><br>
-                                Polyphor (Roche licensee) drug-41</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope undefined" id="drug-43" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Nemonoxacin</strong><br>
-                                TaiGen Biotechnology drug-43</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope undefined" id="drug-44" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Omadacycline</strong><br>
-                                Paratek Pharmaceuticals drug-44</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope undefined" id="drug-48" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Radezolid</strong><br>
-                                Melinta Therapeutics drug-48</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-49" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Ramoplanin</strong><br>
-                                Nanotherapeutics drug-49</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-50" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Ridinilazole</strong><br>
-                                Summit Therapeutics PLC. drug-50</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope undefined" id="drug-64" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Zabofloxacin</strong><br>
-                                Dong Wha Pharmaceutical drug-64</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-66" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Zoliflodacin</strong><br>
-                                Entasis Therapeutics drug-66</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                            <div class="src-views-viz-view--drug nope undefined" id="drug-5" data-tippy-content="<strong>Avarofloxacin</strong><br />Allergan PLC (Formerly Actavis formerly Furiex)Furiex Pharmaceuticals" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel undefined" id="drug-10" data-tippy-content="<strong>Brilacidin</strong><br />Innovation Pharmaceuticals Inc. (Formerly Cellceutix Corp.)" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--urgent undefined" id="drug-15" data-tippy-content="<strong>Cefiderocol</strong><br />Shionogi" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-17" data-tippy-content="<strong>Ceftaroline + Avibactam</strong><br />AstraZeneca/Forest Laboratories" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel undefined" id="drug-19" data-tippy-content="<strong>CG400549</strong><br />CrystalGenomics, Inc." tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope undefined" id="drug-28" data-tippy-content="<strong>Finafloxacin</strong><br />MerLion  Pharmaceuticals" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-29" data-tippy-content="<strong>Gepotidacin</strong><br />GlaxoSmithKline" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--urgent undefined" id="drug-33" data-tippy-content="<strong>Imipenem/Cilastatin + Relebactam</strong><br />Merck &amp; Co." tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel undefined" id="drug-36" data-tippy-content="<strong>Lefamulin</strong><br />Nabriva Therapeutics" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative src-views-viz-view--novel nope undefined" id="drug-42" data-tippy-content="<strong>Murepavadin</strong><br />Polyphor (Roche licensee)" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope undefined" id="drug-44" data-tippy-content="<strong>Nemonoxacin</strong><br />TaiGen Biotechnology" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope undefined" id="drug-45" data-tippy-content="<strong>Omadacycline</strong><br />Paratek Pharmaceuticals" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--isTranslated undefined" id="drug-49" data-tippy-content="<strong>Radezolid</strong><br />Melinta Therapeutics" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent src-views-viz-view--isTranslated undefined" id="drug-50" data-tippy-content="<strong>Ramoplanin</strong><br />Nanotherapeutics" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent src-views-viz-view--isTranslated undefined" id="drug-51" data-tippy-content="<strong>Ridinilazole</strong><br />Summit Therapeutics PLC." tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--isTranslated undefined" id="drug-65" data-tippy-content="<strong>Zabofloxacin</strong><br />Dong Wha Pharmaceutical" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent src-views-viz-view--isTranslated undefined" id="drug-67" data-tippy-content="<strong>Zoliflodacin</strong><br />Entasis Therapeutics" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
                           </div>
                           <div class="src-views-viz-view--column">
-                            <div class="src-views-viz-view--drug nope undefined" id="drug-8" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Baxdela</strong><br>
-                                Melinta Therapeutics drug-8</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope src-views-viz-view--urgent undefined" id="drug-11" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Cadazolid</strong><br>
-                                Actelion Pharmaceuticals drug-11</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope undefined" id="drug-25" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Eravacycline</strong><br>
-                                Tetraphase Pharmaceuticals drug-25</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--urgent undefined" id="drug-47" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Plazomicin</strong><br>
-                                Achaogen drug-47</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope src-views-viz-view--urgent undefined" id="drug-51" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Solithera</strong><br>
-                                Melinta Therapeutics (Formerly Cempra Pharmaceuticals) drug-51</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope src-views-viz-view--urgent undefined" id="drug-56" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Surotomycin</strong><br>
-                                Cubist Pharmaceuticals drug-56</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope undefined" id="drug-57" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Taksta</strong><br>
-                                Melinta Therapeutics (Formerly Cempra Pharmaceuticals) drug-57</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-62" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Vabomere</strong><br>
-                                Rempex Pharmaceuticals/The Medicines Company drug-62</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--isTranslated undefined" id="drug-8" data-tippy-content="<strong>Baxdela</strong><br />Melinta Therapeutics" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--urgent src-views-viz-view--isTranslated undefined" id="drug-11" data-tippy-content="<strong>Cadazolid</strong><br />Actelion Pharmaceuticals" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--isTranslated undefined" id="drug-25" data-tippy-content="<strong>Eravacycline</strong><br />Tetraphase Pharmaceuticals" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--urgent src-views-viz-view--isTranslated undefined" id="drug-48" data-tippy-content="<strong>Plazomicin</strong><br />Achaogen" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--urgent src-views-viz-view--isTranslated undefined" id="drug-52" data-tippy-content="<strong>Solithera</strong><br />Melinta Therapeutics (Formerly Cempra Pharmaceuticals)" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--urgent src-views-viz-view--isTranslated undefined" id="drug-57" data-tippy-content="<strong>Surotomycin</strong><br />Cubist Pharmaceuticals" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--isTranslated undefined" id="drug-58" data-tippy-content="<strong>Taksta</strong><br />Melinta Therapeutics (Formerly Cempra Pharmaceuticals)" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative src-views-viz-view--novel src-views-viz-view--urgent src-views-viz-view--isTranslated undefined" id="drug-63" data-tippy-content="<strong>Vabomere</strong><br />Rempex Pharmaceuticals/The Medicines Company" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
@@ -668,12 +1098,7 @@ Data Visualization
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                           </div>
                           <div class="src-views-viz-view--column">
-                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-6" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Avycaz</strong><br>
-                                AstraZeneca/Forest Laboratories drug-6</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative src-views-viz-view--novel src-views-viz-view--urgent src-views-viz-view--isTranslated undefined" id="drug-6" data-tippy-content="<strong>Avycaz</strong><br />AstraZeneca/Forest Laboratories" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
@@ -692,24 +1117,10 @@ Data Visualization
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                           </div>
                           <div class="src-views-viz-view--column">
-                            <div class="src-views-viz-view--drug nope undefined" id="drug-21" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Dalbavancin</strong><br>
-                                Actavis (Formerly Durata Therapeutics) drug-21</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope undefined" id="drug-46" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Oritavancin</strong><br>
-                                The Medicines Company drug-46</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope undefined" id="drug-59" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Tedizolid</strong><br>
-                                Cubist Pharmaceuticals drug-59</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope undefined" id="drug-65" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Zerbaxa</strong><br>
-                                Cubist Pharmaceuticals drug-65</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--isTranslated undefined" id="drug-21" data-tippy-content="<strong>Dalbavancin</strong><br />Actavis (Formerly Durata Therapeutics)" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--isTranslated undefined" id="drug-47" data-tippy-content="<strong>Oritavancin</strong><br />The Medicines Company" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--isTranslated undefined" id="drug-60" data-tippy-content="<strong>Tedizolid</strong><br />Cubist Pharmaceuticals" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope src-views-viz-view--isTranslated undefined" id="drug-66" data-tippy-content="<strong>Zerbaxa</strong><br />Cubist Pharmaceuticals" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
@@ -734,41 +1145,23 @@ Data Visualization
                         </div>
                         <div class="src-views-viz-view--discontinuedContainer">
                           <div class="src-views-viz-view--column">
-                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-1" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>ACHN-975</strong><br>
-                                Achaogen drug-1</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope undefined" id="drug-24" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>EDP-788</strong><br>
-                                Enanta Pharmaceuticals drug-24</div>
-                            </div>
+                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative src-views-viz-view--novel src-views-viz-view--urgent undefined src-views-viz-view--isTranslated" id="drug-1" data-tippy-content="<strong>ACHN-975</strong><br />Achaogen" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope undefined src-views-viz-view--isTranslated" id="drug-24" data-tippy-content="<strong>EDP-788</strong><br />Enanta Pharmaceuticals" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                           </div>
                           <div class="src-views-viz-view--column">
-                            <div class="src-views-viz-view--drug nope undefined" id="drug-16" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Cefilavacin</strong><br>
-                                R-Pharm/ Theravance Biopharma Inc. drug-16</div>
-                            </div>
-                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope undefined" id="drug-18" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>Ceftobiprole</strong><br>
-                                Basilea Pharmaceutica drug-18</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel undefined" id="drug-29" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>GSK-1322322</strong><br>
-                                GlaxoSmithKline drug-29</div>
-                            </div>
-                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent undefined" id="drug-36" style="transition-duration: 0.5s; transform: translate(0px, 0px);">
-                              <div class="src-views-viz-view--detailDrawer"><strong>LFF571</strong><br>
-                                Novartis drug-36</div>
-                            </div>
+                            <div class="src-views-viz-view--drug nope undefined src-views-viz-view--isTranslated" id="drug-16" data-tippy-content="<strong>Cefilavacin</strong><br />R-Pharm/ Theravance Biopharma Inc." tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel undefined src-views-viz-view--isTranslated" id="drug-30" data-tippy-content="<strong>GSK-1322322</strong><br />GlaxoSmithKline" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug nope src-views-viz-view--novel src-views-viz-view--urgent undefined src-views-viz-view--isTranslated" id="drug-37" data-tippy-content="<strong>LFF571</strong><br />Novartis" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
+                            <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                           </div>
                           <div class="src-views-viz-view--column">
-                            <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
+                            <div class="src-views-viz-view--drug src-views-viz-view--gramNegative nope undefined src-views-viz-view--isTranslated" id="drug-18" data-tippy-content="<strong>Ceftobiprole</strong><br />Basilea Pharmaceutica" tabindex="0" style="transition-duration: 1s; transform: translate(0px, 0px);"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
                             <div class="src-views-viz-view--drug src-views-viz-view--drugEmpty"></div>
@@ -796,8 +1189,8 @@ Data Visualization
                     </div>
                   </div>
                   <div id="abx-totals">
-                    <p>Total approved antibiotics since 2014 / <span id="total-approved" class="total-span">4</span></p>
-                    <p>Total discontinued antibiotics since 2014 / <span id="total-discontinued" class="total-span">6</span></p>
+                    <p>Total approved antibiotics since 2014: <span id="total-approved" class="total-span">4</span></p>
+                    <p>Total discontinued antibiotics since 2014: <span id="total-discontinued" class="total-span">6</span></p>
                   </div>
                 </div>
               </section>
@@ -1312,6 +1705,7 @@ RELATED		</span>
       </div>
     </footer>
     <script src="assets/Pew/js/libraries-generated.js"></script>
+    <script src="assets/Pew/js/index-generated.js"></script>
     <script type="text/javascript" id="">
       (function(e, g, h, d, a, b, c) {
         e.GoogleAnalyticsObject = a;
@@ -1375,7 +1769,6 @@ RELATED		</span>
       };
       gaParams();
     </script>
-    <script src="assets/Pew/js/index-generated.js"></script>
     <div class="selectionSharer" id="selectionSharerPopover" style="position:absolute;">
       <div id="selectionSharerPopover-inner">
         <ul>
@@ -1406,7 +1799,7 @@ RELATED		</span>
     </div>
 
     <script type="text/javascript" src="js/index.js"></script>
-    <script src="https://px.ads.linkedin.com/collect/?time=1555525652976&amp;pid=230521&amp;url=http%3A%2F%2Flocalhost%3A8000%2F&amp;fmt=js&amp;s=1" type="text/javascript"></script>
+    <script src="https://px.ads.linkedin.com/collect/?time=1555705245866&amp;pid=230521&amp;url=http%3A%2F%2Flocalhost%3A8000%2F&amp;fmt=js&amp;s=1" type="text/javascript"></script>
     <script src="https://analytics.twitter.com/i/adsct?p_id=Twitter&amp;p_user_id=0&amp;txn_id=nzc7z&amp;events=%5B%5B%22pageview%22%2Cnull%5D%5D&amp;tw_sale_amount=0&amp;tw_order_quantity=0&amp;tw_iframe_status=0&amp;tpx_cb=twttr.conversion.loadPixels&amp;tw_document_href=http%3A%2F%2Flocalhost%3A8000%2F" type="text/javascript"></script>
     <div class="explore-module__modal-container">
       <div class="explore-module__modal-inner">
