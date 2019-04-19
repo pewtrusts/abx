@@ -15,7 +15,7 @@ const headers = [
     ['Application', 'NDA'],
     ['Approved', '&#10004']
 ];
-const duration = 200;
+const duration = 20;
 
 var  isFirstLoad = true;
 
@@ -272,7 +272,7 @@ export default class VizView extends Element {
             this.setYearState([this.model.years[0], null, 0], true);
             setTimeout(() => {
                 this.playYears('reciprocal');
-            }, 2000);
+            }, duration * 2);
         } else {
             if ( currentObservation === 0 ){
                 new Promise((resolve) => {
@@ -328,7 +328,7 @@ export default class VizView extends Element {
     removeReplayOption(){
         this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
         this.replayBtn.classList.remove(s.replay);
-        this.replayBtn.title = "Play";
+        //this.replayBtn.title = "Play";
     }
     checkHeight() {
 

@@ -11,9 +11,9 @@
 }
 :global(#viz-view) {
     display: flex;
-    justify-content: flex-end;
-}
-.container {
+    justify-content: flex-end; 
+}  
+.container { 
         width: calc(100% - 65px);
     min-width: 320px;
     .squat & {
@@ -45,7 +45,7 @@
         &::after {
             height: calc(var(--unit-dimension) * 0.7);
             line-height: 135%;
-
+ 
         }
     }
     &::after {
@@ -194,8 +194,8 @@
     background-color: transparent;
     padding: 0;
     margin: 0;
-    width: 35px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
     cursor: pointer;
 }
 @keyframes pauseSpinner {
