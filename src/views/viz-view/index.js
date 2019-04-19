@@ -531,6 +531,7 @@ export default class VizView extends Element {
             drug.id = '';
             drug.setAttribute('data-tippy-content','');
             if ( drug._tippy ){
+                drug.removeAttribute('tabindex');
                 drug._tippy.destroy();
             }
            // drug.innerText = '';
