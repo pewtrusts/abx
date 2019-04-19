@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config webpack.build.js --env production",
     "start": "webpack-dev-server --open --config webpack.dev.js --env development",
+    "broadcast": "webpack-dev-server --open --config webpack.dev.js --env development --host 0.0.0.0 --port 8080",
     "preview": "webpack --config webpack.preview.js --env preview"
   },
   "keywords": [],
