@@ -143,6 +143,22 @@
         font-size: 0.85em;
         
     }
+    &.isMoving {
+        z-index: 1;
+        &::before {
+            opacity: 1 !important;
+        }
+    }
+    &:not(.drugEmpty)::before {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      transition: opacity 0.3s ease-in-out;
+    }
     
     
 }
@@ -159,6 +175,7 @@
     justify-content: center;
     height: var(--unit-dimension);
     border-right: 1px solid #fff;
+    position: relative;
     .superSquat & {
         font-size: 0.65em;
         height: auto;
@@ -166,6 +183,20 @@
     }
     &:last-child {
         border-width: 0;
+    }
+    span {
+        //display: block;
+        transition: background-color 0.2s ease-in-out;
+        width: 100%;
+        height: 45px;
+        position: absolute;
+        line-height: 45px;
+        background-color: $medium_red;
+    }
+    &.isAnimating {
+        span {
+            background-color: $red;
+        }
     }
 }
 
@@ -177,7 +208,7 @@
 .phaseAbbr {
     display: none;
      @media screen and (max-width: 450px) {
-        display: inline;
+        display: block;
     }
 }
 

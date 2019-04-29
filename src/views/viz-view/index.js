@@ -15,7 +15,7 @@ const headers = [
     ['Application', 'NDA'],
     ['Approved', '&#10004']
 ];
-const duration = 500;
+const duration = 1500;
 
 var  isFirstLoad = true;
 
@@ -572,21 +572,47 @@ export default class VizView extends Element {
             }
         }
         
-        function transition(DOMDrug, dur = duration){
+        function transition(DOMDrug, dur = duration, index = null){
            // var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ','').split(',');
            // var distanceToTravel = Math.sqrt( Math.abs(parseInt(translateXY[0])) ** 2 + Math.abs(parseInt(translateXY[0])) ** 2 );
-           console.log(dur);
+           
+            var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ','').split(',').map(d => parseInt(d));
+            DOMDrug.classList.add(s.isMoving);
+            console.log(translateXY);
+            if ( index === 0 || index === 1 || index === 2 ){
+                DOMDrug._tippy.show(0);
+            }
             DOMDrug.style.transitionDuration = dur / 1000 + 's';
-            window.requestAnimationFrame(function(){
-                DOMDrug.style.transform = 'translate(0px,0px)';
+            setTimeout(() => {
+                console.log(DOMDrug._tippy.popper.style);
+                var match = DOMDrug._tippy.popper.style.transform.match(/translate3d\((.*?)\)/);
+                var popperCurrentTranslate3d = match ? match[1].replace(' ','').split(',').map(d => parseInt(d)) : [0,0,0];
+                console.log(popperCurrentTranslate3d);
+                if ( index === 0 || index === 1 || index === 2 ){
+                    DOMDrug._tippy.popper.style.transitionDuration = dur / 1000 + 's';
+                    DOMDrug._tippy.popper.style.transitionTimingFunction = 'ease-in-out';
+                }
+                window.requestAnimationFrame(function(){
+                   if ( index === 0 || index === 1 || index === 2 ){
+                    DOMDrug._tippy.popper.style.transform = `translate3d(${parseInt(popperCurrentTranslate3d[0]) - parseInt(translateXY[0])}px, ${parseInt(popperCurrentTranslate3d[1]) - parseInt(translateXY[1])}px, 0px)`;
+                   }
+                    DOMDrug.style.transform = 'translate(0px,0px)';
+                });
+                setTimeout(function(){
+                    DOMDrug.classList.remove(s.isMoving);
+                    DOMDrug._tippy.popper.style.transitionDuration = '0s';
+                    DOMDrug._tippy.hide();
+                }, dur);
             });
-            setTimeout(function(){
-                DOMDrug.classList.remove(s.isTranslated);
-            }, dur);
         }
-        
+        function toggleHighlight(){
+            if ( column > 0 ){
+                document.querySelectorAll('.' + s.headerDiv)[column - 1].classList.toggle(s.isAnimating);
+            }
+        }
         function animateSingleColumn(resolve){
             console.log('  column ' + column);
+            toggleHighlight();
             var matchingDrugIDs = Object.keys(this.previousStatuses).filter(id => this.previousStatuses[id].column === column),
                 matchingDOMDrugs = Array.from(this.nonEmptyDrugs).filter(DOMDrug => matchingDrugIDs.includes(DOMDrug.id));
             var elementsWillStayButMove = matchingDOMDrugs.filter(el => {
@@ -617,11 +643,11 @@ export default class VizView extends Element {
                         subsets[index].forEach((DOMDrug, i, array) => {
                             //var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ').split(',');
                             //var dur = translateXY[0] === 0 && translateXY[1] === 0 ? 0 : duration;
-                            var dur = index === 3 ? duration / 4 : index === 4 ? duration * 2 : duration; // speeds up transition for drugs that will stay but move; slows it down for  drugs that will enter
-                            var delay = index === 3 ? dur * .5 * i : index === 4 ? dur * .1 * i : dur * i;
+                            var dur = index === 3 ? duration / 12 : index === 4 ? duration / 2 : duration; // speeds up transition for drugs that will stay but move; slows it down for  drugs that will enter
+                            var delay = index === 3 ? dur * .5 * i : index === 4 ? dur * .1 * i : dur * ( i + 1 );
                             setTimeout(() => {
                                 console.log(dur);
-                                transition(DOMDrug, dur); // passing in the existing translate coords so that timing can be base on distance
+                                transition(DOMDrug, dur, index); // passing in the existing translate coords so that timing can be base on distance
                             }, delay);
                             if ( i === array.length - 1 ){
                                 let resolveDelay = index === 4 ? dur * 2 : dur * (i + 1);
@@ -639,10 +665,13 @@ export default class VizView extends Element {
                     } else {
                         //return; // if not, stop
                         if ( column > 0 ){
-                            //setTimeout(() => {
+                            let del = lengthOfAllSubsets === 0 ? 100 : duration;
+                            setTimeout(() => {
+                                console.log(lengthOfAllSubsets);
+                                toggleHighlight();
                                 column--;
                                 animateSingleColumn.call(this, resolve);
-                            //}, del);
+                            }, del);
                         } else {
                             let delayBetweenObservation = lengthOfAllSubsets === 0 ? 0 : duration;
                             setTimeout(() => {
