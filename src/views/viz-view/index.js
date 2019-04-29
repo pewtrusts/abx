@@ -124,7 +124,7 @@ export default class VizView extends Element {
     }
     populatePlaceholders(yearIndex, observation) {
         function addIdsAndClasses(placeholder, drug, containerIndex){
-            console.log(drug);
+//console.log(drug);
             function appendDetails(){
                 //var drawer = document.createElement('div');
                 //drawer.classList.add(s.detailDrawer);
@@ -145,7 +145,7 @@ export default class VizView extends Element {
 
         // copy index 1 of phaseMembers to index 0. JSON parse/stringify to make deep copy
         this.phaseMembers[0] = JSON.parse(JSON.stringify(this.phaseMembers[1]));
-        console.log(this.phaseMembers);
+        //console.log(this.phaseMembers);
         [activeContainer, discontinuedContainer].forEach((container, k) => {
             this.model.data[yearIndex].observations[observation].forEach((phase, i) => {
                 function getPhaseMembersIndex(id){
@@ -158,7 +158,7 @@ export default class VizView extends Element {
                             existingIndexB = getPhaseMembersIndex.call(this, b.id);
                           //  console.log('a ', a.id, 'b ', b.id);
                         if ( this.phaseMembers[0][0].active.includes(a.id) ) { //  if a was previously in column0 (ie off screen / is entering ), sort last
-                            console.log('a is entering', a.id)
+                            //console.log('a is entering', a.id)
                             return this.phaseMembers[0][0].active.includes(b.id) ? a.id - b.id : 1;
                         }
                         if ( this.phaseMembers[0][0].active.includes(b.id) ) {
@@ -180,7 +180,7 @@ export default class VizView extends Element {
                          //   console.log('both were in column, b before a');
                             return 1;
                         }
-                        console.log('returning 0', a.id, b.id);
+                 //       console.log('returning 0', a.id, b.id);
                         return a.id - b.id;
                     }),
                     column = container.querySelectorAll('.' + s.column)[i];
@@ -194,7 +194,7 @@ export default class VizView extends Element {
                     this.phaseMembers[1][i + 1][ ( k === 0 ? 'active' : 'discontinued' ) ].push(drug.id); // place the drug in the proper bucket tracking its column
                 });
                 this.phaseMembers[1][0].active = this.model.unnestedData.filter(d => d[+this.currentYear][this.currentObservation].column === 0).map(each => each.id);
-                console.log(this.phaseMembers);
+             //   console.log(this.phaseMembers);
             });
         });
         
@@ -558,7 +558,7 @@ export default class VizView extends Element {
             currentState = S.getState('year'),
             currentYear = currentState[0],
             currentObservation = currentState[2];
-        console.log(currentYear, currentObservation);
+        //console.log(currentYear, currentObservation);
             
 
        
@@ -572,17 +572,17 @@ export default class VizView extends Element {
             }
         }
         
-        function transition(DOMDrug){
+        function transition(DOMDrug, dur = duration){
            // var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ','').split(',');
            // var distanceToTravel = Math.sqrt( Math.abs(parseInt(translateXY[0])) ** 2 + Math.abs(parseInt(translateXY[0])) ** 2 );
-            var factor = DOMDrug.style.transform === 'translate(-3000px, -3000px)' ? 2 : 1;
-            DOMDrug.style.transitionDuration = factor * duration / 1000 + 's';
+           console.log(dur);
+            DOMDrug.style.transitionDuration = dur / 1000 + 's';
             window.requestAnimationFrame(function(){
                 DOMDrug.style.transform = 'translate(0px,0px)';
             });
             setTimeout(function(){
                 DOMDrug.classList.remove(s.isTranslated);
-            }, factor * duration);
+            }, dur);
         }
         
         function animateSingleColumn(resolve){
@@ -596,7 +596,7 @@ export default class VizView extends Element {
                 return ( this.previousStatuses[el.id].column === currentDatum.column && this.previousStatuses[el.id].isDiscontinued === currentDatum.isDiscontinued && ( translateXY[0] !== '0px' || translateXY[1] !== '0px' ) );
             });
             var elementsWillChangeStatus = matchingDOMDrugs.filter(el => this.previousStatuses[el.id].isDiscontinued !== this.model.unnestedData.find(d => d.id === el.id)[currentYear][currentObservation].isDiscontinued );     
-            var elementsWillMoveForward = matchingDOMDrugs.filter(el => this.previousStatuses[el.id].column < this.model.unnestedData.find(d => d.id === el.id)[currentYear][currentObservation].column );
+            var elementsWillMoveForward = matchingDOMDrugs.filter(el => this.previousStatuses[el.id].column !== 0 && this.previousStatuses[el.id].column < this.model.unnestedData.find(d => d.id === el.id)[currentYear][currentObservation].column );
             var elementsWillMoveBackward = matchingDOMDrugs.filter(el => this.previousStatuses[el.id].column > this.model.unnestedData.find(d => d.id === el.id)[currentYear][currentObservation].column );
             var elementsWillEnter = matchingDOMDrugs.filter(el => this.previousStatuses[el.id].column === 0);
 
@@ -608,7 +608,7 @@ export default class VizView extends Element {
             console.log(lengthOfAllSubsets);
             
             function handleSubset(index){
-                console.log('    subset ' + index );
+                console.log('    subset ' + index , subsets[index]);
                 new Promise(resolve => {
                     if (subsets[index].length === 0){
                         console.log('      skipping ^');
@@ -617,11 +617,17 @@ export default class VizView extends Element {
                         subsets[index].forEach((DOMDrug, i, array) => {
                             //var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ').split(',');
                             //var dur = translateXY[0] === 0 && translateXY[1] === 0 ? 0 : duration;
-                            transition(DOMDrug); // passing in the existing translate coords so that timing can be base on distance
+                            var dur = index === 3 ? duration / 4 : index === 4 ? duration * 2 : duration; // speeds up transition for drugs that will stay but move; slows it down for  drugs that will enter
+                            var delay = index === 3 ? dur * .5 * i : index === 4 ? dur * .1 * i : dur * i;
+                            setTimeout(() => {
+                                console.log(dur);
+                                transition(DOMDrug, dur); // passing in the existing translate coords so that timing can be base on distance
+                            }, delay);
                             if ( i === array.length - 1 ){
+                                let resolveDelay = index === 4 ? dur * 2 : dur * (i + 1);
                                 setTimeout(() => {
                                     resolve(true);
-                                }, duration); // wait until last item in subset has finished its transition
+                                }, resolveDelay); // wait until last item in subset has finished its transition
                                               // before resolving and triggering the next subset
                             }
                         });
@@ -638,7 +644,7 @@ export default class VizView extends Element {
                                 animateSingleColumn.call(this, resolve);
                             //}, del);
                         } else {
-                            let delayBetweenObservation = lengthOfAllSubsets === 0 ? duration : 0;
+                            let delayBetweenObservation = lengthOfAllSubsets === 0 ? 0 : duration;
                             setTimeout(() => {
                                if ( !S.getState('isPaused') ){
                                     resolve(true);  
