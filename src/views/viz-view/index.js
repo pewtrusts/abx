@@ -15,7 +15,7 @@ const headers = [
     ['Application', 'NDA'],
     ['Approved', '&#10004']
 ];
-const duration = 1000;
+const duration = 1500;
 
 var  isFirstLoad = true;
 
@@ -145,11 +145,12 @@ export default class VizView extends Element {
 
         // copy index 1 of phaseMembers to index 0. JSON parse/stringify to make deep copy
         this.phaseMembers[0] = JSON.parse(JSON.stringify(this.phaseMembers[1]));
-        //console.log(this.phaseMembers);
+        console.log(this.phaseMembers, this.previousStatuses);
         [activeContainer, discontinuedContainer].forEach((container, k) => {
+            var status = k === 0 ? 'active' : 'discontinued';
             this.model.data[yearIndex].observations[observation].forEach((phase, i) => {
                 function getPhaseMembersIndex(id){
-                    return this.phaseMembers[1][i + 1][ ( k === 0 ? 'active' : 'discontinued' ) ].indexOf(id)   
+                    return this.phaseMembers[1][i + 1][status].indexOf(id)   
                 }
                 // filter drugs by whether they're active or discontinued; also sort them based on whether they were already in the column
                 //  they are about to be placed in
@@ -157,31 +158,32 @@ export default class VizView extends Element {
                         var existingIndexA = getPhaseMembersIndex.call(this, a.id),
                             existingIndexB = getPhaseMembersIndex.call(this, b.id);
                           //  console.log('a ', a.id, 'b ', b.id);
-                        if ( this.phaseMembers[0][0].active.includes(a.id) ) { //  if a was previously in column0 (ie off screen / is entering ), sort last
+                          // [0][0].active is ok here because column 0 drugs are all under the `active` status
+                        if ( this.phaseMembers[0][0].active.includes(a.id) ) {                      // A was previously in column0   (ie off screen / is entering ), sort last
                             //console.log('a is entering', a.id)
-                            return this.phaseMembers[0][0].active.includes(b.id) ? a.id - b.id : 1;
+                            return this.phaseMembers[0][0].active.includes(b.id) ? a.id - b.id : 1; // A and B are coming from column 0    , sort based on IDs with higher IDs coming later
                         }
-                        if ( this.phaseMembers[0][0].active.includes(b.id) ) {
+                        if ( this.phaseMembers[0][0].active.includes(b.id) ) {                      // A was not in column 0 but B was           the comaprison (b) was in column zero, sort a before it
                             return -1;
                         }
-                        if ( existingIndexB < 0 && existingIndexA >= 0 ) { // if drug is entering the column, ie, not already in it
+                        if ( existingIndexB < 0 && existingIndexA >= 0 ) {                          // A was already in current column, B was not
                          //   console.log('a was in column, b was not');
                             return -1;
                         }
-                        if (existingIndexA < 0 && existingIndexB >= 0 ) {
+                        if (existingIndexA < 0 && existingIndexB >= 0 ) {                           // A was not in current column but B was       
                          //   console.log('a was not in column, b was');
                             return 1;
-                        }
+                        }                                                                           // Both A and B were in current column, scenario 1: a was before b
                         if ( getPhaseMembersIndex.call(this, a.id) < getPhaseMembersIndex.call(this, b.id) ) { 
                          //   console.log('both were in column, a before b');
                             return -1;
-                        }
+                        }                                                                           // Both A and B were in current column, scenario 1: b was before a
                         if ( getPhaseMembersIndex.call(this, a.id) > getPhaseMembersIndex.call(this, b.id) ) { 
                          //   console.log('both were in column, b before a');
                             return 1;
                         }
-                 //       console.log('returning 0', a.id, b.id);
-                        return a.id - b.id;
+                        console.log(this.previousStatuses[a.id],this.previousStatuses[b.id]);                                                                           // Neither A nor B was in the current column
+                        return this.previousStatuses[b.id].column - this.previousStatuses[a.id].column;
                     }),
                     column = container.querySelectorAll('.' + s.column)[i];
                 
