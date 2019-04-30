@@ -143,10 +143,11 @@
         font-size: 0.85em;
         
     }
+
     &.isMoving {
         z-index: 1;
-        &::before {
-            opacity: 1 !important;
+        &:not(.drugEmpty)::before {
+            opacity: 1;
         }
     }
     &:not(.drugEmpty)::before {
@@ -156,7 +157,7 @@
       width: 100%;
       height: 100%;
       opacity: 0;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      box-shadow: 5px 5px 5px rgba(0,0,0,0.3);
       transition: opacity 0.3s ease-in-out;
     }
     
@@ -228,6 +229,9 @@
     width: 34px;
     height: 34px;
     cursor: pointer;
+    &:disabled {
+        cursor: not-allowed;
+    }
 }
 @keyframes pauseSpinner {
   0% {
@@ -252,6 +256,7 @@
         cursor: wait;
     }
 }
+
 .yearButton {
     font-size: .80em;
     font-weight: 500;
@@ -288,7 +293,7 @@
 
     }
 
-    &.yearButtonActive, &.yearButtonPrevious {
+    &.yearButtonActive/*, &.yearButtonPrevious*/ {
         color: #333;
        
         &.observation {
@@ -318,7 +323,5 @@
         color: $medium_blue;
         font-weight: 900;
     }
-    &:disabled {
-        cursor: not-allowed;
-    }
+
 }

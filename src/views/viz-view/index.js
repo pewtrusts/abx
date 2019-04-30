@@ -15,7 +15,8 @@ const headers = [
     ['Application', 'NDA'],
     ['Approved', '&#10004']
 ];
-const duration = 1500;
+
+const duration = 1200;
 
 var  isFirstLoad = true;
 
@@ -123,65 +124,94 @@ export default class VizView extends Element {
         return view;
     }
     populatePlaceholders(yearIndex, observation) {
+        console.log(this.previousStatuses);
+
         function addIdsAndClasses(placeholder, drug, containerIndex){
-//console.log(drug);
-            function appendDetails(){
-                //var drawer = document.createElement('div');
-                //drawer.classList.add(s.detailDrawer);
-                placeholder.setAttribute('data-tippy-content',`<strong>${drug.name}</strong><br />${drug.company}`);
-                //placeholder.appendChild(drawer);   
-            }
             placeholder.id = drug.id;
-           // placeholder.innerText = drug.id.split('-')[1];
             placeholder.classList.remove(s.drugEmpty);
             placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`);
             if ( containerIndex === 1 ){
                 placeholder.classList.add(s.isDiscontinued);
             }
-            appendDetails()
+            placeholder.setAttribute('data-tippy-content',`<strong>${drug.name}</strong><br />${drug.company}`);
         }
+
         var activeContainer = document.querySelector('.' + s.activeContainer),
             discontinuedContainer = document.querySelector('.' + s.discontinuedContainer);
 
         // copy index 1 of phaseMembers to index 0. JSON parse/stringify to make deep copy
         this.phaseMembers[0] = JSON.parse(JSON.stringify(this.phaseMembers[1]));
-        //console.log(this.phaseMembers);
+        console.log(this.phaseMembers, this.previousStatuses);
         [activeContainer, discontinuedContainer].forEach((container, k) => {
+            var isDiscontinued = k === 0 ? false : true;
+
             this.model.data[yearIndex].observations[observation].forEach((phase, i) => {
                 function getPhaseMembersIndex(id){
-                    return this.phaseMembers[1][i + 1][ ( k === 0 ? 'active' : 'discontinued' ) ].indexOf(id)   
+                    return this.phaseMembers[1][i + 1][( isDiscontinued ? 'discontinued' : 'active' )].indexOf(id)   
                 }
                 // filter drugs by whether they're active or discontinued; also sort them based on whether they were already in the column
                 //  they are about to be placed in
                 var filtered = phase.values.filter(d => k === 0 ? !d[this.model.years[yearIndex]][observation].isDiscontinued : d[this.model.years[yearIndex]][observation].isDiscontinued).sort((a, b) => {
-                        var existingIndexA = getPhaseMembersIndex.call(this, a.id),
-                            existingIndexB = getPhaseMembersIndex.call(this, b.id);
-                          //  console.log('a ', a.id, 'b ', b.id);
-                        if ( this.phaseMembers[0][0].active.includes(a.id) ) { //  if a was previously in column0 (ie off screen / is entering ), sort last
-                            //console.log('a is entering', a.id)
-                            return this.phaseMembers[0][0].active.includes(b.id) ? a.id - b.id : 1;
-                        }
-                        if ( this.phaseMembers[0][0].active.includes(b.id) ) {
-                            return -1;
-                        }
-                        if ( existingIndexB < 0 && existingIndexA >= 0 ) { // if drug is entering the column, ie, not already in it
-                         //   console.log('a was in column, b was not');
-                            return -1;
-                        }
-                        if (existingIndexA < 0 && existingIndexB >= 0 ) {
-                         //   console.log('a was not in column, b was');
+                       
+                       /* ENTERING / NOT ENTERING */
+                       if (this.previousStatuses === undefined ){ // should be true only on first load
+                           return a.id - b.id; // lower ids first
+                       }
+
+                       if ( !this.previousStatuses[a.id] && !this.previousStatuses[b.id] ){ // both are entering. coercing !true to catch undefined or zero
+                           return a.id - b.id;  // lower ids first
+                       }
+
+                       if ( !this.previousStatuses[a.id] ) { // a is entering but b is not. coercing !true to catch undefined or zero
                             return 1;
-                        }
-                        if ( getPhaseMembersIndex.call(this, a.id) < getPhaseMembersIndex.call(this, b.id) ) { 
-                         //   console.log('both were in column, a before b');
+                       }
+
+                       if ( !this.previousStatuses[b.id] ) { // b is entering but a is not. coercing !true to catch undefined or zero
                             return -1;
-                        }
-                        if ( getPhaseMembersIndex.call(this, a.id) > getPhaseMembersIndex.call(this, b.id) ) { 
-                         //   console.log('both were in column, b before a');
+                       }
+
+                       /* STAYING IN COLUMN / NOT STAYING IN COLUMN */
+                                                                    // .column is 1-indexed, i is zero indexed
+                       if ( this.previousStatuses[a.id].column === i + 1 && this.previousStatuses[a.id].isDiscontinued === isDiscontinued ) { // a is in current column and matches current discontinued state
+                            if ( this.previousStatuses[b.id].column === i + 1 && this.previousStatuses[b.id].isDiscontinued === isDiscontinued ) { // also true for b 
+                                // i.e. BOTH ARE IN SAME COLUMN
+                                return getPhaseMembersIndex.call(this, a.id) < getPhaseMembersIndex.call(this, b.id) ? -1 : 1;
+                            }
+                            // not also true for b
+                            return -1;
+                       }
+                       if ( this.previousStatuses[b.id].column === i + 1 && this.previousStatuses[b.id].isDiscontinued === isDiscontinued ) { // b is in current column and matches current discontinued state. not true for a
                             return 1;
-                        }
-                 //       console.log('returning 0', a.id, b.id);
-                        return a.id - b.id;
+                       }
+                       if ( this.previousStatuses[a.id].column === i + 1 ){ // A is in current column but changing status
+                            if ( this.previousStatuses[b.id].column === i + 1 && this.previousStatuses[b.id].isDiscontinued !== isDiscontinued ){ // same is true for B
+                                return a.id - b.id;
+                            }
+                            if ( this.previousStatuses[b.id].column === i + 1 ){ // B is also in current column but is not changing status
+                                return 1;
+                            } else {
+                                return -1;
+                            }
+                       }
+                       if ( this.previousStatuses[b.id].column === i + 1 ) {
+                            return 1;
+                       }
+
+                       // process of elimination, below both a and b have been present but are coming from columns other than the current
+                       if ( this.previousStatuses[a.id].column > this.previousStatuses[b.id].column ) { // sort drugs coming from greater columns first
+                            return -1;
+                       }
+                       if ( this.previousStatuses[a.id].column < this.previousStatuses[b.id].column ) { // sort drugs coming from lesser columns last
+                            return 1;
+                       }
+                       // process of elimination, below both and b coming from the same column
+                       if ( this.previousStatuses[a.id].isDiscontinued === isDiscontinued && this.previousStatuses[b.id].isDiscontinued !== isDiscontinued ) { // A was discontinued/notDiscontinued; B was not
+                            return -1;
+                       }
+                       if ( this.previousStatuses[b.id].isDiscontinued === isDiscontinued && this.previousStatuses[a.id].isDiscontinued !== isDiscontinued ) { // B was discontinued/notDiscontinued; A was not
+                            return 1;
+                       }
+                       return a.id - b.id; // lower ids first
                     }),
                     column = container.querySelectorAll('.' + s.column)[i];
                 
@@ -256,6 +286,14 @@ export default class VizView extends Element {
         this.yearButtons.forEach(function(btn){
             btn.setAttribute('disabled','disabled');
         });
+    }
+    disablePlayButton(){
+        this.playBtn = this.playBtn || document.querySelector('.' + s.playButton);
+        this.playBtn.setAttribute('disabled','disabled');
+    }
+    enablePlayButton(){
+        this.playBtn = this.playBtn || document.querySelector('.' + s.playButton);
+        this.playBtn.removeAttribute('disabled');
     }
     enableYearButtons(){
         this.yearButtons = this.yearButtons || document.querySelectorAll('.' + s.yearButton);
@@ -411,6 +449,7 @@ export default class VizView extends Element {
             
             var _this = this;
             button.addEventListener('click', function(){
+                _this.disablePlayButton();
                 S.setState('isPaused', false);
                 _this.removeReplayOption();
                 var currentYear = S.getState('year')[0];
@@ -553,14 +592,26 @@ export default class VizView extends Element {
         });
     }
     playAnimation(resolve){
-        
-        var column = headers.length,
+        console.log(S.getState('isBackward'));
+        var column = S.getState('isBackward') ? 0 : headers.length,
             currentState = S.getState('year'),
             currentYear = currentState[0],
             currentObservation = currentState[2];
         //console.log(currentYear, currentObservation);
             
-
+        function testColumn(){
+            if ( S.getState('isBackward') ){
+                return column < headers.length;
+            }
+            return column > 0 ;
+        }
+        function incrementColumn(){
+            if ( S.getState('isBackward') ){
+                column++;
+            } else {
+                column--;
+            }
+        }
        
         function resolveTrue(duration){
             if (resolve) {
@@ -605,14 +656,9 @@ export default class VizView extends Element {
                 }, dur);
             });
         }
-        function toggleHighlight(){
-            if ( column > 0 ){
-                document.querySelectorAll('.' + s.headerDiv)[column - 1].classList.toggle(s.isAnimating);
-            }
-        }
         function animateSingleColumn(resolve){
-            console.log('  column ' + column);
-            toggleHighlight();
+
+            this.disableYearButtons();
             var matchingDrugIDs = Object.keys(this.previousStatuses).filter(id => this.previousStatuses[id].column === column),
                 matchingDOMDrugs = Array.from(this.nonEmptyDrugs).filter(DOMDrug => matchingDrugIDs.includes(DOMDrug.id));
             var elementsWillStayButMove = matchingDOMDrugs.filter(el => {
@@ -644,7 +690,7 @@ export default class VizView extends Element {
                             //var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ').split(',');
                             //var dur = translateXY[0] === 0 && translateXY[1] === 0 ? 0 : duration;
                             var dur = index === 3 ? duration / 12 : index === 4 ? duration / 2 : duration; // speeds up transition for drugs that will stay but move; slows it down for  drugs that will enter
-                            var delay = index === 3 ? dur * .5 * i : index === 4 ? dur * .1 * i : dur * ( i + 1 );
+                            var delay = index === 3 ? dur * .5 * i : index === 4 ? dur * .1 * i : dur * i;
                             setTimeout(() => {
                                 console.log(dur);
                                 transition(DOMDrug, dur, index); // passing in the existing translate coords so that timing can be base on distance
@@ -664,17 +710,16 @@ export default class VizView extends Element {
                         handleSubset.call(this, index);
                     } else {
                         //return; // if not, stop
-                        if ( column > 0 ){
-                            let del = lengthOfAllSubsets === 0 ? 100 : duration;
-                            setTimeout(() => {
-                                console.log(lengthOfAllSubsets);
-                                toggleHighlight();
-                                column--;
+
+                        if ( testColumn() ){
+                            //setTimeout(() => {
+                                incrementColumn();
                                 animateSingleColumn.call(this, resolve);
-                            }, del);
                         } else {
                             let delayBetweenObservation = lengthOfAllSubsets === 0 ? 0 : duration;
                             setTimeout(() => {
+                            this.enableYearButtons();
+                            this.enablePlayButton();
                                if ( !S.getState('isPaused') ){
                                     resolve(true);  
                                 } else {
