@@ -273,7 +273,7 @@
 
     }
 
-    &.yearButtonActive, &.yearButtonPrevious {
+    &.yearButtonActive/*, &.yearButtonPrevious*/ {
         color: #333;
        
         &.observation {
