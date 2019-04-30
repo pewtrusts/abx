@@ -123,23 +123,18 @@ export default class VizView extends Element {
         return view;
     }
     populatePlaceholders(yearIndex, observation) {
+        console.log(this.previousStatuses);
+
         function addIdsAndClasses(placeholder, drug, containerIndex){
-//console.log(drug);
-            function appendDetails(){
-                //var drawer = document.createElement('div');
-                //drawer.classList.add(s.detailDrawer);
-                placeholder.setAttribute('data-tippy-content',`<strong>${drug.name}</strong><br />${drug.company}`);
-                //placeholder.appendChild(drawer);   
-            }
             placeholder.id = drug.id;
-           // placeholder.innerText = drug.id.split('-')[1];
             placeholder.classList.remove(s.drugEmpty);
             placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`);
             if ( containerIndex === 1 ){
                 placeholder.classList.add(s.isDiscontinued);
             }
-            appendDetails()
+            placeholder.setAttribute('data-tippy-content',`<strong>${drug.name}</strong><br />${drug.company}`);
         }
+
         var activeContainer = document.querySelector('.' + s.activeContainer),
             discontinuedContainer = document.querySelector('.' + s.discontinuedContainer);
 
@@ -147,43 +142,58 @@ export default class VizView extends Element {
         this.phaseMembers[0] = JSON.parse(JSON.stringify(this.phaseMembers[1]));
         console.log(this.phaseMembers, this.previousStatuses);
         [activeContainer, discontinuedContainer].forEach((container, k) => {
-            var status = k === 0 ? 'active' : 'discontinued';
+            var isDiscontinued = k === 0 ? false : true;
             this.model.data[yearIndex].observations[observation].forEach((phase, i) => {
-                function getPhaseMembersIndex(id){
-                    return this.phaseMembers[1][i + 1][status].indexOf(id)   
-                }
+                console.log(i);
                 // filter drugs by whether they're active or discontinued; also sort them based on whether they were already in the column
                 //  they are about to be placed in
                 var filtered = phase.values.filter(d => k === 0 ? !d[this.model.years[yearIndex]][observation].isDiscontinued : d[this.model.years[yearIndex]][observation].isDiscontinued).sort((a, b) => {
-                        var existingIndexA = getPhaseMembersIndex.call(this, a.id),
-                            existingIndexB = getPhaseMembersIndex.call(this, b.id);
-                          //  console.log('a ', a.id, 'b ', b.id);
-                          // [0][0].active is ok here because column 0 drugs are all under the `active` status
-                        if ( this.phaseMembers[0][0].active.includes(a.id) ) {                      // A was previously in column0   (ie off screen / is entering ), sort last
-                            //console.log('a is entering', a.id)
-                            return this.phaseMembers[0][0].active.includes(b.id) ? a.id - b.id : 1; // A and B are coming from column 0    , sort based on IDs with higher IDs coming later
-                        }
-                        if ( this.phaseMembers[0][0].active.includes(b.id) ) {                      // A was not in column 0 but B was           the comaprison (b) was in column zero, sort a before it
-                            return -1;
-                        }
-                        if ( existingIndexB < 0 && existingIndexA >= 0 ) {                          // A was already in current column, B was not
-                         //   console.log('a was in column, b was not');
-                            return -1;
-                        }
-                        if (existingIndexA < 0 && existingIndexB >= 0 ) {                           // A was not in current column but B was       
-                         //   console.log('a was not in column, b was');
+                       
+                       /* ENTERING / NOT ENTERING */
+                       if (this.previousStatuses === undefined ){ // should be true only on first load
+                           return a.id - b.id; // lower ids first
+                       }
+
+                       if ( !this.previousStatuses[a.id] && !this.previousStatuses[b.id] ){ // both are entering. coercing !true to catch undefined or zero
+                           return a.id - b.id;  // lower ids first
+                       }
+
+                       if ( !this.previousStatuses[a.id] ) { // a is entering but b is not. coercing !true to catch undefined or zero
                             return 1;
-                        }                                                                           // Both A and B were in current column, scenario 1: a was before b
-                        if ( getPhaseMembersIndex.call(this, a.id) < getPhaseMembersIndex.call(this, b.id) ) { 
-                         //   console.log('both were in column, a before b');
+                       }
+
+                       if ( !this.previousStatuses[b.id] ) { // b is entering but a is not. coercing !true to catch undefined or zero
                             return -1;
-                        }                                                                           // Both A and B were in current column, scenario 1: b was before a
-                        if ( getPhaseMembersIndex.call(this, a.id) > getPhaseMembersIndex.call(this, b.id) ) { 
-                         //   console.log('both were in column, b before a');
+                       }
+
+                       /* STAYING IN COLUMN / NOT STAYING IN COLUMN */
+                                                                    // .column is 1-indexed, i is zero indexed
+                       if ( this.previousStatuses[a.id].column === i + 1 && this.previousStatuses[a.id].isDiscontinued === isDiscontinued ) { // a is in current column and matches current discontinued state
+                            if ( this.previousStatuses[b.id].column === i + 1 && this.previousStatuses[b.id].isDiscontinued === isDiscontinued ) { // also true for b
+                                return a.id - b.id;
+                            }
+                            // not also true for b
+                            return -1;
+                       }
+                       if ( this.previousStatuses[b.id].column === i + 1 && this.previousStatuses[b.id].isDiscontinued === isDiscontinued ) { // a is in current column and matches current discontinued state. not true for b
                             return 1;
-                        }
-                        console.log(this.previousStatuses[a.id],this.previousStatuses[b.id]);                                                                           // Neither A nor B was in the current column
-                        return this.previousStatuses[b.id].column - this.previousStatuses[a.id].column;
+                       }
+
+                       // process of elimination, below both a and b have been present but are coming from columns other than the current
+                       if ( this.previousStatuses[a.id].column > this.previousStatuses[b.id].column ) { // sort drugs coming from greater columns first
+                            return -1;
+                       }
+                       if ( this.previousStatuses[a.id].column < this.previousStatuses[b.id].column ) { // sort drugs coming from lesser columns last
+                            return 1;
+                       }
+                       // process of elimination, below both and b coming from the same column
+                       if ( this.previousStatuses[a.id].isDiscontinued === isDiscontinued && this.previousStatuses[b.id].isDiscontinued !== isDiscontinued ) { // A was discontinued/notDiscontinued; B was not
+                            return -1;
+                       }
+                       if ( this.previousStatuses[b.id].isDiscontinued === isDiscontinued && this.previousStatuses[a.id].isDiscontinued !== isDiscontinued ) { // B was discontinued/notDiscontinued; A was not
+                            return 1;
+                       }
+                       return a.id - b.id; // lower ids first
                     }),
                     column = container.querySelectorAll('.' + s.column)[i];
                 
