@@ -15,7 +15,7 @@ const headers = [
     ['Application', 'NDA'],
     ['Approved', '&#10004']
 ];
-const duration = 1500;
+const duration = 1200;
 
 var  isFirstLoad = true;
 
@@ -286,6 +286,14 @@ export default class VizView extends Element {
             btn.setAttribute('disabled','disabled');
         });
     }
+    disablePlayButton(){
+        this.playBtn = this.playBtn || document.querySelector('.' + s.playButton);
+        this.playBtn.setAttribute('disabled','disabled');
+    }
+    enablePlayButton(){
+        this.playBtn = this.playBtn || document.querySelector('.' + s.playButton);
+        this.playBtn.removeAttribute('disabled');
+    }
     enableYearButtons(){
         this.yearButtons = this.yearButtons || document.querySelectorAll('.' + s.yearButton);
         this.yearButtons.forEach(function(btn){
@@ -440,6 +448,7 @@ export default class VizView extends Element {
             
             var _this = this;
             button.addEventListener('click', function(){
+                _this.disablePlayButton();
                 S.setState('isPaused', false);
                 _this.removeReplayOption();
                 var currentYear = S.getState('year')[0];
@@ -582,14 +591,26 @@ export default class VizView extends Element {
         });
     }
     playAnimation(resolve){
-        
-        var column = headers.length,
+        console.log(S.getState('isBackward'));
+        var column = S.getState('isBackward') ? 0 : headers.length,
             currentState = S.getState('year'),
             currentYear = currentState[0],
             currentObservation = currentState[2];
         //console.log(currentYear, currentObservation);
             
-
+        function testColumn(){
+            if ( S.getState('isBackward') ){
+                return column < headers.length;
+            }
+            return column > 0 ;
+        }
+        function incrementColumn(){
+            if ( S.getState('isBackward') ){
+                column++;
+            } else {
+                column--;
+            }
+        }
        
         function resolveTrue(duration){
             if (resolve) {
@@ -636,7 +657,7 @@ export default class VizView extends Element {
         }
         
         function animateSingleColumn(resolve){
-            console.log('  column ' + column);
+            this.disableYearButtons();
             var matchingDrugIDs = Object.keys(this.previousStatuses).filter(id => this.previousStatuses[id].column === column),
                 matchingDOMDrugs = Array.from(this.nonEmptyDrugs).filter(DOMDrug => matchingDrugIDs.includes(DOMDrug.id));
             var elementsWillStayButMove = matchingDOMDrugs.filter(el => {
@@ -688,14 +709,16 @@ export default class VizView extends Element {
                         handleSubset.call(this, index);
                     } else {
                         //return; // if not, stop
-                        if ( column > 0 ){
+                        if ( testColumn() ){
                             //setTimeout(() => {
-                                column--;
+                                incrementColumn();
                                 animateSingleColumn.call(this, resolve);
                             //}, del);
                         } else {
                             let delayBetweenObservation = lengthOfAllSubsets === 0 ? 0 : duration;
                             setTimeout(() => {
+                            this.enableYearButtons();
+                            this.enablePlayButton();
                                if ( !S.getState('isPaused') ){
                                     resolve(true);  
                                 } else {

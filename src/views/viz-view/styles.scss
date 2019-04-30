@@ -213,6 +213,9 @@
     width: 34px;
     height: 34px;
     cursor: pointer;
+    &:disabled {
+        cursor: not-allowed;
+    }
 }
 @keyframes pauseSpinner {
   0% {
@@ -237,6 +240,7 @@
         cursor: wait;
     }
 }
+
 .yearButton {
     font-size: .80em;
     font-weight: 500;
@@ -303,7 +307,5 @@
         color: $medium_blue;
         font-weight: 900;
     }
-    &:disabled {
-        cursor: not-allowed;
-    }
+   
 }
