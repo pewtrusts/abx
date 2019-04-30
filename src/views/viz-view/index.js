@@ -143,8 +143,11 @@ export default class VizView extends Element {
         console.log(this.phaseMembers, this.previousStatuses);
         [activeContainer, discontinuedContainer].forEach((container, k) => {
             var isDiscontinued = k === 0 ? false : true;
+
             this.model.data[yearIndex].observations[observation].forEach((phase, i) => {
-                console.log(i);
+                function getPhaseMembersIndex(id){
+                    return this.phaseMembers[1][i + 1][( isDiscontinued ? 'discontinued' : 'active' )].indexOf(id)   
+                }
                 // filter drugs by whether they're active or discontinued; also sort them based on whether they were already in the column
                 //  they are about to be placed in
                 var filtered = phase.values.filter(d => k === 0 ? !d[this.model.years[yearIndex]][observation].isDiscontinued : d[this.model.years[yearIndex]][observation].isDiscontinued).sort((a, b) => {
@@ -169,13 +172,27 @@ export default class VizView extends Element {
                        /* STAYING IN COLUMN / NOT STAYING IN COLUMN */
                                                                     // .column is 1-indexed, i is zero indexed
                        if ( this.previousStatuses[a.id].column === i + 1 && this.previousStatuses[a.id].isDiscontinued === isDiscontinued ) { // a is in current column and matches current discontinued state
-                            if ( this.previousStatuses[b.id].column === i + 1 && this.previousStatuses[b.id].isDiscontinued === isDiscontinued ) { // also true for b
-                                return a.id - b.id;
+                            if ( this.previousStatuses[b.id].column === i + 1 && this.previousStatuses[b.id].isDiscontinued === isDiscontinued ) { // also true for b 
+                                // i.e. BOTH ARE IN SAME COLUMN
+                                return getPhaseMembersIndex.call(this, a.id) < getPhaseMembersIndex.call(this, b.id) ? -1 : 1;
                             }
                             // not also true for b
                             return -1;
                        }
-                       if ( this.previousStatuses[b.id].column === i + 1 && this.previousStatuses[b.id].isDiscontinued === isDiscontinued ) { // a is in current column and matches current discontinued state. not true for b
+                       if ( this.previousStatuses[b.id].column === i + 1 && this.previousStatuses[b.id].isDiscontinued === isDiscontinued ) { // b is in current column and matches current discontinued state. not true for a
+                            return 1;
+                       }
+                       if ( this.previousStatuses[a.id].column === i + 1 ){ // A is in current column but changing status
+                            if ( this.previousStatuses[b.id].column === i + 1 && this.previousStatuses[b.id].isDiscontinued !== isDiscontinued ){ // same is true for B
+                                return a.id - b.id;
+                            }
+                            if ( this.previousStatuses[b.id].column === i + 1 ){ // B is also in current column but is not changing status
+                                return 1;
+                            } else {
+                                return -1;
+                            }
+                       }
+                       if ( this.previousStatuses[b.id].column === i + 1 ) {
                             return 1;
                        }
 
