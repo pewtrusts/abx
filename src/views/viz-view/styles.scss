@@ -143,6 +143,22 @@
         font-size: 0.85em;
         
     }
+    &.isMoving {
+        z-index: 1;
+        &:not(.drugEmpty)::before {
+            opacity: 1;
+        }
+    }
+    &:not(.drugEmpty)::before {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      box-shadow: 5px 5px 5px rgba(0,0,0,0.3);
+      transition: opacity 0.3s ease-in-out;
+    }
     
     
 }
