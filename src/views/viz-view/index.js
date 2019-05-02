@@ -16,7 +16,7 @@ const headers = [
     ['Approved', '&#10004']
 ];
 
-const duration = 1200;
+const duration = 120;
 
 var  isFirstLoad = true;
 
@@ -243,31 +243,31 @@ export default class VizView extends Element {
         PS.setSubs([
             ['resize', this.checkHeight.bind(this)],
             ['year', this.update.bind(this)],
-            ['isBackward', this.toggleIsBackward.bind(this)],
-            ['isSameYear', this.toggleIsSameYear.bind(this)]
+          //  ['isBackward', this.toggleIsBackward.bind(this)],
+           // ['isSameYear', this.toggleIsSameYear.bind(this)]
         ]);
-        this.setYearState([this.model.years[0], null, 0]);
+        this.setYearState([this.model.years[0], null, 1]);
         this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         this.checkHeight();
         this.initializeYearButtons();
         this.initializePlayButton();
     }
-    toggleIsSameYear(msg,data){
+   /* toggleIsSameYear(msg,data){
         var container = this.controlContainer || document.querySelector('.' + s.controlContainer);
         if ( data ){
             container.classList.add(s.isSameYearSelected);
         } else {
             container.classList.remove(s.isSameYearSelected);
         }
-    }
-    toggleIsBackward(msg, data){
+    }*/
+  /*  toggleIsBackward(msg, data){
         var container = this.controlContainer || document.querySelector('.' + s.controlContainer);
         if ( data ){
             container.classList.add(s.isMovingBackward);
         } else {
             container.classList.remove(s.isMovingBackward);
         }
-    }
+    }*/
     initializePlayButton(){
         this.playYearsBind = this.playYears.bind(this);
         var playButton = document.querySelector('.' + s.playButton);
@@ -304,7 +304,7 @@ export default class VizView extends Element {
     playYears(event){
         S.setState('isPaused', false);
         S.setState('isBackward', false);
-        S.setState('isSameYear', false);
+       // S.setState('isSameYear', false);
         this.disableYearButtons();
         this.playBtn = this.playBtn || document.querySelector('.' + s.playButton);
         this.playBtn.blur();
@@ -336,10 +336,10 @@ export default class VizView extends Element {
         }
         
         var currentYear = S.getState('year')[0],
-            currentObservation = document.querySelector('.' + s.yearButtonActive).classList.contains(s.observation0) ? 0 : 1;
-
+            currentObservation = S.getState('year')[2];
+            console.log(currentYear, currentObservation);
         // ifn is on last observation of the last year
-        if ( this.model.years.indexOf(currentYear) === this.model.years.length - 1 && currentObservation === 1 ){
+        if ( this.model.years.indexOf(+currentYear) === this.model.years.length - 1 && currentObservation === 1 ){
             this.removeReplayOption();
             isFirstLoad = true;
             this.clearAttributesAndDetails();
@@ -374,7 +374,10 @@ export default class VizView extends Element {
     showReplayOption(){
         this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
         this.replayBtn.removeEventListener('click', this.pausePlayBind);
-        this.replayBtn.addEventListener('click', this.playYearsBind);
+        this.replayBtn.addEventListener('click', () => {
+            S.logState();
+            this.playYearsBind();
+        });
         this.replayBtn.classList.add(s.replay);
         this.replayBtn.classList.remove(s.pause);
         this.replayBtn.classList.remove(s.willPause);
@@ -449,62 +452,65 @@ export default class VizView extends Element {
             
             var _this = this;
             button.addEventListener('click', function(){
-                _this.disablePlayButton();
-                S.setState('isPaused', false);
-                _this.removeReplayOption();
                 var currentYear = S.getState('year')[0];
-                this.blur();
-                if ( currentYear !== this.value ) { // is not the already selected button
-                    S.setState('isSameYear', false);
-                    let observations;
-                    if ( this.value > currentYear ) {
-                        observations = [0,1];
+                console.log(currentYear, this.value);
+                if ( currentYear != this.value ) { // is not the already selected button
+                    S.setState('isPaused', false);
+                    this.blur();
+                    _this.disablePlayButton();
+                    _this.removeReplayOption();
+                //    S.setState('isSameYear', false);
+                    //let observations;
+                    if ( +this.value > +currentYear ) {
+                    //    observations = [0,1];
                         S.setState('isBackward', false);
+                        new Promise(resolve => {
+                            _this.setYearState([this.value, resolve, 0]);
+                        }).then(() => {
+                            _this.setYearState([this.value, null, 1]);
+                        });
                     } else {
-                        observations = [1,0];
+                    //    observations = [1,0];
                         S.setState('isBackward', true);
+                        new Promise(() => {
+                            _this.setYearState([this.value, null, 1]);
+                        })
                     }
-                    new Promise(resolve => {
-                        _this.setYearState([this.value, resolve, observations[0]]);
-                    }).then(() => {
-                        _this.setYearState([this.value, null, observations[1]]);
-                    });
-                } else {
+                }/* else {
                     let observation = this.classList.contains(s.observation0) ? 1 : 0;
                     S.setState('isSameYear', true);
                     _this.setYearState([this.value, null, observation]);   
-                }
+                }*/
             });
         });
     }
     update(msg,data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
         
         // find btn to be deselected and change its appearance
-        var toBeDeselectedActive = document.querySelector('.' + s.yearButtonActive),
-        observationToCheckAgainst = !S.getState('isBackward') ? 0 : 1;
+        var toBeDeselectedActive = document.querySelector('.' + s.yearButtonActive);        //observationToCheckAgainst = !S.getState('isBackward') ? 0 : 1;
        
         toBeDeselectedActive.classList.remove(s.yearButtonActive, s.observation, s.observation0, s.observation1)
 
-        if ( data[2] === observationToCheckAgainst ) { // is first observation
+      /*  if ( data[2] === observationToCheckAgainst ) { // is first observation
             toBeDeselectedActive.classList.add(s.yearButtonPrevious);
         } else {
             let toBeDeselectedPrevious = document.querySelector('.' + s.yearButtonPrevious);
             if (toBeDeselectedPrevious) {
                 toBeDeselectedPrevious.classList.remove(s.yearButtonPrevious);
             }
-        }
+        }*/
         
         // find button that matches new selection and change its appearance
         var btn = document.querySelector('button[value="' + data[0] +'"]');
         
         //toggle observation 0 or observation 1
         btn.classList.add(s.yearButtonActive);
-        if ( data[2] === 0 ){
+       /* if ( data[2] === 0 ){
             btn.classList.remove(s.observation1);
         } else {
             btn.classList.remove(s.observation0);
-        }
-        btn.classList.add(s.observation, s['observation' + data[2]])
+        }*/
+        //btn.classList.add(s.observation, s['observation' + data[2]])
         this.FLIP(parseInt(data[0]), data[1], data[2]); // yearIndex, resolve fn, observation
         this.updateText();
     }
@@ -721,8 +727,11 @@ export default class VizView extends Element {
                         } else {
                             let delayBetweenObservation = lengthOfAllSubsets === 0 ? 0 : duration;
                             setTimeout(() => {
-                            this.enableYearButtons();
-                            this.enablePlayButton();
+                                this.enableYearButtons();
+                                console.log(S.getState('year')[0], this.model.years[this.model.years.length - 1], S.getState('year')[2]);
+                                if ( S.getState('year')[2] == 1 && !(S.getState('year')[0] == this.model.years[this.model.years.length - 1] && S.getState('year')[2] == 1 ) ){
+                                    this.enablePlayButton();
+                                } 
                                if ( !S.getState('isPaused') ){
                                     resolve(true);  
                                 } else {
