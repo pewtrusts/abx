@@ -263,63 +263,15 @@
     position: relative;
     color: $dark_gray;
     transition: color 0.2s ease-in-out;
-    &:not(:nth-of-type(2))::before {
-        content: '';
-        display: block;
-        width: 2px;
-        height: 13px;
-        position: absolute;
-        background-color: $gray;
-        top: 0;
-        left: 50%;
-        transform: translate(-50%,-50%);
-        transition: background-color 0.2s ease-in-out;
-        z-index: 1;
-    }
-    &:not(:last-child)::after {
-        content: '';
-        display: block;
-        width: 2px;
-        height: 13px;
-        position: absolute;
-        background-color: $gray;
-        bottom: 0;
-        left: 50%;
-        transform: translate(-50%,50%);
-        transition: background-color 0.2s ease-in-out;
-        .isMovingBackward & {
-            z-index: 2;
-        }
-
-    }
-
+    
     &.yearButtonActive/*, &.yearButtonPrevious*/ {
         color: #333;
         font-weight: 900;
+        cursor: not-allowed;
        
-        &.observation {
-            &::before {
-            }
-            &.observation0::before {
-                background-color: $medium_red;
-                .isSameYearSelected & {
-                    z-index: 3;
-                }   
-            }
-            &.observation1::after {
-                background-color: $medium_red;
-                .isSameYearSelected & {
-                    z-index: 2;
-                }
-            }
-        }
+        
     }
-    &.yearButtonActive {
-        &::before {
-
-            transform: translate(-50%,-50%) scale(0.8333);
-        }
-    }
+    
     &:not(.yearButtonActive):hover, &:not(.yearButtonActive):focus {
         color: $medium_blue;
         font-weight: 900;
