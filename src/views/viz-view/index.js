@@ -537,9 +537,12 @@ export default class VizView extends Element {
             arrow: true,
             distance: 3
         });
-        
-        this.invertPositions();
-        this.playAnimation(resolve); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
+        if (!S.getState('isBackward')) {
+            this.invertPositions();
+            this.playAnimation(resolve); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
+        } else {
+            this.enablePlayButton();
+        }
 
         
      
@@ -689,7 +692,7 @@ export default class VizView extends Element {
                         subsets[index].forEach((DOMDrug, i, array) => {
                             //var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ').split(',');
                             //var dur = translateXY[0] === 0 && translateXY[1] === 0 ? 0 : duration;
-                            var dur = index === 3 ? duration / 12 : index === 4 ? duration / 2 : duration; // speeds up transition for drugs that will stay but move; slows it down for  drugs that will enter
+                            var dur = index === 3 ? duration / 12 : index === 4 ? duration / 1.5 : duration; // speeds up transition for drugs that will stay but move; slows it down for  drugs that will enter
                             var delay = index === 3 ? dur * .5 * i : index === 4 ? dur * .1 * i : dur * i;
                             setTimeout(() => {
                                 console.log(dur);
