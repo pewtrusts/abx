@@ -295,6 +295,7 @@
 
     &.yearButtonActive/*, &.yearButtonPrevious*/ {
         color: #333;
+        font-weight: 900;
        
         &.observation {
             &::before {
