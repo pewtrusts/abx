@@ -637,7 +637,7 @@ export default class VizView extends Element {
             DOMDrug.classList.add(s.isMoving);
             console.log(translateXY);
             if ( index === 0 || index === 1 || index === 2 ){
-                DOMDrug._tippy.show(0);
+                //DOMDrug._tippy.show(0);
             }
             DOMDrug.style.transitionDuration = dur / 1000 + 's';
             setTimeout(() => {
