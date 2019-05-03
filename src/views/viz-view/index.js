@@ -16,7 +16,7 @@ const headers = [
     ['Approved', '&#10004']
 ];
 
-const duration = 120;
+const duration = 1200;
 
 var  isFirstLoad = true;
 
@@ -274,7 +274,6 @@ export default class VizView extends Element {
         playButton.addEventListener('click', this.playYearsBind);
     }
     pausePlay(){
-        this.enableYearButtons();
         document.querySelector('.' + s.yearButtonPrevious).classList.remove(s.yearButtonPrevious);
         this.playBtn.blur();
         this.playBtn.removeEventListener('click', this.pausePlayBind);
@@ -310,6 +309,7 @@ export default class VizView extends Element {
         this.playBtn.blur();
         function nextPromise(){
             if ( S.getState('isPaused') ){
+                this.enableYearButtons();
                 this.removePauseOption();
                 return;
             }
@@ -351,6 +351,7 @@ export default class VizView extends Element {
             if ( currentObservation === 0 ){
                 new Promise((resolve) => {
                     if ( S.getState('isPaused') ){
+                        this.enableYearButtons();
                         resolve(false);
                     } else {
                         this.setYearState([currentYear, resolve, 1]); 
@@ -358,9 +359,7 @@ export default class VizView extends Element {
                 }).then(resolution => {
                     if ( !S.getState('isPaused') && resolution === true ){
                         nextPromise.call(this);
-                    } //else {
-                        //this.removePauseOption();
-                   // }
+                    }
                 });
             } else {
                 if ( !S.getState('isPaused') ){
@@ -736,6 +735,7 @@ export default class VizView extends Element {
                                     resolve(true);  
                                 } else {
                                     this.removePauseOption();
+                                    this.enableYearButtons();
                                 }
                             }, delayBetweenObservation);
                         }
