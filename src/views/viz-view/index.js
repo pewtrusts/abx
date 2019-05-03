@@ -16,7 +16,7 @@ const headers = [
     ['Approved', '&#10004']
 ];
 
-const duration = 1200;
+const duration = 120;
 
 var  isFirstLoad = true;
 
@@ -478,7 +478,6 @@ export default class VizView extends Element {
                     _this.setYearState([this.value, null, observation]);   
                 }*/
             });
-            this.disableYearButtons(); // disable yearButtons on load; they are enable after the firstLoad finishes, see if ( isFirstLoad ) condition of animateSingleColumn fn below
         });
     }
     update(msg,data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
@@ -751,14 +750,9 @@ export default class VizView extends Element {
         if ( isFirstLoad ){ // ie is  the first animation on load FIRST ANIMATION
 
             
-            this.nonEmptyDrugs.forEach((DOMDrug, i, array) => {
-                setTimeout(() => {
+            this.nonEmptyDrugs.forEach((DOMDrug, i) => {
+                setTimeout(function(){
                     transition(DOMDrug);
-                    if ( i === array.length - 1 ){
-                        setTimeout(() => {
-                            this.enableYearButtons();
-                        }, duration);
-                    }
                 }, i * 10);
             });
             isFirstLoad = false;
