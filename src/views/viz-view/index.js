@@ -16,7 +16,7 @@ const headers = [
     ['Approved', '&#10004']
 ];
 
-const duration = 120;
+const duration = 1200;
 
 var  isFirstLoad = true;
 
@@ -750,10 +750,8 @@ export default class VizView extends Element {
         if ( isFirstLoad ){ // ie is  the first animation on load FIRST ANIMATION
 
             
-            this.nonEmptyDrugs.forEach((DOMDrug, i) => {
-                setTimeout(function(){
-                    transition(DOMDrug);
-                }, i * 10);
+            this.nonEmptyDrugs.forEach((DOMDrug) => {
+                transition(DOMDrug, 0);
             });
             isFirstLoad = false;
        //     resolveTrue(duration); */
