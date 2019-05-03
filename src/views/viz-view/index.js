@@ -16,7 +16,7 @@ const headers = [
     ['Approved', '&#10004']
 ];
 
-const duration = 1200;
+const duration = 120;
 
 var  isFirstLoad = true;
 
@@ -373,10 +373,7 @@ export default class VizView extends Element {
     showReplayOption(){
         this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
         this.replayBtn.removeEventListener('click', this.pausePlayBind);
-        this.replayBtn.addEventListener('click', () => {
-            S.logState();
-            this.playYearsBind();
-        });
+        this.replayBtn.addEventListener('click', this.playYearsBind);
         this.replayBtn.classList.add(s.replay);
         this.replayBtn.classList.remove(s.pause);
         this.replayBtn.classList.remove(s.willPause);
