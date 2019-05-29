@@ -572,11 +572,16 @@ export default class VizView extends Element {
         if ( this.animateYears !== false ) {
             this.invertPositions();
             this.playAnimation(resolve); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
+            if ( !resolve ){
+                setTimeout(() => {
+                    this.enablePlayButton();
+                }, duration);
+            }
         } else {
             if ( resolve ){
                 setTimeout(() => {
-                    resolve(true);
                     this.enablePlayButton();
+                    resolve(true);
                 }, duration);
             } else {
                 this.enablePlayButton();
