@@ -16,7 +16,7 @@ const headers = [
     ['Approved', '&#10004']
 ];
 
-const duration = 1200;
+const duration = 120;
 
 var  isFirstLoad = true;
 
@@ -290,6 +290,7 @@ export default class VizView extends Element {
         }
     }*/
     initializeAnimateOnOff(){
+        this.animateYears = true;
         function handler(el){
             if ( el.checked ){
                 this.animateYears = true;
@@ -571,23 +572,25 @@ export default class VizView extends Element {
         console.log(this.animateYears !== false);
         if ( this.animateYears !== false ) {
             this.invertPositions();
-            this.playAnimation(resolve); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
-            if ( !resolve ){
+        }
+            this.playAnimation(resolve, this.animateYears); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
+           /* if ( !resolve ){
                 setTimeout(() => {
                     this.enablePlayButton();
                 }, duration);
-            }
-        } else {
-            if ( resolve ){
+            }*/
+        //} else {
+            /*if ( resolve ){
                 setTimeout(() => {
                     this.enablePlayButton();
                     resolve(true);
                 }, duration);
             } else {
                 this.enablePlayButton();
-            }
+            }*/
+          /*  this.playAnimation(resolve);
 
-        }
+        }*/
 
         
      
@@ -639,7 +642,7 @@ export default class VizView extends Element {
             }
         });
     }
-    playAnimation(resolve){
+    playAnimation(resolve, animateYears){
         console.log(S.getState('isBackward'));
         var column = S.getState('isBackward') ? 0 : headers.length,
             currentState = S.getState('year'),
@@ -674,11 +677,11 @@ export default class VizView extends Element {
         function transition(DOMDrug, dur = duration, index = null){
            // var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ','').split(',');
            // var distanceToTravel = Math.sqrt( Math.abs(parseInt(translateXY[0])) ** 2 + Math.abs(parseInt(translateXY[0])) ** 2 );
-           
-            var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ','').split(',').map(d => parseInt(d));
-            DOMDrug.classList.add(s.isMoving);
+            var styleMatch = DOMDrug.style.transform.match(/translate\((.*?)\)/);
+            var translateXY = styleMatch ? styleMatch[1].replace(' ','').split(',').map(d => parseInt(d)) : [0,0];
             console.log(translateXY);
-            if ( index === 0 || index === 1 || index === 2 ){
+            if ( ( translateXY[0] !== 0 && translateXY[1] !== 0 ) && ( index === 0 || index === 1 || index === 2 ) ){
+                DOMDrug.classList.add(s.isMoving);
                 DOMDrug._tippy.show(0);
             }
             DOMDrug.style.transitionDuration = dur / 1000 + 's';
@@ -711,7 +714,7 @@ export default class VizView extends Element {
                 matchingDOMDrugs = Array.from(this.nonEmptyDrugs).filter(DOMDrug => matchingDrugIDs.includes(DOMDrug.id));
             var elementsWillStayButMove = matchingDOMDrugs.filter(el => {
                 var currentDatum = this.model.unnestedData.find(d => d.id === el.id)[currentYear][currentObservation];
-                var translateXY = el.style.transform.match(/translate\((.*?)\)/)[1].replace(' ','').split(',');
+                var translateXY = el.style.transform.match(/translate\((.*?)\)/) ? el.style.transform.match(/translate\((.*?)\)/)[1].replace(' ','').split(',') : [0,0];
                 el.translateXY = translateXY;
                 return ( this.previousStatuses[el.id].column === currentDatum.column && this.previousStatuses[el.id].isDiscontinued === currentDatum.isDiscontinued && ( translateXY[0] !== '0px' || translateXY[1] !== '0px' ) );
             });
@@ -739,6 +742,10 @@ export default class VizView extends Element {
                             //var dur = translateXY[0] === 0 && translateXY[1] === 0 ? 0 : duration;
                             var dur = index === 3 ? duration / 12 : index === 4 ? duration / 1.5 : duration; // speeds up transition for drugs that will stay but move; slows it down for  drugs that will enter
                             var delay = index === 3 ? dur * .5 * i : index === 4 ? dur * .1 * i : dur * i;
+                            if (!animateYears){
+                                dur = 0;
+                                delay = 0; 
+                            }
                             setTimeout(() => {
                                 console.log(dur);
                                 transition(DOMDrug, dur, index); // passing in the existing translate coords so that timing can be base on distance

@@ -133,13 +133,13 @@
         border-color: $dark_blue;
     }
     &.gramNegative::after {
-        content: '(—)';
+        content: 'G–';
         color: $medium_blue;
         display: block;
         position: absolute;
         top: 2px;
         right: 10px;
-        font-weight: 900;
+        font-weight: 600;
         font-size: 0.85em;
         
     }
