@@ -775,12 +775,10 @@ export default class VizView extends Element {
                             setTimeout(() => {
                                 this.enableYearButtons();
                                 console.log(S.getState('year')[0], this.model.years[this.model.years.length - 1], S.getState('year')[2]);
-                                if ( S.getState('year')[2] == 1 ){
                                     this.enablePlayButton();
                                     if ( S.getState('year')[0] == this.model.years[this.model.years.length - 1] ) {
                                         this.showReplayOption();
                                     }
-                                } 
                                 if ( !S.getState('isPaused') ){
                                     resolve(true);  
                                 } else {
