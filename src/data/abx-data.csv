@@ -3,7 +3,7 @@ id,name,urgent,gramNegative,novel,company,2014,2015,2016,2017,2018
 2,ACX-362E,TRUE,FALSE,TRUE,Acurx Pharmaceuticals LLC,0,0,0,0,1
 3,Afabicin,FALSE,FALSE,TRUE,Debiopharm Group (Formerly Affinium Pharmaceuticals),1,2,2,2,2
 4,AIC499,FALSE,FALSE,FALSE,AiCuris,0,0,0,1,1
-5,Avarofloxacin,FALSE,FALSE,FALSE,Allergan PLC (Formerly Actavis formerly Furiex)Furiex Pharmaceuticals,2,2,2d,2d,2d
+5,Avarofloxacin,FALSE,FALSE,FALSE,Allergan PLC (Formerly Actavis formerly Furiex) Furiex Pharmaceuticals,2,2,2d,2d,2d
 6,Avycaz,TRUE,TRUE,TRUE,AstraZeneca/Forest Laboratories,4,5,5,5,5
 7,BAL30072,TRUE,TRUE,FALSE,Basilea Pharmaceutica,1,1,1d,1d,1d
 8,Baxdela,FALSE,FALSE,FALSE,Melinta Therapeutics,3,3,4,5,5
