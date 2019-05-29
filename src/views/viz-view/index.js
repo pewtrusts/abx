@@ -84,6 +84,26 @@ export default class VizView extends Element {
                 controlContainer.appendChild(yearButton);
             });
 
+            //animate on/off
+            var inputWrapper = document.createElement('div');
+            
+            var input = document.createElement('input');
+            input.classList.add('js-animate-checkbox');
+            input.setAttribute('type', 'checkbox');
+            input.setAttribute('checked', 'checked');
+            input.id = 'toggle-animate-on-off';
+
+            var label = document.createElement('label');
+            label.classList.add(s.inputLabel);
+            label.setAttribute('for', 'toggle-animate-on-off');
+            label.textContent = 'Animate single years';
+
+            inputWrapper.appendChild(input);
+            inputWrapper.appendChild(label);
+            controlContainer.appendChild(inputWrapper);
+
+
+
         view.appendChild(controlContainer);
 
         // container
@@ -250,6 +270,7 @@ export default class VizView extends Element {
         this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         this.checkHeight();
         this.initializeYearButtons();
+        this.initializeAnimateOnOff();
         this.initializePlayButton();
     }
    /* toggleIsSameYear(msg,data){
@@ -268,6 +289,21 @@ export default class VizView extends Element {
             container.classList.remove(s.isMovingBackward);
         }
     }*/
+    initializeAnimateOnOff(){
+        function handler(el){
+            if ( el.checked ){
+                this.animateYears = true;
+            } else {
+                this.animateYears = false;
+            }
+            console.log(this);
+        }
+        var input = document.querySelector('.js-animate-checkbox');
+        var handlerBind = handler.bind(this);
+        input.addEventListener('change', function(){
+            handlerBind(this);
+        });
+    }
     initializePlayButton(){
         this.playYearsBind = this.playYears.bind(this);
         var playButton = document.querySelector('.' + s.playButton);
@@ -524,7 +560,8 @@ export default class VizView extends Element {
             arrow: true,
             distance: 3
         });
-        if (!S.getState('isBackward')) {
+        console.log(this.animateYears !== false);
+        if (!S.getState('isBackward') && this.animateYears !== false ) {
             this.invertPositions();
             this.playAnimation(resolve); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
         } else {
