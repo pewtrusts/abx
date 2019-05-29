@@ -16,7 +16,7 @@ const headers = [
     ['Approved', '&#10004']
 ];
 
-const duration = 120;
+const duration = 1200;
 
 var  isFirstLoad = true;
 
