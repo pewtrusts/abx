@@ -3,6 +3,7 @@
 :global(.tippy-tooltip){
     background-color: #fff;
     border: 1px solid $dark_blue;
+    width: 250px;
 }
 :global(.tippy-arrow){
     border-top-color: $dark_blue !important;
