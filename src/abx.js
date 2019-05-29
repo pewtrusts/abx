@@ -83,11 +83,11 @@ function getRuntimeData(){
                 model.unnestedData = response.data.map(d => { // turn each string value like "1-1d" into an array , [1,1d]
                     d.id = 'drug-' + d.id;
                     model.years.forEach(year => {
-                        d[year] = [0,1].map(observation => {
+                        d[year] = [0].map(() => {
                             
                             return {
-                                column: parseInt(d[year].split('-')[observation]),
-                                isDiscontinued: ( d[year].split('-')[observation].toString().indexOf('d') !== -1 )
+                                column: parseInt(d[year]),
+                                isDiscontinued: ( d[year].toString().indexOf('d') !== -1 )
                             };
                         });
                     });
@@ -96,7 +96,7 @@ function getRuntimeData(){
                 model.data = model.years.map(year => {
                     return {
                         year,
-                        observations: [0,1].map(observation => { // each year has two observations
+                        observations: [0].map(observation => { // each year has two observations
                             return [1, 2, 3, 4, 5].map(phase => {
                                 
                                 return {

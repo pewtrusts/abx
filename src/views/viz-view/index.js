@@ -246,7 +246,7 @@ export default class VizView extends Element {
           //  ['isBackward', this.toggleIsBackward.bind(this)],
            // ['isSameYear', this.toggleIsSameYear.bind(this)]
         ]);
-        this.setYearState([this.model.years[0], null, 1]);
+        this.setYearState([this.model.years[0], null, 0]);
         this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         this.checkHeight();
         this.initializeYearButtons();
@@ -315,15 +315,11 @@ export default class VizView extends Element {
             }
             currentYear++;
             if ( currentYear <= this.model.years[this.model.years.length - 1] ){
-                new Promise(wrapperResolve => {
                     new Promise(resolve => {
                         this.setYearState([currentYear, resolve, 0]); 
                     }).then(() => {
-                        this.setYearState([currentYear, wrapperResolve, 1]);
+                        nextPromise.call(this);
                     });    
-                }).then(() => {
-                    nextPromise.call(this);
-                });
             
             } else {
                 this.showReplayOption.call(this);
@@ -335,11 +331,8 @@ export default class VizView extends Element {
             this.showPauseOption();
         }
         
-        var currentYear = S.getState('year')[0],
-            currentObservation = S.getState('year')[2];
-            console.log(currentYear, currentObservation);
-        // ifn is on last observation of the last year
-        if ( this.model.years.indexOf(+currentYear) === this.model.years.length - 1 && currentObservation === 1 ){
+        var currentYear = S.getState('year')[0];
+        if ( this.model.years.indexOf(+currentYear) === this.model.years.length - 1 ){
             this.removeReplayOption();
             isFirstLoad = true;
             this.clearAttributesAndDetails();
@@ -348,24 +341,18 @@ export default class VizView extends Element {
                 this.playYears('reciprocal');
             }, duration * 2);
         } else {
-            if ( currentObservation === 0 ){
                 new Promise((resolve) => {
                     if ( S.getState('isPaused') ){
                         this.enableYearButtons();
                         resolve(false);
                     } else {
-                        this.setYearState([currentYear, resolve, 1]); 
+                        resolve(true);
                     }
                 }).then(resolution => {
                     if ( !S.getState('isPaused') && resolution === true ){
                         nextPromise.call(this);
                     }
                 });
-            } else {
-                if ( !S.getState('isPaused') ){
-                    nextPromise.call(this);
-                }
-            } 
         }
         
 
@@ -526,7 +513,7 @@ export default class VizView extends Element {
             document.querySelector('#total-discontinued').fadeInContent(totalDiscontinued);
         }
     }
-    FLIP(data, resolve, observation = 1){ // observation defaults to 1 for the initial page load animation
+    FLIP(data, resolve, observation = 0){ // observation defaults to 0 for the initial page load animation.  LEGACY FROM WHEN THERE WERE TWO OBSRVATIONS PER YEAR
         this.recordFirstPositions(); // first positions on page
         //this.recordStatuses(data, observation);
         this.clearAttributesAndDetails(); // removes classNames and IDs of nonempty drug
