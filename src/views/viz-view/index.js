@@ -16,7 +16,7 @@ const headers = [
     ['Approved', '&#10004']
 ];
 
-const duration = 1200;
+const duration = 120;
 
 var  isFirstLoad = true;
 
@@ -447,16 +447,14 @@ export default class VizView extends Element {
                     if ( +this.value > +currentYear ) {
                     //    observations = [0,1];
                         S.setState('isBackward', false);
-                        new Promise(resolve => {
-                            _this.setYearState([this.value, resolve, 0]);
-                        }).then(() => {
-                            _this.setYearState([this.value, null, 1]);
+                        new Promise(() => {
+                            _this.setYearState([this.value, null, 0]);
                         });
                     } else {
                     //    observations = [1,0];
                         S.setState('isBackward', true);
                         new Promise(() => {
-                            _this.setYearState([this.value, null, 1]);
+                            _this.setYearState([this.value, null, 0]);
                         })
                     }
                 }/* else {
