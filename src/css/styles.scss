@@ -89,10 +89,16 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
-    margin-top: 20px;
+    margin-top: -50px;
 
     p {
         margin: 0;
+        &:first-child {
+            width: 100%;
+            text-align: right;
+            font-size: 72px;
+            font-weight: 300;
+        }
         &:last-child {
             margin-left: 20px;
         }
@@ -107,5 +113,19 @@
         &:global(.no-opacity) {
             opacity: 0;
         }
+    }
+    :global(#big-year){
+        opacity: 1;
+        transition: opacity 0.2s ease-in-out;
+        &:global(.no-opacity) {
+            opacity: 0;
+        }
+    }
+}
+
+:global(.since-2014){
+    display: none;
+    :global(.is-subsequent) & {
+        display: inline;
     }
 }
