@@ -16,7 +16,7 @@ const headers = [
     ['Approved', '&#10004']
 ];
 
-const duration = 120;
+const duration = 1200;
 
 var  isFirstLoad = true;
 
@@ -96,7 +96,7 @@ export default class VizView extends Element {
             var label = document.createElement('label');
             label.classList.add(s.inputLabel);
             label.setAttribute('for', 'toggle-animate-on-off');
-            label.textContent = 'Animate single years';
+            label.textContent = 'Animate change';
 
             inputWrapper.appendChild(input);
             inputWrapper.appendChild(label);
@@ -561,11 +561,19 @@ export default class VizView extends Element {
             distance: 3
         });
         console.log(this.animateYears !== false);
-        if (!S.getState('isBackward') && this.animateYears !== false ) {
+        if ( this.animateYears !== false ) {
             this.invertPositions();
             this.playAnimation(resolve); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
         } else {
-            this.enablePlayButton();
+            if ( resolve ){
+                setTimeout(() => {
+                    resolve(true);
+                    this.enablePlayButton();
+                }, duration);
+            } else {
+                this.enablePlayButton();
+            }
+
         }
 
         
