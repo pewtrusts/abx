@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html prefix="og: http://ogp.me/ns#" style="--unit-dimension:30px; --header-height:45px; --max-container-height:1057px; --active-max-height:NaNpx; --discontinued-max-height:NaNpx;">
+<html prefix="og: http://ogp.me/ns#" style="--unit-dimension:30px; --header-height:45px; --max-container-height:1015px; --active-max-height:NaNpx; --discontinued-max-height:NaNpx;">
 
   <head>
     <style type="text/css">
@@ -650,10 +650,10 @@
 
 
 
-    <link href="css/styles.css?v=9dc22b" rel="stylesheet">
+    <link href="css/styles.css?v=038495" rel="stylesheet">
   </head>
 
-  <body class="has-hover src-views-viz-view--squat src-views-viz-view--superSquat">
+  <body class="has-hover src-views-viz-view--squat">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W2Z5TT" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
@@ -1039,7 +1039,7 @@ Data Visualization
                   <div id="abx-visualization">
                     <div id="viz-view">
                       <div class="src-views-viz-view--controlContainer"><button class="src-views-viz-view--playButton" type="button" title="Play"></button><button class="src-views-viz-view--yearButton src-views-viz-view--yearButtonActive" type="button" value="2014">2014</button><button class="src-views-viz-view--yearButton nope" type="button" value="2015">2015</button><button class="src-views-viz-view--yearButton nope" type="button" value="2016">2016</button><button class="src-views-viz-view--yearButton nope" type="button" value="2017">2017</button><button class="src-views-viz-view--yearButton nope" type="button" value="2018">2018</button>
-                        <div><input class="js-animate-checkbox" type="checkbox" checked="checked" id="toggle-animate-on-off"><label class="src-views-viz-view--inputLabel" for="toggle-animate-on-off">Animate change</label></div>
+                        <div class="src-views-viz-view--inputWrapper"><input class="js-animate-checkbox" type="checkbox" checked="checked" id="toggle-animate-on-off"><label class="src-views-viz-view--inputLabel" for="toggle-animate-on-off">Animate change</label></div>
                       </div>
                       <div class="src-views-viz-view--container">
                         <div class="src-views-viz-view--activeContainer">
@@ -1710,6 +1710,36 @@ RELATED		</span>
     </footer>
     <script src="assets/Pew/js/libraries-generated.js"></script>
     <script src="assets/Pew/js/index-generated.js"></script>
+    <div class="selectionSharer" id="selectionSharerPopover" style="position:absolute;">
+      <div id="selectionSharerPopover-inner">
+        <ul>
+          <li><a class="action tweet" href="" title="Share this selection on Twitter" target="_blank">Tweet</a></li>
+          <li><a class="action facebook" href="" title="Share this selection on Facebook" target="_blank">Facebook</a></li>
+          <li><a class="action email" href="" title="Share this selection by email"><svg width="20" height="20">
+                <path stroke="%23FFF" stroke-width="6" d="m16,25h82v60H16zl37,37q4,3 8,0l37-37M16,85l30-30m22,0 30,30"></path>
+              </svg></a></li>
+        </ul>
+      </div>
+      <div class="selectionSharerPopover-clip"><span class="selectionSharerPopover-arrow"></span></div>
+    </div>
+    <div id="selectionSharerPopunder" class="selectionSharer">
+      <div id="selectionSharerPopunder-inner"> <label>Share this selection</label>
+        <ul>
+          <li><a class="action tweet" href="" title="Share this selection on Twitter" target="_blank">Tweet</a></li>
+          <li><a class="action facebook" href="" title="Share this selection on Facebook" target="_blank">Facebook</a></li>
+          <li><a class="action email" href="" title="Share this selection by email"><svg width="20" height="20">
+                <path stroke="%23FFF" stroke-width="6" d="m16,25h82v60H16zl37,37q4,3 8,0l37-37M16,85l30-30m22,0 30,30"></path>
+              </svg></a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="modal-overlay">
+      <div class="modal-overlay__inset-container"><span class="modal-overlay__close-modal js-close-modal"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M18.98 6.42L13.4 12 19 17.58l-1.4 1.4L12 13.4 6.42 19l-1.4-1.4L10.6 12 5 6.42l1.4-1.4L12 10.6 17.58 5z"></path></svg></span>
+        <div class="modal-overlay__content"></div>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="js/index.js"></script>
     <script type="text/javascript" id="">
       (function(e, g, h, d, a, b, c) {
         e.GoogleAnalyticsObject = a;
@@ -1773,38 +1803,8 @@ RELATED		</span>
       };
       gaParams();
     </script>
-    <div class="selectionSharer" id="selectionSharerPopover" style="position:absolute;">
-      <div id="selectionSharerPopover-inner">
-        <ul>
-          <li><a class="action tweet" href="" title="Share this selection on Twitter" target="_blank">Tweet</a></li>
-          <li><a class="action facebook" href="" title="Share this selection on Facebook" target="_blank">Facebook</a></li>
-          <li><a class="action email" href="" title="Share this selection by email"><svg width="20" height="20">
-                <path stroke="%23FFF" stroke-width="6" d="m16,25h82v60H16zl37,37q4,3 8,0l37-37M16,85l30-30m22,0 30,30"></path>
-              </svg></a></li>
-        </ul>
-      </div>
-      <div class="selectionSharerPopover-clip"><span class="selectionSharerPopover-arrow"></span></div>
-    </div>
-    <div id="selectionSharerPopunder" class="selectionSharer">
-      <div id="selectionSharerPopunder-inner"> <label>Share this selection</label>
-        <ul>
-          <li><a class="action tweet" href="" title="Share this selection on Twitter" target="_blank">Tweet</a></li>
-          <li><a class="action facebook" href="" title="Share this selection on Facebook" target="_blank">Facebook</a></li>
-          <li><a class="action email" href="" title="Share this selection by email"><svg width="20" height="20">
-                <path stroke="%23FFF" stroke-width="6" d="m16,25h82v60H16zl37,37q4,3 8,0l37-37M16,85l30-30m22,0 30,30"></path>
-              </svg></a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="modal-overlay">
-      <div class="modal-overlay__inset-container"><span class="modal-overlay__close-modal js-close-modal"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M18.98 6.42L13.4 12 19 17.58l-1.4 1.4L12 13.4 6.42 19l-1.4-1.4L10.6 12 5 6.42l1.4-1.4L12 10.6 17.58 5z"></path></svg></span>
-        <div class="modal-overlay__content"></div>
-      </div>
-    </div>
-
-    <script type="text/javascript" src="js/index.js"></script>
-    <script src="https://px.ads.linkedin.com/collect/?time=1559142800579&amp;pid=230521&amp;url=http%3A%2F%2Flocalhost%3A8000%2F&amp;fmt=js&amp;s=1" type="text/javascript"></script>
     <script src="https://analytics.twitter.com/i/adsct?p_id=Twitter&amp;p_user_id=0&amp;txn_id=nzc7z&amp;events=%5B%5B%22pageview%22%2Cnull%5D%5D&amp;tw_sale_amount=0&amp;tw_order_quantity=0&amp;tw_iframe_status=0&amp;tpx_cb=twttr.conversion.loadPixels&amp;tw_document_href=http%3A%2F%2Flocalhost%3A8000%2F" type="text/javascript"></script>
+    <script src="https://px.ads.linkedin.com/collect/?time=1559240988544&amp;pid=230521&amp;url=http%3A%2F%2Flocalhost%3A8000%2F&amp;fmt=js&amp;s=1" type="text/javascript"></script>
     <div class="explore-module__modal-container">
       <div class="explore-module__modal-inner">
         <div class="explore-module__close-modal js-close-explore-module">
