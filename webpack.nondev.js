@@ -32,6 +32,7 @@ module.exports = env => {
                             sourceMap: true,
                             ident: 'postcss',
                             plugins: (loader) => [
+                                require('postcss-css-variables')(),
                                 require('postcss-assets')(),
                                 require('postcss-preset-env')({
                                     autoprefixer: {

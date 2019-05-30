@@ -34,6 +34,7 @@ module.exports = env => { // module.exports is function now to pass in env varia
                                sourceMap: true,
                                ident: 'postcss',
                                plugins: (loader) => [
+                                   require('postcss-css-variables')(),
                                    require('postcss-assets')()
                                ]
                            }
