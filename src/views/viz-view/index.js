@@ -312,7 +312,10 @@ export default class VizView extends Element {
         playButton.addEventListener('click', this.playYearsBind);
     }
     pausePlay(){
-        document.querySelector('.' + s.yearButtonPrevious).classList.remove(s.yearButtonPrevious);
+        var previousYearButton = document.querySelector('.' + s.yearButtonPrevious);
+        if ( previousYearButton ){
+            document.querySelector('.' + s.yearButtonPrevious).classList.remove(s.yearButtonPrevious);
+        }
         this.playBtn.blur();
         this.playBtn.removeEventListener('click', this.pausePlayBind);
         S.setState('isPaused', true);
