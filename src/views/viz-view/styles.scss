@@ -12,11 +12,17 @@
 :global(#viz-view) {
     display: flex;
     justify-content: flex-end; 
+    @media screen and (max-width: 719px){
+            flex-direction: column;
+        }
 }  
 .container { 
         width: calc(100% - 65px);
-    min-width: 320px;
+    min-width: calc(320px - 2.25em);
     .squat & {
+    }
+    @media screen and (max-width: 719px){
+        width: 100%;
     }
 }
 
@@ -84,6 +90,9 @@
     .discontinuedContainer & {
         flex-wrap: wrap;
     }
+    @media screen and (max-width: 399px){
+        margin: 0 !important;
+    }
 }
 .drug {
     width: 100%;
@@ -141,6 +150,13 @@
         right: 10px;
         font-weight: 600;
         font-size: 0.85em;
+        @media screen and (max-width: 719px){
+            right: 2px;
+        }
+        @media screen and (max-width: 399px){
+            right: 0px;
+            font-size: 0.75em;
+        }
         
     }
 
@@ -202,13 +218,13 @@
 }
 
 .phaseFull {
-    @media screen and (max-width: 450px) {
+    @media screen and (max-width: 820px) {
         display: none;
     }
 }
 .phaseAbbr {
     display: none;
-     @media screen and (max-width: 450px) {
+     @media screen and (max-width: 820px) {
         display: block;
     }
 }
@@ -218,6 +234,11 @@
     flex-wrap: wrap;
     width: 65px;
     align-content: flex-start;
+    @media screen and (max-width: 719px){
+            width: 100%;
+            margin-bottom: 20px;
+            //justify-content: space-between;
+        }
 
 }
 .playButton, .yearButton {
@@ -229,8 +250,27 @@
     width: 34px;
     height: 34px;
     cursor: pointer;
+    position: relative;
     &:disabled {
         cursor: not-allowed;
+    }
+    @media screen and (max-width: 719px){
+         &.yearButton {
+             width: 50px;
+            bottom: 1px;
+        }
+    }
+}
+.inputWrapper {
+    @media screen and (max-width: 719px){
+        position: relative;
+        top: 5px;
+        margin-left: 10px;
+        label {
+            position: relative;
+            bottom: 1px;
+            margin-left: 5px;
+        }
     }
 }
 @keyframes pauseSpinner {

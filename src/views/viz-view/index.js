@@ -41,7 +41,7 @@ export default class VizView extends Element {
             });
         });   
             
-        this.heightNeeded = ( this.model.maxActive + this.model.maxDiscontinued + 1 ) * ( this.minUnitDimension + this.unitPadding ) + this.headerHeight + this.unitPadding + 51 + 90 + 61 + 40;
+        this.heightNeeded = ( this.model.maxActive + this.model.maxDiscontinued + 1 ) * ( this.minUnitDimension + this.unitPadding ) + this.headerHeight + this.unitPadding + 200;
         //container
         var view = super.prerender();
         if (this.prerendered && !this.rerender) {
@@ -86,6 +86,7 @@ export default class VizView extends Element {
 
             //animate on/off
             var inputWrapper = document.createElement('div');
+            inputWrapper.classList.add(s.inputWrapper);
             
             var input = document.createElement('input');
             input.classList.add('js-animate-checkbox');
@@ -437,11 +438,11 @@ export default class VizView extends Element {
         } else {
             document.body.classList.remove(s.squat);
         }
-        if ( document.querySelector('#section-comparison .js-inner-content').offsetHeight > window.innerHeight - 100 ) {
+        /*if ( document.querySelector('#section-comparison .js-inner-content').offsetHeight > window.innerHeight ) {
             document.body.classList.add(s.superSquat);
         } else {
             document.body.classList.remove(s.superSquat);
-        }
+        }*/
 
         function adjustCSSVariables() {
             var root = document.documentElement;
