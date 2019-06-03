@@ -16,7 +16,7 @@ const headers = [
     ['Approved', '&#10004']
 ];
 
-const duration = 1200;
+const duration = 120;
 
 var  isFirstLoad = true;
 
@@ -574,7 +574,8 @@ export default class VizView extends Element {
             distance: 3
         });
         console.log(this.animateYears !== false);
-        if ( this.animateYears !== false ) {
+        var isBackward = S.getState('isBackward');
+        if ( this.animateYears !== false && isBackward == false ) {
             this.invertPositions();
         }
             this.playAnimation(resolve, this.animateYears); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
