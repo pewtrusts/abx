@@ -706,6 +706,7 @@ export default class VizView extends Element {
                 });
                 setTimeout(function(){
                     DOMDrug.classList.remove(s.isMoving);
+                    DOMDrug.classList.remove(s.isTranslated);
                     DOMDrug._tippy.popper.style.transitionDuration = '0s';
                     DOMDrug._tippy.hide();
                 }, dur);
