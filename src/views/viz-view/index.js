@@ -711,8 +711,18 @@ export default class VizView extends Element {
                 }, dur);
             });
         }
+        function highlightColumn(bool){
+            if ( column > 0 ){
+                let header = document.querySelectorAll('.' + s.headerDiv)[column - 1];
+                if (bool){
+                    header.classList.add(s.isAnimating);
+                } else {
+                    header.classList.remove(s.isAnimating);
+                }
+            }
+        }
         function animateSingleColumn(resolve){
-
+            highlightColumn(true);
             this.disableYearButtons();
             var matchingDrugIDs = Object.keys(this.previousStatuses).filter(id => this.previousStatuses[id].column === column),
                 matchingDOMDrugs = Array.from(this.nonEmptyDrugs).filter(DOMDrug => matchingDrugIDs.includes(DOMDrug.id));
@@ -772,6 +782,7 @@ export default class VizView extends Element {
 
                         if ( testColumn() ){
                             //setTimeout(() => {
+                                highlightColumn(false);
                                 incrementColumn();
                                 animateSingleColumn.call(this, resolve);
                         } else {
@@ -781,11 +792,14 @@ export default class VizView extends Element {
                                 console.log(S.getState('year')[0], this.model.years[this.model.years.length - 1], S.getState('year')[2]);
                                     this.enablePlayButton();
                                     if ( S.getState('year')[0] == this.model.years[this.model.years.length - 1] ) {
+                                        highlightColumn(false);
                                         this.showReplayOption();
                                     }
                                 if ( !S.getState('isPaused') ){
+                                    highlightColumn(false);
                                     resolve(true);  
                                 } else {
+                                    highlightColumn(false);
                                     this.removePauseOption();
                                     this.enableYearButtons();
                                 }

@@ -191,31 +191,27 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: var(--unit-dimension);
-    border-right: 1px solid #fff;
+    height: var(--header-height);
     position: relative;
+    transition: background-color 0.2s ease-in-out;
     .superSquat & {
         font-size: 0.65em;
         height: auto;
         line-height: 200%;
     }
-    &:last-child {
-        border-width: 0;
-    }
     span {
         //display: block;
-        transition: background-color 0.2s ease-in-out;
+        border-right: 1px solid #fff;
         width: 100%;
-        height: 0;
-        position: absolute;
-        top: -7px;
-        line-height: 45px;
-        background-color: $medium_red;
+        height: var(--unit-dimension);
+        line-height: var(--unit-dimension);
+        //background-color: $medium_red;
+    }
+    &:last-child span {
+        border-width: 0;
     }
     &.isAnimating {
-        span {
             background-color: $red;
-        }
     }
 }
 
