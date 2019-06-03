@@ -684,7 +684,7 @@ export default class VizView extends Element {
             var styleMatch = DOMDrug.style.transform.match(/translate\((.*?)\)/);
             var translateXY = styleMatch ? styleMatch[1].replace(' ','').split(',').map(d => parseInt(d)) : [0,0];
             console.log(translateXY);
-            if ( ( translateXY[0] !== 0 && translateXY[1] !== 0 ) && ( index === 0 || index === 1 || index === 2 ) ){
+            if ( ( translateXY[0] !== 0 || translateXY[1] !== 0 ) && ( index === 0 || index === 1 || index === 2 ) ){
                 DOMDrug.classList.add(s.isMoving);
                 DOMDrug._tippy.show(0);
             }
