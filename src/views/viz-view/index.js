@@ -546,8 +546,6 @@ export default class VizView extends Element {
             discontinuedSpan = document.querySelector('#total-discontinued'),
             year = S.getState('year')[0],
             totals = document.querySelector('#abx-totals');
-
-        document.querySelector('#big-year').fadeInContent(year);
         if ( +year > this.model.years[0] ){
             totals.classList.add('is-subsequent');
         } else {
