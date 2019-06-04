@@ -16,7 +16,7 @@ const headers = [
     ['Approved', '&#10004']
 ];
 
-const duration = 120;
+const duration = 1200;
 
 var  isFirstLoad = true;
 
@@ -609,6 +609,15 @@ export default class VizView extends Element {
                 })
             return acc;
         },{});
+        this.currentStatuses = this.model.data[this.model.years.indexOf(+year + 1)].observations[observation].reduce((acc, phase) => { // cur is the phase object
+                phase.values.forEach(drug => {
+                    acc[drug.id] = {
+                        column: drug[+year + 1][observation].column,
+                        isDiscontinued: drug[+year + 1][observation].isDiscontinued
+                    };
+                })
+            return acc;
+        },{});
         
     }
     recordFirstPositions(){
@@ -680,6 +689,7 @@ export default class VizView extends Element {
         function transition(DOMDrug, dur = duration, index = null){
            // var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ','').split(',');
            // var distanceToTravel = Math.sqrt( Math.abs(parseInt(translateXY[0])) ** 2 + Math.abs(parseInt(translateXY[0])) ** 2 );
+           var _this = this;
             var styleMatch = DOMDrug.style.transform.match(/translate\((.*?)\)/);
             var translateXY = styleMatch ? styleMatch[1].replace(' ','').split(',').map(d => parseInt(d)) : [0,0];
             console.log(translateXY);
@@ -697,11 +707,34 @@ export default class VizView extends Element {
                     DOMDrug._tippy.popper.style.transitionDuration = dur / 1000 + 's';
                     DOMDrug._tippy.popper.style.transitionTimingFunction = 'ease-in-out';
                 }
-                window.requestAnimationFrame(function(){
+                window.requestAnimationFrame(() => {
                    if ( index === 0 || index === 1 || index === 2 ){
                     DOMDrug._tippy.popper.style.transform = `translate3d(${parseInt(popperCurrentTranslate3d[0]) - parseInt(translateXY[0])}px, ${parseInt(popperCurrentTranslate3d[1]) - parseInt(translateXY[1])}px, 0px)`;
                    }
-                    DOMDrug.style.transform = 'translate(0px,0px)';
+                   if ( _this.currentStatuses ){
+                       let currentColumn = _this.currentStatuses[DOMDrug.id] ? _this.currentStatuses[DOMDrug.id].column : 0;
+                       let isDiscontinued = _this.currentStatuses[DOMDrug.id] ? _this.currentStatuses[DOMDrug.id].isDiscontinued : false;
+                       let previousColumn = _this.previousStatuses[DOMDrug.id].column;
+                       let currentIndexInColumn = _this.phaseMembers[1][currentColumn][ (isDiscontinued ? 'discontinued' : 'active') ].indexOf(DOMDrug.id);
+                       let currentColumnLength = _this.phaseMembers[1][currentColumn][ (isDiscontinued ? 'discontinued' : 'active') ].length;
+                       let previousColumnLength = _this.phaseMembers[0][currentColumn][ (isDiscontinued ? 'discontinued' : 'active') ].length;
+                        if ( currentColumn < previousColumn ) {
+                            console.log('moving backward!');
+                            if ( currentIndexInColumn < previousColumnLength ){
+                                let difference1 = previousColumnLength - currentIndexInColumn;
+                                let difference2 = currentColumnLength - currentIndexInColumn;
+                                let difference = Math.max(difference1, difference2);
+                                let offsetY = isDiscontinued ? difference * 32 : 0 - difference * 32;
+                                DOMDrug.style.transform = `translate(0px,${offsetY}px)`;
+                            } else {
+                                DOMDrug.style.transform = 'translate(0px,0px)';
+                            }
+                        } else {
+                            DOMDrug.style.transform = 'translate(0px,0px)';
+                        }
+                    } else {
+                        DOMDrug.style.transform = 'translate(0px,0px)';
+                    }
                 });
                 setTimeout(function(){
                     DOMDrug.classList.remove(s.isMoving);
@@ -745,6 +778,7 @@ export default class VizView extends Element {
             console.log(lengthOfAllSubsets);
             
             function handleSubset(index){
+                var _this = this;
                 console.log('    subset ' + index , subsets[index]);
                 new Promise(resolve => {
                     if (subsets[index].length === 0){
@@ -762,7 +796,7 @@ export default class VizView extends Element {
                             }
                             setTimeout(() => {
                                 console.log(dur);
-                                transition(DOMDrug, dur, index); // passing in the existing translate coords so that timing can be base on distance
+                                transition.call(_this, DOMDrug, dur, index); // passing in the existing translate coords so that timing can be base on distance
                             }, delay);
                             if ( i === array.length - 1 ){
                                 let resolveDelay = index === 4 ? dur * 2 : dur * (i + 1);
@@ -817,7 +851,7 @@ export default class VizView extends Element {
 
             
             this.nonEmptyDrugs.forEach((DOMDrug) => {
-                transition(DOMDrug, 0);
+                transition.call(this, DOMDrug, 0);
             });
             isFirstLoad = false;
        //     resolveTrue(duration); */
