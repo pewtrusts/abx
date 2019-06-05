@@ -734,6 +734,7 @@ export default class VizView extends Element {
         function animateSingleColumn(resolve){
             highlightColumn(true);
             this.disableYearButtons();
+
             var matchingDrugIDs = Object.keys(this.previousStatuses).filter(id => this.previousStatuses[id].column === column),
                 matchingDOMDrugs = Array.from(this.nonEmptyDrugs).filter(DOMDrug => matchingDrugIDs.includes(DOMDrug.id));
             var elementsWillStayButMove = matchingDOMDrugs.filter(el => {
@@ -820,7 +821,9 @@ export default class VizView extends Element {
                     }
                 });
             }
-            handleSubset.call(this,0);
+            setTimeout(() => {
+                handleSubset.call(this,0);
+            },500);
           
         } // end animateSingleColumn
         
