@@ -687,12 +687,13 @@ export default class VizView extends Element {
         }
         
         function transition(DOMDrug, dur = duration, index = null){
+            let _index = index;
            // var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ','').split(',');
            // var distanceToTravel = Math.sqrt( Math.abs(parseInt(translateXY[0])) ** 2 + Math.abs(parseInt(translateXY[0])) ** 2 );
             var styleMatch = DOMDrug.style.transform.match(/translate\((.*?)\)/);
             var translateXY = styleMatch ? styleMatch[1].replace(' ','').split(',').map(d => parseInt(d)) : [0,0];
             console.log(translateXY);
-            if ( ( translateXY[0] !== 0 || translateXY[1] !== 0 ) && ( index === 0 || index === 1 || index === 2 ) ){
+            if ( ( translateXY[0] !== 0 || translateXY[1] !== 0 ) && ( index === 0 || index === 1 || index === 3 ) ){
                 DOMDrug.classList.add(s.isMoving);
                 DOMDrug._tippy.show(0);
             }
@@ -702,12 +703,12 @@ export default class VizView extends Element {
                 var match = DOMDrug._tippy.popper.style.transform.match(/translate3d\((.*?)\)/);
                 var popperCurrentTranslate3d = match ? match[1].replace(' ','').split(',').map(d => parseInt(d)) : [0,0,0];
                 console.log(popperCurrentTranslate3d);
-                if ( index === 0 || index === 1 || index === 2 ){
+                if ( _index === 0 || _index === 1 || _index === 3 ){
                     DOMDrug._tippy.popper.style.transitionDuration = dur / 1000 + 's';
                     DOMDrug._tippy.popper.style.transitionTimingFunction = 'ease-in-out';
                 }
                 window.requestAnimationFrame(function(){
-                   if ( index === 0 || index === 1 || index === 2 ){
+                   if ( _index === 0 || _index === 1 || _index === 3 ){
                     DOMDrug._tippy.popper.style.transform = `translate3d(${parseInt(popperCurrentTranslate3d[0]) - parseInt(translateXY[0])}px, ${parseInt(popperCurrentTranslate3d[1]) - parseInt(translateXY[1])}px, 0px)`;
                    }
                     DOMDrug.style.transform = 'translate(0px,0px)';
@@ -746,7 +747,7 @@ export default class VizView extends Element {
             var elementsWillMoveBackward = matchingDOMDrugs.filter(el => this.previousStatuses[el.id].column > this.model.unnestedData.find(d => d.id === el.id)[currentYear][currentObservation].column );
             var elementsWillEnter = matchingDOMDrugs.filter(el => this.previousStatuses[el.id].column === 0);
 
-            var subsets = [elementsWillMoveForward, elementsWillMoveBackward, elementsWillChangeStatus, elementsWillStayButMove, elementsWillEnter];
+            var subsets = [elementsWillMoveForward, elementsWillMoveBackward, elementsWillStayButMove, elementsWillChangeStatus, elementsWillEnter];
            // console.log(elementsWillStayButMove);
             var lengthOfAllSubsets = subsets.reduce(function(acc,cur){
                 return acc + cur.length;
@@ -754,27 +755,29 @@ export default class VizView extends Element {
             console.log(lengthOfAllSubsets);
             
             function handleSubset(index){
+                let _index = index;
                 console.log('    subset ' + index , subsets[index]);
                 new Promise(resolve => {
-                    if (subsets[index].length === 0){
+                    if (subsets[_index].length === 0){
                         console.log('      skipping ^');
                         resolve(true);        // if the subset is empty, resolve right away
                     } else {
-                        subsets[index].forEach((DOMDrug, i, array) => {
+                        subsets[_index].forEach((DOMDrug, i, array) => {
                             //var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ').split(',');
                             //var dur = translateXY[0] === 0 && translateXY[1] === 0 ? 0 : duration;
-                            var dur = index === 3 ? duration / 12 : index === 4 ? duration / 1.5 : duration; // speeds up transition for drugs that will stay but move; slows it down for  drugs that will enter
-                            var delay = index === 3 ? dur * .5 * i : index === 4 ? dur * .1 * i : dur * i;
+                            var dur = _index === 2 ? duration / 12 : _index === 4 ? duration / 1.5 : duration; // speeds up transition for drugs that will stay but move; slows it down for  drugs that will enter
+                            var delay = _index === 2 ? dur * .5 * i : _index === 4 ? dur * .1 * i : dur * i;
                             if (!animateYears){
                                 dur = 0;
                                 delay = 0; 
                             }
                             setTimeout(() => {
                                 console.log(dur);
-                                transition(DOMDrug, dur, index); // passing in the existing translate coords so that timing can be base on distance
+                                transition(DOMDrug, dur, _index); // passing in the existing translate coords so that timing can be base on distance
                             }, delay);
                             if ( i === array.length - 1 ){
-                                let resolveDelay = index === 4 ? dur * 2 : dur * (i + 1);
+                                console.log(_index);
+                                let resolveDelay = _index === 4 ? dur * 2 : _index === 2 ? 0 : dur * (i + 1);
                                 setTimeout(() => {
                                     resolve(true);
                                 }, resolveDelay); // wait until last item in subset has finished its transition
@@ -795,7 +798,7 @@ export default class VizView extends Element {
                                 incrementColumn();
                                 animateSingleColumn.call(this, resolve);
                         } else {
-                            let delayBetweenObservation = lengthOfAllSubsets === 0 ? 0 : duration;
+                            let delayBetweenObservation = 0; // legacy
                             setTimeout(() => {
                                 this.enableYearButtons();
                                 console.log(S.getState('year')[0], this.model.years[this.model.years.length - 1], S.getState('year')[2]);
