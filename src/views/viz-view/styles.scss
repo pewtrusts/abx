@@ -324,6 +324,17 @@
         color: #333;
         font-weight: 900;
         cursor: not-allowed;
+        &::before {
+            content: '';
+            position: absolute;
+            display: block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: $medium_red;
+            left: -13px;
+            top: 13px;
+        }
        
         
     }
