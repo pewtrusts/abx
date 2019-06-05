@@ -4,6 +4,7 @@ import { stateModule as S } from 'stateful-dead';
 import PS from 'pubsub-setter';
 import tippy from 'tippy.js';
 import './tippy-styles.scss';
+import { GTMPush } from '@Utils';
 
 const minUnitDimension = 30; // minimum px height/width accepted for touchable element
 const headerHeight = 1.5 * minUnitDimension; // the height of the phase-heading bars relative to minUnitDimension
@@ -294,8 +295,10 @@ export default class VizView extends Element {
         this.animateYears = true;
         function handler(el){
             if ( el.checked ){
+                GTMPush('ABXAnimation|ToggleAnimation|On');
                 this.animateYears = true;
             } else {
+                GTMPush('ABXAnimation|ToggleAnimation|Off');
                 this.animateYears = false;
             }
             console.log(this);
@@ -342,6 +345,11 @@ export default class VizView extends Element {
         });
     }
     playYears(event){
+        if ( event === 'reciprocal' ){
+            GTMPush('ABXAnimation|Replay');
+        } else {
+            GTMPush('ABXAnimation|Play');
+        }
         let thisResolveDelay = this.animateYears ? 0 : 0.625 * duration;
         S.setState('isPaused', false);
         S.setState('isBackward', false);
@@ -486,6 +494,7 @@ export default class VizView extends Element {
                 var currentYear = S.getState('year')[0];
                 console.log(currentYear, this.value);
                 if ( currentYear != this.value ) { // is not the already selected button
+                    GTMPush('ABXAnimation|Year|' + this.value);
                     S.setState('isPaused', false);
                     this.blur();
                     _this.disablePlayButton();
