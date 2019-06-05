@@ -342,6 +342,7 @@ export default class VizView extends Element {
         });
     }
     playYears(event){
+        let thisResolveDelay = this.animateYears ? 0 : 750;
         S.setState('isPaused', false);
         S.setState('isBackward', false);
        // S.setState('isSameYear', false);
@@ -359,7 +360,9 @@ export default class VizView extends Element {
                     new Promise(resolve => {
                         this.setYearState([currentYear, resolve, 0]); 
                     }).then(() => {
-                        nextPromise.call(this);
+                        setTimeout(() => {
+                            nextPromise.call(this);
+                        }, thisResolveDelay);
                     });    
             
             } else {
@@ -383,12 +386,15 @@ export default class VizView extends Element {
                 this.playYears('reciprocal');
             }, _duration);
         } else {
+           
                 new Promise((resolve) => {
                     if ( S.getState('isPaused') ){
                         this.enableYearButtons();
                         resolve(false);
                     } else {
-                        resolve(true);
+                        //setTimeout(() => {
+                            resolve(true);
+                        //}, thisResolveDelay);
                     }
                 }).then(resolution => {
                     if ( !S.getState('isPaused') && resolution === true ){
@@ -772,6 +778,9 @@ export default class VizView extends Element {
                             if ( i === array.length - 1 ){
                                 console.log(_index);
                                 let resolveDelay = _index === 4 ? dur * 2 + subsetDelay : _index === 2 ? 0 : dur * (i + 1) + subsetDelay;
+                                if ( !animateYears ){
+                                    resolveDelay = 0;
+                                }
                                 setTimeout(() => {
                                     resolve(true);
                                 }, resolveDelay); // wait until last item in subset has finished its transition
@@ -792,7 +801,7 @@ export default class VizView extends Element {
                                 incrementColumn();
                                 animateSingleColumn.call(this, resolve);
                         } else {
-                            let delayBetweenObservation = animateYears ? 0 : 750
+                            let delayBetweenObservation = animateYears ? 0 : 0
                             setTimeout(() => {
                                 this.enableYearButtons();
                                 console.log(S.getState('year')[0], this.model.years[this.model.years.length - 1], S.getState('year')[2]);
