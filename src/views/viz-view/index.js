@@ -374,13 +374,14 @@ export default class VizView extends Element {
         
         var currentYear = S.getState('year')[0];
         if ( this.model.years.indexOf(+currentYear) === this.model.years.length - 1 ){
+            let _duration = this.animateYears ? duration : 750;
             this.removeReplayOption();
             isFirstLoad = true;
             this.clearAttributesAndDetails();
             this.setYearState([this.model.years[0], null, 0], true);
             setTimeout(() => {
                 this.playYears('reciprocal');
-            }, duration * 2);
+            }, _duration);
         } else {
                 new Promise((resolve) => {
                     if ( S.getState('isPaused') ){
