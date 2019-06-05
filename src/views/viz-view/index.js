@@ -732,6 +732,7 @@ export default class VizView extends Element {
             }
         }
         function animateSingleColumn(resolve){
+            let subsetDelay = this.animateYears ? 500 : 0;
             highlightColumn(true);
             this.disableYearButtons();
 
@@ -756,6 +757,7 @@ export default class VizView extends Element {
             console.log(lengthOfAllSubsets);
             
             function handleSubset(index){
+                
                 let _index = index;
                 console.log('    subset ' + index , subsets[index]);
                 new Promise(resolve => {
@@ -778,7 +780,7 @@ export default class VizView extends Element {
                             }, delay);
                             if ( i === array.length - 1 ){
                                 console.log(_index);
-                                let resolveDelay = _index === 4 ? dur * 2 : _index === 2 ? 0 : dur * (i + 1);
+                                let resolveDelay = _index === 4 ? dur * 2 + subsetDelay : _index === 2 ? 0 : dur * (i + 1) + subsetDelay;
                                 setTimeout(() => {
                                     resolve(true);
                                 }, resolveDelay); // wait until last item in subset has finished its transition
@@ -799,7 +801,7 @@ export default class VizView extends Element {
                                 incrementColumn();
                                 animateSingleColumn.call(this, resolve);
                         } else {
-                            let delayBetweenObservation = 0; // legacy
+                            let delayBetweenObservation = animateYears ? 0 : 750
                             setTimeout(() => {
                                 this.enableYearButtons();
                                 console.log(S.getState('year')[0], this.model.years[this.model.years.length - 1], S.getState('year')[2]);
@@ -823,7 +825,7 @@ export default class VizView extends Element {
             }
             setTimeout(() => {
                 handleSubset.call(this,0);
-            },500);
+            }, subsetDelay);
           
         } // end animateSingleColumn
         
