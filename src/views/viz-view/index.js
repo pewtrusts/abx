@@ -16,7 +16,7 @@ const headers = [
     ['Approved', '&#10004']
 ];
 
-const duration = 1200;
+const duration = 120;
 
 var  isFirstLoad = true;
 
@@ -342,7 +342,7 @@ export default class VizView extends Element {
         });
     }
     playYears(event){
-        let thisResolveDelay = this.animateYears ? 0 : 750;
+        let thisResolveDelay = this.animateYears ? 0 : 0.625 * duration;
         S.setState('isPaused', false);
         S.setState('isBackward', false);
        // S.setState('isSameYear', false);
@@ -377,7 +377,7 @@ export default class VizView extends Element {
         
         var currentYear = S.getState('year')[0];
         if ( this.model.years.indexOf(+currentYear) === this.model.years.length - 1 ){
-            let _duration = this.animateYears ? duration : 750;
+            let _duration = this.animateYears ? duration : 0.625 * duration;
             this.removeReplayOption();
             isFirstLoad = true;
             this.clearAttributesAndDetails();
@@ -583,7 +583,7 @@ export default class VizView extends Element {
         if ( this.animateYears !== false && isBackward == false ) {
             this.invertPositions();
         }
-            this.playAnimation(resolve, this.animateYears); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
+            this.playAnimation(resolve, ( this.animateYears && !isBackward ) ); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
            /* if ( !resolve ){
                 setTimeout(() => {
                     this.enablePlayButton();
@@ -653,24 +653,17 @@ export default class VizView extends Element {
     }
     playAnimation(resolve, animateYears){
         console.log(S.getState('isBackward'));
-        var column = S.getState('isBackward') ? 0 : headers.length,
+        var column = headers.length,
             currentState = S.getState('year'),
             currentYear = currentState[0],
             currentObservation = currentState[2];
         //console.log(currentYear, currentObservation);
             
         function testColumn(){
-            if ( S.getState('isBackward') ){
-                return column < headers.length;
-            }
             return column > 0 ;
         }
         function incrementColumn(){
-            if ( S.getState('isBackward') ){
-                column++;
-            } else {
-                column--;
-            }
+            column--;
         }
        
         function resolveTrue(duration){
@@ -729,7 +722,7 @@ export default class VizView extends Element {
             }
         }
         function animateSingleColumn(resolve){
-            let subsetDelay = this.animateYears ? 500 : 0;
+            let subsetDelay = animateYears ? 500 : 0;
             highlightColumn(true);
             this.disableYearButtons();
 
