@@ -16,7 +16,7 @@ const headers = [
     ['Approved', '&#10004']
 ];
 
-const duration = 120;
+const duration = 1200;
 
 var  isFirstLoad = true;
 
@@ -147,10 +147,10 @@ export default class VizView extends Element {
     populatePlaceholders(yearIndex, observation) {
         console.log(this.previousStatuses);
 
-        function addIdsAndClasses(placeholder, drug, containerIndex){
+        function addIdsAndClasses(placeholder, drug, containerIndex, previousStatuses, model){
             placeholder.id = drug.id;
             placeholder.classList.remove(s.drugEmpty);
-            placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`);
+            placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`, `${ previousStatuses && previousStatuses[drug.id] && previousStatuses[drug.id].isDiscontinued && !drug[model.years[yearIndex]].isDiscontinued ? s.wasDiscontinued : 'nope'}`);
             if ( containerIndex === 1 ){
                 placeholder.classList.add(s.isDiscontinued);
             }
@@ -241,7 +241,7 @@ export default class VizView extends Element {
                 this.phaseMembers[1][i + 1][ ( k === 0 ? 'active' : 'discontinued' ) ].length = 0;
                 filtered.forEach((drug, j) => {
                     var placeholder = column.querySelectorAll('.' + s.drug)[j];
-                    addIdsAndClasses(placeholder, drug, k);
+                    addIdsAndClasses(placeholder, drug, k, this.previousStatuses, this.model);
                     this.phaseMembers[1][i + 1][ ( k === 0 ? 'active' : 'discontinued' ) ].push(drug.id); // place the drug in the proper bucket tracking its column
                 });
                 this.phaseMembers[1][0].active = this.model.unnestedData.filter(d => d[+this.currentYear][this.currentObservation].column === 0).map(each => each.id);

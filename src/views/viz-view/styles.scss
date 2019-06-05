@@ -115,6 +115,8 @@
     }
     .discontinuedContainer & {
         margin-top: var(--unit-padding);
+    }
+    .discontinuedContainer & {
         &:not(.isTranslated){
             &:not(.drugEmpty) {
                 border-color: lighten($gray, 10%);
@@ -131,6 +133,22 @@
                 color: lighten($medium_blue, 15%);
             }
         }
+    }
+    &.wasDiscontinued.isTranslated {
+        &:not(.drugEmpty) {
+            border-color: lighten($gray, 10%);
+            background-color: lighten($gray, 10%);
+        }
+        &.novel {
+            background-color: lighten($green, 15%);
+            border-color: lighten($green, 15%);
+        }
+        &.urgent {
+            border-color: desaturate(lighten($dark_blue, 40%), 40%);
+        }
+        &.gramNegative::after {
+            color: lighten($medium_blue, 15%);
+        }   
     }
     .squat & {
         width: calc(50% - var(--unit-padding));
