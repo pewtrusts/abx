@@ -45,8 +45,8 @@
     align-items: center;
     position: relative;
     margin-bottom: calc( var(--unit-dimension) + var(--unit-padding) );
-    .superSquat & {
-        height: auto;
+    .squat & {
+        height: calc( var(--header-height) * 0.7 );
         margin-bottom: calc( var(--unit-dimension) * 0.7 );
         &::after {
             height: calc(var(--unit-dimension) * 0.7);
@@ -212,6 +212,9 @@
     height: var(--header-height);
     position: relative;
     transition: background-color 0.2s ease-in-out;
+    .squat & {
+        height: calc( var(--header-height) * 0.7 );
+    }
     .superSquat & {
         font-size: 0.65em;
         height: auto;
@@ -250,9 +253,12 @@
     flex-wrap: wrap;
     width: 65px;
     align-content: flex-start;
+    position: relative;
     @media screen and (max-width: 719px){
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+            right: 10px;
+
             //justify-content: space-between;
         }
 
