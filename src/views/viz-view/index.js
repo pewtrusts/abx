@@ -13,7 +13,7 @@ const headers = [
     ['Phase 2', 'P2'],
     ['Phase 3', 'P3'],
     ['Application', 'NDA'],
-    ['Approved', '&#10004']
+    ['Approved', '&#x2713']
 ];
 
 const duration = 1200;
