@@ -610,16 +610,6 @@ export default class VizView extends Element {
                 })
             return acc;
         },{});
-        this.currentStatuses = this.model.data[this.model.years.indexOf(+year + 1)].observations[observation].reduce((acc, phase) => { // cur is the phase object
-                phase.values.forEach(drug => {
-                    acc[drug.id] = {
-                        column: drug[+year + 1][observation].column,
-                        isDiscontinued: drug[+year + 1][observation].isDiscontinued
-                    };
-                })
-            return acc;
-        },{});
-        
     }
     recordFirstPositions(){
         this.firstPositions = Array.from(document.querySelectorAll('.' + s.drug + ':not(' + s.drugEmpty + ')')).reduce((acc, cur) => {
