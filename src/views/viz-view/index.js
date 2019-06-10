@@ -101,7 +101,7 @@ export default class VizView extends Element {
             label.textContent = 'Animate change';
 
             inputWrapper.appendChild(input);
-            inputWrapper.appendChild(label);
+            inputWrapper.appendChil(label);
             controlContainer.appendChild(inputWrapper);
 
 
