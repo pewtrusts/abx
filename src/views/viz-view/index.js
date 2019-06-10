@@ -691,9 +691,12 @@ export default class VizView extends Element {
            // var distanceToTravel = Math.sqrt( Math.abs(parseInt(translateXY[0])) ** 2 + Math.abs(parseInt(translateXY[0])) ** 2 );
             var styleMatch = DOMDrug.style.transform.match(/translate\((.*?)\)/);
             var translateXY = styleMatch ? styleMatch[1].replace(' ','').split(',').map(d => parseInt(d)) : [0,0];
-            console.log(translateXY);
+            console.log(translateXY, DOMDrug);
             if ( ( translateXY[0] !== 0 || translateXY[1] !== 0 ) && ( index === 0 || index === 1 || index === 3 ) ){
                 DOMDrug.classList.add(s.isMoving);
+                if (translateXY[0] > 78 ) {
+                    DOMDrug.classList.add('js-has-moved-backward', s.hasMovedBackward ); // 78 cuz in double column views drugs can move 78 px and still be in the same phase
+                }
                 DOMDrug._tippy.show(0);
             }
             DOMDrug.style.transitionDuration = dur / 1000 + 's';
@@ -710,10 +713,10 @@ export default class VizView extends Element {
                    if ( _index === 0 || _index === 1 || _index === 3 ){
                     DOMDrug._tippy.popper.style.transform = `translate3d(${parseInt(popperCurrentTranslate3d[0]) - parseInt(translateXY[0])}px, ${parseInt(popperCurrentTranslate3d[1]) - parseInt(translateXY[1])}px, 0px)`;
                    }
-                    DOMDrug.style.transform = 'translate(0px,0px)';
+                    DOMDrug.style.transform = DOMDrug.classList.contains('js-has-moved-backward') ? 'translate(0px,0px) rotate(-10deg)' : 'translate(0px,0px)'; 
                 });
                 setTimeout(function(){
-                    DOMDrug.classList.remove(s.isMoving);
+                    DOMDrug.classList.remove(s.isMoving);   
                     DOMDrug.classList.remove(s.isTranslated);
                     DOMDrug._tippy.popper.style.transitionDuration = '0s';
                     DOMDrug._tippy.hide();
@@ -758,6 +761,12 @@ export default class VizView extends Element {
             function handleSubset(index){
                 
                 let _index = index;
+                if ( _index === 1 ){
+                    document.querySelectorAll('.js-has-moved-backward').forEach(function(regressed){
+                        regressed.style.transform = 'translate(0px,0px)';
+                        regressed.classList.remove('js-has-moved-backward', s.hasMovedBackward);
+                    });
+                }
                 console.log('    subset ' + index , subsets[index]);
                 new Promise(resolve => {
                     if (subsets[_index].length === 0){
