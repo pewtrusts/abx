@@ -650,7 +650,7 @@
 
 
 
-    <link href="css/styles.css?v=87548e" rel="stylesheet">
+    <link href="css/styles.css?v=06e683" rel="stylesheet">
   </head>
 
   <body class="has-hover src-views-viz-view--squat">
@@ -1024,7 +1024,7 @@ Data Visualization
                 <h2 id="antibiotic-innovation">Antibiotic Innovation</h2>
                 <p>The Pew Charitable Trusts has tracked the pipeline of antibiotics in clinical development since 2014 and has aggregated updates into an interactive tool that illustrates trends in the pipeline—as drugs are either approved, discontinued from development, or remain stagnant. This longitudinal assessment underscores the long-standing concerns of scientists, doctors, public health officials, and other stakeholders regarding the dangerously low number of antibiotics in development to address current and future patient needs, particularly for treating the most urgent bacterial threats, such as Gram-negative pathogens, and those prioritized by the <a href="https://www.cdc.gov/drugresistance/biggest_threats.html">Centers for Disease Control and Prevention</a> and the <a href="https://www.who.int/news-room/detail/27-02-2017-who-publishes-list-of-bacteria-for-which-new-antibiotics-are-urgently-needed">World Health Organization</a>.</p>
                 <p>Click the play button to see the evolution of the antibiotic pipeline since 2014, or click on an individual year to see the status of the pipeline at a particular point in time. (For a view without animation, uncheck the “animate change” box.) To see additional information about each drug, hover over or tap any of the rectangles.</p>
-
+                <p class="visually-hidden">Visually impaired users may wish to skip to <a href="#summary">the summary of the content</a>.</p>
                 <div class="js-inner-content">
                 </div>
               </section>
@@ -1200,16 +1200,466 @@ Data Visualization
                     <p>Total <strong>approved</strong> antibiotics <span class="since-2014">since 2014</span>: <span id="total-approved" class="total-span">4</span></p>
                     <p>Total <strong>discontinued</strong> antibiotics <span class="since-2014">since 2014</span>: <span id="total-discontinued" class="total-span">6</span></p>
                   </div>
+                  <a name="summary" id="summary"></a>
+                  <div id="visually-hidden-container">
+
+                    <div id="visually-hidden-view" class="visually-hidden">
+                      <h2>2014</h2>
+                      <h3>Phase 1</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Afabicin (Debio 1450) (Debiopharm International SA)</li>
+                        <li>BAL30072 (Basilea Pharmaceutica Ltd.)</li>
+                        <li>CRS3123 (Crestone Inc.)</li>
+                        <li>Delpazolid (LCB01-0371) (LegoChem Biosciences Inc.)</li>
+                        <li>Meropenem + nacubactam (OP0595/RG6080) (Meiji Seika Pharma Co. Ltd. / Fedora Pharmaceuticals Inc. (Roche AG licensee))</li>
+                        <li>Contezolid (MRX-I/MRX-4) (MicuRx Pharmaceuticals Inc.)</li>
+                        <li>TD-1607 (Theravance Biopharma Inc.)</li>
+                        <li>WCK 771 / WCK 2349 (levonadifloxacin, alalevonadifloxacin) (Wockhardt Ltd.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul>
+                        <li>ACHN-975 (Achaogen Inc.)</li>
+                        <li>EDP-788 (Enanta Pharmaceuticals Inc.)</li>
+                      </ul>
+                      <h3>Phase 2</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Avarofloxacin (Allergan plc (formerly Actavis plc))</li>
+                        <li>Brilacidin (Innovation Pharmaceuticals Inc.)</li>
+                        <li>Cefiderocol (S-649266) (Shionogi &amp; Co. Ltd.)</li>
+                        <li>Ceftaroline + avibactam (AstraZeneca plc / Forest Laboratories Inc.)</li>
+                        <li>CG400549 (CrystalGenomics Inc.)</li>
+                        <li>Finafloxacin (MerLion Pharmaceuticals Pte Ltd.)</li>
+                        <li>Gepotidacin (GSK2140944) (GlaxoSmithKline plc)</li>
+                        <li>Imipenem / cilastatin + relebactam (MK-7655A) (Merck &amp; Co. Inc.)</li>
+                        <li>Lefamulin (BC-3781) (Nabriva Therapeutics AG)</li>
+                        <li>Murepavadin (POL7080) (Polyphor AG)</li>
+                        <li>Nemonoxacin (Taigexyn) (TaiGen Biotechnology Co. Ltd.)</li>
+                        <li>Nuzyra (omadacycline) (Paratek Pharmaceuticals Inc.)</li>
+                        <li>Radezolid (Melinta Therapeutics Inc.)</li>
+                        <li>Ramoplanin (Nanotherapeutics Inc.)</li>
+                        <li>Ridinilazole (SMT 19969) (Summit Therapeutics plc)</li>
+                        <li>Zabofloxacin (Dong Wha Pharmaceutical Co. Ltd.)</li>
+                        <li>Zoliflodacin (ETX0914) (Entasis Therapeutics Inc.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul>
+                        <li>Cefilavacin (TD-1792) (R-Pharm / Theravance Biopharma Inc.)</li>
+                        <li>GSK-1322322 (GlaxoSmithKline plc)</li>
+                        <li>LFF571 (Novartis AG)</li>
+                      </ul>
+                      <h3>Phase 3</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Baxdela (delafloxacin) (Melinta Therapeutics Inc.)</li>
+                        <li>Cadazolid (Actelion Pharmaceuticals Ltd.)</li>
+                        <li>Xerava (eravacycline) (Tetraphase Pharmaceuticals Inc.)</li>
+                        <li>Zemdri (plazomicin) (Achaogen Inc.)</li>
+                        <li>Solithromycin/T-4288 (Toyama Chemical Co. Ltd. / Melinta Therapeutics Inc.)</li>
+                        <li>Surotomycin (Cubist Pharmaceuticals Inc.)</li>
+                        <li>Taksta (fusidic acid) (Melinta Therapeutics Inc. (formerly Cempra Pharmaceuticals Inc.))</li>
+                        <li>Vabomere (meropenem + vaborbactam) (The Medicines Company)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul>
+                        <li>Ceftobiprole (Basilea Pharmaceutica Ltd.)</li>
+                      </ul>
+                      <h3>New drug application</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Avycaz (ceftazidime + avibactam) (AstraZeneca plc / Actavis plc)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul></ul>
+                      <h3>Approved</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Dalvance (dalbavancin) (Durata Therapeutics Inc.)</li>
+                        <li>Orbactiv (oritavancin) (The Medicines Company)</li>
+                        <li>Sivextro (tedizolid) (Cubist Pharmaceuticals Inc.)</li>
+                        <li>Zerbaxa (ceftolozane + tazobactam) (Cubist Pharmaceuticals Inc.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul></ul>
+                      <h2>2015</h2>
+                      <h3>Phase 1</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>BAL30072 (Basilea Pharmaceutica Ltd.)</li>
+                        <li>CRS3123 (Crestone Inc.)</li>
+                        <li>Delpazolid (LCB01-0371) (LegoChem Biosciences Inc.)</li>
+                        <li>Meropenem + nacubactam (OP0595/RG6080) (Meiji Seika Pharma Co. Ltd. / Fedora Pharmaceuticals Inc. (Roche AG licensee))</li>
+                        <li>MGB-BP-3 (MGB Biopharma Ltd.)</li>
+                        <li>Nafithromycin (WCK 4873) (Wockhardt Ltd.)</li>
+                        <li>TD-1607 (Theravance Biopharma Inc.)</li>
+                        <li>WCK 771 / WCK 2349 (levonadifloxacin, alalevonadifloxacin) (Wockhardt Ltd.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul>
+                        <li>ACHN-975 (Achaogen Inc.)</li>
+                        <li>EDP-788 (Enanta Pharmaceuticals Inc.)</li>
+                      </ul>
+                      <h3>Phase 2</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Afabicin (Debio 1450) (Debiopharm International SA)</li>
+                        <li>Avarofloxacin (Allergan plc (formerly Actavis plc))</li>
+                        <li>Brilacidin (Innovation Pharmaceuticals Inc.)</li>
+                        <li>Cefiderocol (S-649266) (Shionogi &amp; Co. Ltd.)</li>
+                        <li>Ceftaroline + avibactam (AstraZeneca plc / Forest Laboratories Inc.)</li>
+                        <li>CG400549 (CrystalGenomics Inc.)</li>
+                        <li>Finafloxacin (MerLion Pharmaceuticals Pte Ltd.)</li>
+                        <li>Gepotidacin (GSK2140944) (GlaxoSmithKline plc)</li>
+                        <li>Contezolid (MRX-I/MRX-4) (MicuRx Pharmaceuticals Inc.)</li>
+                        <li>Murepavadin (POL7080) (Polyphor AG)</li>
+                        <li>Nemonoxacin (Taigexyn) (TaiGen Biotechnology Co. Ltd.)</li>
+                        <li>Radezolid (Melinta Therapeutics Inc.)</li>
+                        <li>Ramoplanin (Nanotherapeutics Inc.)</li>
+                        <li>Ridinilazole (SMT 19969) (Summit Therapeutics plc)</li>
+                        <li>Zabofloxacin (Dong Wha Pharmaceutical Co. Ltd.)</li>
+                        <li>Zoliflodacin (ETX0914) (Entasis Therapeutics Inc.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul>
+                        <li>Cefilavacin (TD-1792) (R-Pharm / Theravance Biopharma Inc.)</li>
+                        <li>GSK-1322322 (GlaxoSmithKline plc)</li>
+                        <li>LFF571 (Novartis AG)</li>
+                      </ul>
+                      <h3>Phase 3</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Baxdela (delafloxacin) (Melinta Therapeutics Inc.)</li>
+                        <li>Cadazolid (Actelion Pharmaceuticals Ltd.)</li>
+                        <li>Xerava (eravacycline) (Tetraphase Pharmaceuticals Inc.)</li>
+                        <li>Iclaprim (Motif Bio plc)</li>
+                        <li>Imipenem / cilastatin + relebactam (MK-7655A) (Merck &amp; Co. Inc.)</li>
+                        <li>Lefamulin (BC-3781) (Nabriva Therapeutics AG)</li>
+                        <li>Nuzyra (omadacycline) (Paratek Pharmaceuticals Inc.)</li>
+                        <li>Zemdri (plazomicin) (Achaogen Inc.)</li>
+                        <li>Solithromycin/T-4288 (Toyama Chemical Co. Ltd. / Melinta Therapeutics Inc.)</li>
+                        <li>Surotomycin (Cubist Pharmaceuticals Inc.)</li>
+                        <li>Taksta (fusidic acid) (Melinta Therapeutics Inc. (formerly Cempra Pharmaceuticals Inc.))</li>
+                        <li>Vabomere (meropenem + vaborbactam) (The Medicines Company)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul>
+                        <li>Ceftobiprole (Basilea Pharmaceutica Ltd.)</li>
+                      </ul>
+                      <h3>New drug application</h3>
+                      <h4>Active</h4>
+                      <ul></ul>
+                      <h4>Inactive</h4>
+                      <ul></ul>
+                      <h3>Approved</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Avycaz (ceftazidime + avibactam) (AstraZeneca plc / Actavis plc)</li>
+                        <li>Dalvance (dalbavancin) (Durata Therapeutics Inc.)</li>
+                        <li>Orbactiv (oritavancin) (The Medicines Company)</li>
+                        <li>Sivextro (tedizolid) (Cubist Pharmaceuticals Inc.)</li>
+                        <li>Zerbaxa (ceftolozane + tazobactam) (Cubist Pharmaceuticals Inc.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul></ul>
+                      <h2>2016</h2>
+                      <h3>Phase 1</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Cefepime + zidebactam (WCK 5222) (Wockhardt Ltd.)</li>
+                        <li>CRS3123 (Crestone Inc.)</li>
+                        <li>Delpazolid (LCB01-0371) (LegoChem Biosciences Inc.)</li>
+                        <li>GSK-3342830 (GlaxoSmithKline plc (Shionogi licensee))</li>
+                        <li>KBP-7072 (KBP BioSciences Pharmaceutical Technical Co. Ltd.)</li>
+                        <li>DNV3837 (MCB3837) (Deinove SA (formerly Morphochem AG))</li>
+                        <li>Meropenem + nacubactam (OP0595/RG6080) (Meiji Seika Pharma Co. Ltd. / Fedora Pharmaceuticals Inc. (Roche AG licensee))</li>
+                        <li>MGB-BP-3 (MGB Biopharma Ltd.)</li>
+                        <li>Nafithromycin (WCK 4873) (Wockhardt Ltd.)</li>
+                        <li>TD-1607 (Theravance Biopharma Inc.)</li>
+                        <li>TP-271 (Tetraphase Pharmaceuticals Inc.)</li>
+                        <li>TP-6076 (Tetraphase Pharmaceuticals Inc.)</li>
+                        <li>WCK 771 / WCK 2349 (levonadifloxacin, alalevonadifloxacin) (Wockhardt Ltd.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul>
+                        <li>ACHN-975 (Achaogen Inc.)</li>
+                        <li>BAL30072 (Basilea Pharmaceutica Ltd.)</li>
+                        <li>EDP-788 (Enanta Pharmaceuticals Inc.)</li>
+                      </ul>
+                      <h3>Phase 2</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Afabicin (Debio 1450) (Debiopharm International SA)</li>
+                        <li>Brilacidin (Innovation Pharmaceuticals Inc.)</li>
+                        <li>Ceftaroline + avibactam (AstraZeneca plc / Forest Laboratories Inc.)</li>
+                        <li>CG400549 (CrystalGenomics Inc.)</li>
+                        <li>Finafloxacin (MerLion Pharmaceuticals Pte Ltd.)</li>
+                        <li>Gepotidacin (GSK2140944) (GlaxoSmithKline plc)</li>
+                        <li>Contezolid (MRX-I/MRX-4) (MicuRx Pharmaceuticals Inc.)</li>
+                        <li>Murepavadin (POL7080) (Polyphor AG)</li>
+                        <li>Nemonoxacin (Taigexyn) (TaiGen Biotechnology Co. Ltd.)</li>
+                        <li>Ramoplanin (Nanotherapeutics Inc.)</li>
+                        <li>Ridinilazole (SMT 19969) (Summit Therapeutics plc)</li>
+                        <li>Zoliflodacin (ETX0914) (Entasis Therapeutics Inc.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul>
+                        <li>Avarofloxacin (Allergan plc (formerly Actavis plc))</li>
+                        <li>Cefilavacin (TD-1792) (R-Pharm / Theravance Biopharma Inc.)</li>
+                        <li>GSK-1322322 (GlaxoSmithKline plc)</li>
+                        <li>LFF571 (Novartis AG)</li>
+                        <li>Radezolid (Melinta Therapeutics Inc.)</li>
+                      </ul>
+                      <h3>Phase 3</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Cadazolid (Actelion Pharmaceuticals Ltd.)</li>
+                        <li>Cefiderocol (S-649266) (Shionogi &amp; Co. Ltd.)</li>
+                        <li>Xerava (eravacycline) (Tetraphase Pharmaceuticals Inc.)</li>
+                        <li>Iclaprim (Motif Bio plc)</li>
+                        <li>Imipenem / cilastatin + relebactam (MK-7655A) (Merck &amp; Co. Inc.)</li>
+                        <li>Lefamulin (BC-3781) (Nabriva Therapeutics AG)</li>
+                        <li>Nuzyra (omadacycline) (Paratek Pharmaceuticals Inc.)</li>
+                        <li>Zemdri (plazomicin) (Achaogen Inc.)</li>
+                        <li>Taksta (fusidic acid) (Melinta Therapeutics Inc. (formerly Cempra Pharmaceuticals Inc.))</li>
+                        <li>Vabomere (meropenem + vaborbactam) (The Medicines Company)</li>
+                        <li>Zabofloxacin (Dong Wha Pharmaceutical Co. Ltd.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul>
+                        <li>Ceftobiprole (Basilea Pharmaceutica Ltd.)</li>
+                        <li>Surotomycin (Cubist Pharmaceuticals Inc.)</li>
+                      </ul>
+                      <h3>New drug application</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Baxdela (delafloxacin) (Melinta Therapeutics Inc.)</li>
+                        <li>Solithromycin/T-4288 (Toyama Chemical Co. Ltd. / Melinta Therapeutics Inc.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul></ul>
+                      <h3>Approved</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Avycaz (ceftazidime + avibactam) (AstraZeneca plc / Actavis plc)</li>
+                        <li>Dalvance (dalbavancin) (Durata Therapeutics Inc.)</li>
+                        <li>Orbactiv (oritavancin) (The Medicines Company)</li>
+                        <li>Sivextro (tedizolid) (Cubist Pharmaceuticals Inc.)</li>
+                        <li>Zerbaxa (ceftolozane + tazobactam) (Cubist Pharmaceuticals Inc.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul></ul>
+                      <h2>2017</h2>
+                      <h3>Phase 1</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>AIC499 (AiCuris Anti-infective Cures GmbH)</li>
+                        <li>Cefepime + VNRX-5133 (VenatoRx Pharmaceuticals Inc.)</li>
+                        <li>Cefepime + zidebactam (WCK 5222) (Wockhardt Ltd.)</li>
+                        <li>CRS3123 (Crestone Inc.)</li>
+                        <li>Delpazolid (LCB01-0371) (LegoChem Biosciences Inc.)</li>
+                        <li>DS-2969 (Daiichi Sankyo Co., Ltd.)</li>
+                        <li>ETX2514SUL (Entasis Therapeutics Inc.)</li>
+                        <li>GSK-3342830 (GlaxoSmithKline plc (Shionogi licensee))</li>
+                        <li>KBP-7072 (KBP BioSciences Pharmaceutical Technical Co. Ltd.)</li>
+                        <li>DNV3837 (MCB3837) (Deinove SA (formerly Morphochem AG))</li>
+                        <li>Meropenem + nacubactam (OP0595/RG6080) (Meiji Seika Pharma Co. Ltd. / Fedora Pharmaceuticals Inc. (Roche AG licensee))</li>
+                        <li>MGB-BP-3 (MGB Biopharma Ltd.)</li>
+                        <li>SPR741 (Spero Therapeutics Inc.)</li>
+                        <li>SPR994 (Spero Therapeutics Inc.)</li>
+                        <li>TP-271 (Tetraphase Pharmaceuticals Inc.)</li>
+                        <li>TP-6076 (Tetraphase Pharmaceuticals Inc.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul>
+                        <li>ACHN-975 (Achaogen Inc.)</li>
+                        <li>BAL30072 (Basilea Pharmaceutica Ltd.)</li>
+                        <li>EDP-788 (Enanta Pharmaceuticals Inc.)</li>
+                        <li>TD-1607 (Theravance Biopharma Inc.)</li>
+                      </ul>
+                      <h3>Phase 2</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Afabicin (Debio 1450) (Debiopharm International SA)</li>
+                        <li>BOS-228 (LYS228) (Boston Pharmaceuticals Inc. (Licensed from Novartis AG))</li>
+                        <li>Brilacidin (Innovation Pharmaceuticals Inc.)</li>
+                        <li>Cefepime + AAI101 (Allecra Therapeutics GmbH)</li>
+                        <li>CG400549 (CrystalGenomics Inc.)</li>
+                        <li>Finafloxacin (MerLion Pharmaceuticals Pte Ltd.)</li>
+                        <li>Gepotidacin (GSK2140944) (GlaxoSmithKline plc)</li>
+                        <li>Murepavadin (POL7080) (Polyphor AG)</li>
+                        <li>Nafithromycin (WCK 4873) (Wockhardt Ltd.)</li>
+                        <li>Nemonoxacin (Taigexyn) (TaiGen Biotechnology Co. Ltd.)</li>
+                        <li>OPS-2071 (Otsuka Pharmaceutical Co. Ltd.)</li>
+                        <li>Ridinilazole (SMT 19969) (Summit Therapeutics plc)</li>
+                        <li>WCK 771 / WCK 2349 (levonadifloxacin, alalevonadifloxacin) (Wockhardt Ltd.)</li>
+                        <li>Zoliflodacin (ETX0914) (Entasis Therapeutics Inc.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul>
+                        <li>Avarofloxacin (Allergan plc (formerly Actavis plc))</li>
+                        <li>Ceftaroline + avibactam (AstraZeneca plc / Forest Laboratories Inc.)</li>
+                        <li>GSK-1322322 (GlaxoSmithKline plc)</li>
+                        <li>LFF571 (Novartis AG)</li>
+                        <li>Radezolid (Melinta Therapeutics Inc.)</li>
+                        <li>Ramoplanin (Nanotherapeutics Inc.)</li>
+                      </ul>
+                      <h3>Phase 3</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Cadazolid (Actelion Pharmaceuticals Ltd.)</li>
+                        <li>Cefiderocol (S-649266) (Shionogi &amp; Co. Ltd.)</li>
+                        <li>Cefilavacin (TD-1792) (R-Pharm / Theravance Biopharma Inc.)</li>
+                        <li>Ceftobiprole (Basilea Pharmaceutica Ltd.)</li>
+                        <li>Xerava (eravacycline) (Tetraphase Pharmaceuticals Inc.)</li>
+                        <li>Iclaprim (Motif Bio plc)</li>
+                        <li>Imipenem / cilastatin + relebactam (MK-7655A) (Merck &amp; Co. Inc.)</li>
+                        <li>Lascufloxacin (KRP-AM1977) (Kyorin Pharmaceutical Co. Ltd.)</li>
+                        <li>Lefamulin (BC-3781) (Nabriva Therapeutics AG)</li>
+                        <li>Contezolid (MRX-I/MRX-4) (MicuRx Pharmaceuticals Inc.)</li>
+                        <li>Nuzyra (omadacycline) (Paratek Pharmaceuticals Inc.)</li>
+                        <li>Solithromycin/T-4288 (Toyama Chemical Co. Ltd. / Melinta Therapeutics Inc.)</li>
+                        <li>Sulopenem (Iterum Therapeutics plc)</li>
+                        <li>Taksta (fusidic acid) (Melinta Therapeutics Inc. (formerly Cempra Pharmaceuticals Inc.))</li>
+                        <li>Zabofloxacin (Dong Wha Pharmaceutical Co. Ltd.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul>
+                        <li>Surotomycin (Cubist Pharmaceuticals Inc.)</li>
+                      </ul>
+                      <h3>New drug application</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Zemdri (plazomicin) (Achaogen Inc.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul></ul>
+                      <h3>Approved</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Avycaz (ceftazidime + avibactam) (AstraZeneca plc / Actavis plc)</li>
+                        <li>Baxdela (delafloxacin) (Melinta Therapeutics Inc.)</li>
+                        <li>Dalvance (dalbavancin) (Durata Therapeutics Inc.)</li>
+                        <li>Orbactiv (oritavancin) (The Medicines Company)</li>
+                        <li>Sivextro (tedizolid) (Cubist Pharmaceuticals Inc.)</li>
+                        <li>Vabomere (meropenem + vaborbactam) (The Medicines Company)</li>
+                        <li>Zerbaxa (ceftolozane + tazobactam) (Cubist Pharmaceuticals Inc.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul></ul>
+                      <h2>2018</h2>
+                      <h3>Phase 1</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>ACX-362E (Acurx Pharmaceuticals LLC)</li>
+                        <li>AIC499 (AiCuris Anti-infective Cures GmbH)</li>
+                        <li>Cefepime + VNRX-5133 (VenatoRx Pharmaceuticals Inc.)</li>
+                        <li>Cefepime + zidebactam (WCK 5222) (Wockhardt Ltd.)</li>
+                        <li>CRS3123 (Crestone Inc.)</li>
+                        <li>Delpazolid (LCB01-0371) (LegoChem Biosciences Inc.)</li>
+                        <li>ETX0282CPDP (Entasis Therapeutics Inc.)</li>
+                        <li>KBP-7072 (KBP BioSciences Pharmaceutical Technical Co. Ltd.)</li>
+                        <li>DNV3837 (MCB3837) (Deinove SA (formerly Morphochem AG))</li>
+                        <li>Meropenem + nacubactam (OP0595/RG6080) (Meiji Seika Pharma Co. Ltd. / Fedora Pharmaceuticals Inc. (Roche AG licensee))</li>
+                        <li>MGB-BP-3 (MGB Biopharma Ltd.)</li>
+                        <li>SPR206 (Spero Therapeutics Inc.)</li>
+                        <li>SPR741 (Spero Therapeutics Inc.)</li>
+                        <li>TP-271 (Tetraphase Pharmaceuticals Inc.)</li>
+                        <li>TP-6076 (Tetraphase Pharmaceuticals Inc.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul>
+                        <li>ACHN-975 (Achaogen Inc.)</li>
+                        <li>BAL30072 (Basilea Pharmaceutica Ltd.)</li>
+                        <li>DS-2969 (Daiichi Sankyo Co., Ltd.)</li>
+                        <li>EDP-788 (Enanta Pharmaceuticals Inc.)</li>
+                        <li>GSK-3342830 (GlaxoSmithKline plc (Shionogi licensee))</li>
+                        <li>TD-1607 (Theravance Biopharma Inc.)</li>
+                      </ul>
+                      <h3>Phase 2</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Afabicin (Debio 1450) (Debiopharm International SA)</li>
+                        <li>BOS-228 (LYS228) (Boston Pharmaceuticals Inc. (Licensed from Novartis AG))</li>
+                        <li>Brilacidin (Innovation Pharmaceuticals Inc.)</li>
+                        <li>CG400549 (CrystalGenomics Inc.)</li>
+                        <li>ETX2514SUL (Entasis Therapeutics Inc.)</li>
+                        <li>Finafloxacin (MerLion Pharmaceuticals Pte Ltd.)</li>
+                        <li>Gepotidacin (GSK2140944) (GlaxoSmithKline plc)</li>
+                        <li>Nafithromycin (WCK 4873) (Wockhardt Ltd.)</li>
+                        <li>Nemonoxacin (Taigexyn) (TaiGen Biotechnology Co. Ltd.)</li>
+                        <li>OPS-2071 (Otsuka Pharmaceutical Co. Ltd.)</li>
+                        <li>Zoliflodacin (ETX0914) (Entasis Therapeutics Inc.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul>
+                        <li>Avarofloxacin (Allergan plc (formerly Actavis plc))</li>
+                        <li>Ceftaroline + avibactam (AstraZeneca plc / Forest Laboratories Inc.)</li>
+                        <li>GSK-1322322 (GlaxoSmithKline plc)</li>
+                        <li>LFF571 (Novartis AG)</li>
+                        <li>Radezolid (Melinta Therapeutics Inc.)</li>
+                        <li>Ramoplanin (Nanotherapeutics Inc.)</li>
+                      </ul>
+                      <h3>Phase 3</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Cefepime + AAI101 (Allecra Therapeutics GmbH)</li>
+                        <li>Cefiderocol (S-649266) (Shionogi &amp; Co. Ltd.)</li>
+                        <li>Cefilavacin (TD-1792) (R-Pharm / Theravance Biopharma Inc.)</li>
+                        <li>Ceftobiprole (Basilea Pharmaceutica Ltd.)</li>
+                        <li>Imipenem / cilastatin + relebactam (MK-7655A) (Merck &amp; Co. Inc.)</li>
+                        <li>Contezolid (MRX-I/MRX-4) (MicuRx Pharmaceuticals Inc.)</li>
+                        <li>Murepavadin (POL7080) (Polyphor AG)</li>
+                        <li>Ridinilazole (SMT 19969) (Summit Therapeutics plc)</li>
+                        <li>Solithromycin/T-4288 (Toyama Chemical Co. Ltd. / Melinta Therapeutics Inc.)</li>
+                        <li>SPR994 (Spero Therapeutics Inc.)</li>
+                        <li>Sulopenem (Iterum Therapeutics plc)</li>
+                        <li>Taksta (fusidic acid) (Melinta Therapeutics Inc. (formerly Cempra Pharmaceuticals Inc.))</li>
+                        <li>WCK 771 / WCK 2349 (levonadifloxacin, alalevonadifloxacin) (Wockhardt Ltd.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul>
+                        <li>Cadazolid (Actelion Pharmaceuticals Ltd.)</li>
+                        <li>Surotomycin (Cubist Pharmaceuticals Inc.)</li>
+                        <li>Zabofloxacin (Dong Wha Pharmaceutical Co. Ltd.)</li>
+                      </ul>
+                      <h3>New drug application</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Iclaprim (Motif Bio plc)</li>
+                        <li>Lascufloxacin (KRP-AM1977) (Kyorin Pharmaceutical Co. Ltd.)</li>
+                        <li>Lefamulin (BC-3781) (Nabriva Therapeutics AG)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul></ul>
+                      <h3>Approved</h3>
+                      <h4>Active</h4>
+                      <ul>
+                        <li>Avycaz (ceftazidime + avibactam) (AstraZeneca plc / Actavis plc)</li>
+                        <li>Baxdela (delafloxacin) (Melinta Therapeutics Inc.)</li>
+                        <li>Dalvance (dalbavancin) (Durata Therapeutics Inc.)</li>
+                        <li>Xerava (eravacycline) (Tetraphase Pharmaceuticals Inc.)</li>
+                        <li>Nuzyra (omadacycline) (Paratek Pharmaceuticals Inc.)</li>
+                        <li>Orbactiv (oritavancin) (The Medicines Company)</li>
+                        <li>Zemdri (plazomicin) (Achaogen Inc.)</li>
+                        <li>Sivextro (tedizolid) (Cubist Pharmaceuticals Inc.)</li>
+                        <li>Vabomere (meropenem + vaborbactam) (The Medicines Company)</li>
+                        <li>Zerbaxa (ceftolozane + tazobactam) (Cubist Pharmaceuticals Inc.)</li>
+                      </ul>
+                      <h4>Inactive</h4>
+                      <ul></ul>
+                    </div>
+                  </div>
                 </div>
               </section>
               <div id="abx-notes">
-                <p><strong>Notes:</strong> Candidates included in this data visualization are consistent with Pew’s methodology for tracking antibiotics in clinical development. More information about methodology and the full underlying data can be found in Pew’s latest pipeline analysis. This interactive tool is updated annually. </p>
+                <p><strong>Notes:</strong> Candidates included in this data visualization are consistent with Pew’s methodology for tracking antibiotics in clinical development. More information about methodology and the full underlying data can be found in <a href="https://www.pewtrusts.org/en/research-and-analysis/data-visualizations/2014/antibiotics-currently-in-clinical-development">Pew’s latest pipeline analysis</a>. This interactive tool is updated annually. </p>
               </div>
               <footer class="download-resources">
                 <div>
-                  <p><strong>Download resources:</strong>
-                    <a class="pct-download" href="">Methodology</a>
-                    <a class="pct-download" href="">Report</a>
+                  <p><strong>Resources:</strong>
+                    <a class="pct-download" href="https://www.pewtrusts.org/en/research-and-analysis/issue-briefs/2019/03/tracking-the-global-pipeline-of-antibiotics-in-development">Methodology</a>
+                    <a class="pct-download" href="https://www.pewtrusts.org/en/research-and-analysis/data-visualizations/2014/antibiotics-currently-in-clinical-development">Report</a>
                   </p>
                 </div>
               </footer>
@@ -1807,8 +2257,8 @@ RELATED		</span>
       };
       gaParams();
     </script>
+    <script src="https://px.ads.linkedin.com/collect/?time=1560528451465&amp;pid=230521&amp;url=http%3A%2F%2Flocalhost%3A8000%2F&amp;fmt=js&amp;s=1" type="text/javascript"></script>
     <script src="https://analytics.twitter.com/i/adsct?p_id=Twitter&amp;p_user_id=0&amp;txn_id=nzc7z&amp;events=%5B%5B%22pageview%22%2Cnull%5D%5D&amp;tw_sale_amount=0&amp;tw_order_quantity=0&amp;tw_iframe_status=0&amp;tpx_cb=twttr.conversion.loadPixels&amp;tw_document_href=http%3A%2F%2Flocalhost%3A8000%2F" type="text/javascript"></script>
-    <script src="https://px.ads.linkedin.com/collect/?time=1560521362821&amp;pid=230521&amp;url=http%3A%2F%2Flocalhost%3A8000%2F&amp;fmt=js&amp;s=1" type="text/javascript"></script>
     <div class="explore-module__modal-container">
       <div class="explore-module__modal-inner">
         <div class="explore-module__close-modal js-close-explore-module">
