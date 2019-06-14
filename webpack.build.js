@@ -53,7 +53,7 @@ module.exports = env => {
                 postProcess: function(renderedRoute){
                     renderedRoute.html = renderedRoute.html.replace(/class="emitted-css" href="(.*?)"/,'class="emitted-css" href="' + publicPath + '$1' + '"');
                     renderedRoute.html = renderedRoute.html.replace(/class="emitted-bundle" src="(.*?)"/g,'class="emitted-bundle" src="' + publicPath + '$1' + '"');
-                    renderedRoute.html = renderedRoute.html.replace(/<head>[\s\S].*<\/head>/,'').replace(/<\/?html>|<\/?body>/g,'');
+                    renderedRoute.html = renderedRoute.html.replace(/<head[\s\S].*<\/head>/,'').replace(/<\/?html.*?>|<\/?body.*?>/g,'');
                     renderedRoute.html = pretty(renderedRoute.html);
                     return renderedRoute;
                 }
