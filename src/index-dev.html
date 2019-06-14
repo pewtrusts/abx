@@ -377,8 +377,14 @@ Data Visualization
     -->
     
 
-
+    <p style="display:none;" class="ie-10-note">This page does not work on Internet Explorer 10 or below. Please use another browser.</p>
     <main role="main" id="pew-app" class="pct-section no-js">
+      <script>
+      //check for IE10
+      if (navigator.userAgent.match(/MSIE 10/)) {
+          document.body.classList.add('is-IE10');
+      }
+      </script>
     <script crossorigin="anonymous" src="https://polyfill.io/v3/polyfill.min.js?features=Promise%2CNodeList.prototype.forEach%2CArray.prototype.filter%2CArray.prototype.fill%2CElement.prototype.classList"></script>
 
     </main>

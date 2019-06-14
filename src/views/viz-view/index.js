@@ -40,8 +40,8 @@ export default class VizView extends Element {
                     discontinued: []
                 };
             });
-        });   
-            
+        });
+          
         this.heightNeeded = ( this.model.maxActive + this.model.maxDiscontinued + 1 ) * ( this.minUnitDimension + this.unitPadding ) + this.headerHeight + this.unitPadding + 200;
         //container
         var view = super.prerender();
