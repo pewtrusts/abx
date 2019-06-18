@@ -179,7 +179,7 @@
         
     }
 
-    &.isMoving, &.hasMovedBackward {
+    &.isMoving {
         z-index: 1;
         &:not(.drugEmpty)::before {
             opacity: 1;
