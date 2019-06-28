@@ -13,10 +13,11 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const repoName = 'abx';
 
 module.exports = env => {
+    var folder = env === 'localpreview' ? '/preview/' : '/docs/';
     return merge(common(), {
         devtool: 'inline-source-map', // may be too slow an option; set to another if so
         plugins: [
-            new CleanWebpackPlugin(['docs']),
+            new CleanWebpackPlugin([folder.replace(/\//g,'')]),
             new HtmlWebpackPlugin({
                 title: 'Analysis Shows Continued Deficiencies in Antiobiotic Development',
                 template: './src/index-dev.html',
@@ -45,7 +46,7 @@ module.exports = env => {
             }]),
             new PrerenderSPAPlugin({
                 // Required - The path to the webpack-outputted app to prerender.
-                staticDir: path.join(__dirname, '/docs/'),
+                staticDir: path.join(__dirname, folder),
                 // Required - Routes to render.
                 routes: ['/'],
                 renderer: new PrerenderSPAPlugin.PuppeteerRenderer({
@@ -64,7 +65,7 @@ module.exports = env => {
         ],
         output: {
             filename: '[name].js',
-            path: path.join(__dirname, '/docs/'),
+            path: path.join(__dirname, folder),
         }
       });
   };
