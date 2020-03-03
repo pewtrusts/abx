@@ -80,7 +80,7 @@ function getRuntimeData(){
                     }
                     index++
                 }
-                model.unnestedData = response.data.map(d => { // turn each string value like "1-1d" into an array , [1,1d]
+                model.unnestedData = response.data;/*.map(d => { // turn each string value like "1-1d" into an array , [1,1d]
                     d.id = 'drug-' + d.id;
                     model.years.forEach(year => {
                         d[year] = [0].map(() => {
@@ -92,8 +92,8 @@ function getRuntimeData(){
                         });
                     });
                     return d;
-                });
-                model.data = model.years.map(year => {
+                });*/
+               /* model.data = model.years.map(year => {
                     return {
                         year,
                         observations: [0].map(observation => { // each year has two observations
@@ -106,24 +106,41 @@ function getRuntimeData(){
                             });
                         })
                     };
+                });*/
+                model.normalized = [];
+                const activeLengths =       [1,2,3,4,5].map(() => model.years.map(() => 0));
+                const discontinuedLengths = [1,2,3,4,5].map(() => model.years.map(() => 0));
+                console.log(activeLengths,discontinuedLengths);
+                model.unnestedData.forEach(drug => {
+                    model.years.forEach((year, i) => {
+                        var copy = JSON.parse(JSON.stringify(drug)); // copy not reference
+                        copy.year = year;
+                        copy.value = copy[year];
+                        var phase = parseInt(copy.value);
+                        if ( isNaN(copy.value) && copy.value.charAt(1) === 'd' ){
+                            discontinuedLengths[phase - 1][i]++;
+                        } else if ( copy.value !== 0 ){
+                            activeLengths[phase - 1][i]++;
+                        }
+                        model.normalized.push(copy);
+                    });
                 });
-                console.log(model);
-                const activeLengths = [];
-                const discontinuedLengths = [];
+                console.log(model, activeLengths, discontinuedLengths);
                 // find the maximum number of nondiscontinued drugs in one column at any time. side effect pushes 
                 // number of discontinued drugs to array for max tbd later
                 // these values will be used to determine when stacked drugs need to be collapsed down
                 // for smaller screens
-                model.data.forEach(d => {
+
+              /*  model.data.forEach(d => {
                     d.observations.forEach((obs,i) => {
                         obs.forEach(phase => {
                             activeLengths.push(phase.values.filter(drug => drug[d.year][i].isDiscontinued !== true).length);
                             discontinuedLengths.push(phase.values.filter(drug => drug[d.year][i].isDiscontinued === true).length);
                         });
                     });
-                });
-                model.maxActive = Math.max(...activeLengths);
-                model.maxDiscontinued = Math.max(...discontinuedLengths);
+                });*/
+                model.maxActive = Math.max(...activeLengths.map(d => Math.max(...d)));
+                model.maxDiscontinued = Math.max(...discontinuedLengths.map(d => Math.max(...d)));
                 console.log(model);
                
                 /* push views now that model is complete */
