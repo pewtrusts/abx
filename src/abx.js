@@ -11,7 +11,7 @@ import data from './data/abx-data.csv';
 
 //views
 import VizView from './views/viz-view/';
-import VisuallyHidden from './views/visually-hidden/';
+//import VisuallyHidden from './views/visually-hidden/';
 //import FiftyStateView from './views/fifty-state/';
 
 // app prototype
@@ -147,7 +147,7 @@ function getRuntimeData(){
                 
                 views.push(
                    this.createComponent(model, VizView, 'div#viz-view', {renderToSelector: '#abx-visualization', rerenderOnDataMismatch: true, parent: this}),
-                   this.createComponent(model, VisuallyHidden, 'div#visually-hidden-view', {renderToSelector: '#visually-hidden-container', rerenderOnDataMismatch: true, parent: this})
+            //       this.createComponent(model, VisuallyHidden, 'div#visually-hidden-view', {renderToSelector: '#visually-hidden-container', rerenderOnDataMismatch: true, parent: this})
                    // this.createComponent(model, FiftyStateView, 'div#fifty-state-view', {renderToSelector: '#section-states .js-inner-content', rerenderOnDataMismatch: true, parent: this})  
                 );
                 

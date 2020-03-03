@@ -19,7 +19,7 @@ const headers = [
 
 const duration = 1200;
 
-var  isFirstLoad = true;
+var isFirstLoad = true;
 
 
 
@@ -268,7 +268,11 @@ export default class VizView extends Element {
           //  ['isBackward', this.toggleIsBackward.bind(this)],
            // ['isSameYear', this.toggleIsSameYear.bind(this)]
         ]);
-        this.setYearState([this.model.years[0], null, 0]);
+        this.columns = {};
+        this.columns.active = document.querySelector('.' + s.activeContainer).querySelectorAll('.' + s.column);
+        this.columns.discontinued = document.querySelector('.' + s.discontinuedContainer).querySelectorAll('.' + s.column);
+        S.setState('year',{ year: this.model.years[0], resolve: null, source: 'load'});
+       // this.setYearState([this.model.years[0], null, 0]);
         this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
         this.checkHeight();
         this.initializeYearButtons();
@@ -526,31 +530,41 @@ export default class VizView extends Element {
         
         // find btn to be deselected and change its appearance
         var toBeDeselectedActive = document.querySelector('.' + s.yearButtonActive);        //observationToCheckAgainst = !S.getState('isBackward') ? 0 : 1;
-       
         toBeDeselectedActive.classList.remove(s.yearButtonActive, s.observation, s.observation0, s.observation1)
-
-      /*  if ( data[2] === observationToCheckAgainst ) { // is first observation
-            toBeDeselectedActive.classList.add(s.yearButtonPrevious);
-        } else {
-            let toBeDeselectedPrevious = document.querySelector('.' + s.yearButtonPrevious);
-            if (toBeDeselectedPrevious) {
-                toBeDeselectedPrevious.classList.remove(s.yearButtonPrevious);
-            }
-        }*/
         
         // find button that matches new selection and change its appearance
-        var btn = document.querySelector('button[value="' + data[0] +'"]');
+        var btn = document.querySelector('button[value="' + data.year +'"]');
         
         //toggle observation 0 or observation 1
         btn.classList.add(s.yearButtonActive);
-       /* if ( data[2] === 0 ){
-            btn.classList.remove(s.observation1);
-        } else {
-            btn.classList.remove(s.observation0);
-        }*/
-        //btn.classList.add(s.observation, s['observation' + data[2]])
-        this.FLIP(parseInt(data[0]), data[1], data[2]); // yearIndex, resolve fn, observation
-        this.updateText();
+      
+        if ( data.source === 'load' ){
+            this.populateInitialDrugs(data.year);
+        }
+        //this.FLIP(parseInt(data[0]), data[1], data[2]); // yearIndex, resolve fn, observation
+       // this.updateText();
+    }
+    addIdsAndClasses(placeholder, drug){
+        placeholder.id = drug.id;
+        placeholder.classList.remove(s.drugEmpty);
+        placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`);//, `${ previousStatuses && previousStatuses[drug.id] && previousStatuses[drug.id].isDiscontinued && !drug[model.years[yearIndex]].isDiscontinued ? s.wasDiscontinued : 'nope'}`);
+        if ( isNaN(drug.value) ){
+            placeholder.classList.add(s.isDiscontinued);
+        }
+        placeholder.setAttribute('data-tippy-content',`<strong>${drug.name}</strong><br />${drug.company}`);
+    }
+    populateInitialDrugs(year){
+        var yearMatches = this.model.normalized.filter(d => d.year === year);
+        ['active','discontinued'].forEach((type, i) => {
+            var typeMatches = i === 0 ? yearMatches.filter(d => !isNaN(d.value)) : yearMatches.filter(d => isNaN(d.value));
+            headers.forEach((phase, j) => {
+                var phaseMatches = typeMatches.filter(d => parseInt(d.value) === j + 1);
+                console.log(phaseMatches);
+                phaseMatches.forEach((drug, k) => {
+                    this.addIdsAndClasses(this.columns[type][j].children[k], drug);
+                });
+            });
+        });
     }
     updateText(){
         // phaseMembers[1] is the current state; [0] is the previous state
