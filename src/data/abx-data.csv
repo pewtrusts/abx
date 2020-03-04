@@ -40,11 +40,11 @@
 39,Meropenem + nacubactam (OP0595/ RG6080),TRUE,TRUE,FALSE,Meiji Seika Pharma Co. Ltd./ Fedora Pharmaceuticals Inc.,1,1,1,1,1,1
 40,MGB-BP-3,TRUE,FALSE,TRUE,MGB Biopharma Ltd.,0,1,1,1,1,2
 41,Contezolid (MRX-I) & contezolid acefosamil (MRX-4),FALSE,FALSE,FALSE,MicuRx Pharmaceuticals Inc.,1,2,2,3,3,3
-42,Murepavadin (POL7080),FALSE,TRUE,TRUE,Polyphor AG,2,2,2,2,3,0
+42,Murepavadin (POL7080),FALSE,TRUE,TRUE,Polyphor AG,2,2,2,2,3,3d
 43,Nafithromycin (WCK 4873),FALSE,FALSE,FALSE,Wockhardt Ltd.,0,1,1,2,2,2
 44,Taigexyn (Nemonoxacin),FALSE,FALSE,FALSE,TaiGen Biotechnology Co. Ltd.,2,2,2,2,2,2
 45,Nuzyra (omadacycline),FALSE,TRUE,FALSE,Paratek Pharmaceuticals Inc.,2,3,3,3,5,5
-46,OPS-2071,TRUE,FALSE,FALSE,Otsuka Pharmaceutical Co. Ltd.,0,0,0,2,2,0
+46,OPS-2071,TRUE,FALSE,FALSE,Otsuka Pharmaceutical Co. Ltd.,0,0,0,2,2,2d
 47,Orbactiv (oritavancin),FALSE,FALSE,FALSE,The Medicines Company,5,5,5,5,5,5
 48,Zemdri (plazomicin),TRUE,TRUE,FALSE,Achaogen Inc.,3,3,3,4,5,5
 49,Radezolid,FALSE,FALSE,FALSE,Melinta Therapeutics Inc.,2,2,2d,2d,2d,2d

@@ -139,8 +139,8 @@ function getRuntimeData(){
                         });
                     });
                 });*/
-                model.maxActive = Math.max(...activeLengths.map(d => Math.max(...d)));
-                model.maxDiscontinued = Math.max(...discontinuedLengths.map(d => Math.max(...d)));
+                model.maxActive = Math.max(...activeLengths.map(d => Math.max(...d))) + 1;
+                model.maxDiscontinued = Math.max(...discontinuedLengths.map(d => Math.max(...d))) + 1;
                 console.log(model);
                
                 /* push views now that model is complete */

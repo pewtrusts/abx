@@ -21,13 +21,13 @@ const duration = 1200;
 
 var isFirstLoad = true;
 
-function arrayFromNumber(num, value){
+/*function arrayFromNumber(num, value){
     var arr = [];
     for ( let i = 0; i < num; i++){
         arr.push(value);
     }
     return arr;
-}
+}*/
 
 export default class VizView extends Element {
     prerender() { // this prerender is called as part of the super constructor
@@ -162,8 +162,8 @@ export default class VizView extends Element {
         this.columns.active = document.querySelector('.' + s.activeContainer).querySelectorAll('.' + s.column);
         this.columns.discontinued = document.querySelector('.' + s.discontinuedContainer).querySelectorAll('.' + s.column);
         this.positionMap = {
-            active: headers.map(() => arrayFromNumber(this.model.maxActive, 'empty')),
-            discontinued: headers.map(() => arrayFromNumber(this.model.maxDiscontinued, 'empty'))
+            active: headers.map(() => []),
+            discontinued: headers.map(() => [])
         };
         console.log(this.positionMap);
         S.setState('year',{ year: this.model.years[0], resolve: null, source: 'load'});
@@ -213,21 +213,105 @@ export default class VizView extends Element {
                 console.log(phaseMatches);
                 phaseMatches.forEach((drug, k) => {
                     this.addIdsAndClasses(this.columns[type][j].children[k], drug);
+                    this.mapPositions({type, phaseIndex: j, slot: k, drug});
                 });
             });
+            console.log(this.positionMap);
         });
-        this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
-        tippy(this.nonEmptyDrugs,{
+        this.setTippys();
+        
+    }
+    setTippys(){
+        tippy('[data-tippy-content]',{
             arrow: true,
             distance: 3
         });
-        this.mapPositions()
     }
-    mapPositions(){
-
+    mapPositions({type, phaseIndex, slot, drug}){
+        this.positionMap[type][phaseIndex][slot] = drug;
     }
-    switchYears(){
+    switchYears({year}){
+        var drugsThatMove = [];
+        var drugsThatStay = [];
+        var phaseIndex = headers.length - 1;
+        var previousYear = S.getPreviousState('year').year;
+        console.log(previousYear, year);
+        function iterate(){
+            ['active','discontinued'].forEach(type => {
+                var length = this.positionMap[type][phaseIndex].length;
+                for ( let i = length - 1; i >= 0; i-- ){
+                    let drug = this.positionMap[type][phaseIndex][i];
+                    console.log(drug[previousYear],drug[year]);
+                    if ( drug[year] !== drug[previousYear] ){
+                        let newType = isNaN(drug[year]) ? 'discontinued' : 'active';
+                        let newPhaseIndex = parseInt(drug[year]) - 1;
+                        // add some attributes to the drug
+                        // put the drug in its new position in the positionMap, ie, the first empty slot of the relevant "column"
+                        this.mapPositions({type: newType, phaseIndex: newPhaseIndex, slot: this.positionMap[newType][newPhaseIndex].length, drug});
+                        // remove the drug from the original position. should be ok bc we are looping in reverse. shouldn't leave gaps
+                        let splice = this.positionMap[type][phaseIndex].splice(i, 1);
+                        console.log(this.positionMap[type][phaseIndex], i, splice);
+                        drug.movedFromProcessedColumn = true;
+                        drugsThatMove.push(drug);
+                    } else {
+                        drug.movedFromProcessedColumn = true;
+                        drugsThatStay.push(drug);
+                    }
+                    drug.phaseIndex = parseInt(drug[year]) - 1;
+                    drug.type = isNaN(drug[year]) ? 'discontinued' : 'active';
 
+                }
+            });
+            console.log(this.positionMap, drugsThatMove, drugsThatStay);
+            this.clearPhase(phaseIndex);
+            this.placeDrugs([...drugsThatMove, ...drugsThatStay.reverse()]);
+            if ( phaseIndex > 0 ){
+                phaseIndex--;
+                setTimeout(iterateBind, 500);
+            } else {
+                //gone through the phases and need to place entering drugs
+                let enteringDrugs = this.model.normalized.filter(d => d.year == this.model.years[0] && d.phaseIndex === undefined && d[year] != 0);
+                console.log('foo', enteringDrugs);
+                this.enterDrugs(enteringDrugs, year);
+                //TODO: does data really need to be normalized after all?
+                this.setTippys();
+            }
+        }
+        var iterateBind = iterate.bind(this);
+        iterateBind();
+        // TODO: after first "column" will need to handle entering drugs
+    }
+    enterDrugs(enteringDrugs, year){
+        enteringDrugs.forEach(drug => {
+            var type = isNaN(drug[year]) ? 'discontinued' : 'active';
+            var phaseIndex = parseInt(drug[year]) - 1;
+            drug.phaseIndex = phaseIndex;
+            drug.type = type;
+            this.mapPositions({type, phaseIndex, slot: this.positionMap[type][phaseIndex].length, drug});
+        }); 
+        this.placeDrugs(enteringDrugs);
+    }
+    placeDrugs(drugs){
+        function handler(drug){
+            var slot = this.positionMap[drug.type][drug.phaseIndex].indexOf(drug);
+            this.addIdsAndClasses(this.columns[drug.type][drug.phaseIndex].children[slot], drug);
+        }
+        var handlerBind = handler.bind(this);
+        drugs.forEach(handlerBind);
+    }
+    clearPhase(phaseIndex){
+        
+        ['active','discontinued'].forEach(type => {
+            this.columns[type][phaseIndex].childNodes.forEach(drugNode => {
+                drugNode.className =  `${s.drug} ${s.drugEmpty}`;
+                drugNode.id = '';
+                drugNode.setAttribute('data-tippy-content','');
+                if ( drugNode._tippy ){
+                    drugNode.removeAttribute('tabindex');
+                    drugNode._tippy.destroy();
+                }
+            }) 
+        });
     }
     initializeYearButtons(){
         document.querySelectorAll('.' + s.yearButton).forEach(button => {
