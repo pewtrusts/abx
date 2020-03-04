@@ -273,7 +273,7 @@ export default class VizView extends Element {
         this.columns.discontinued = document.querySelector('.' + s.discontinuedContainer).querySelectorAll('.' + s.column);
         S.setState('year',{ year: this.model.years[0], resolve: null, source: 'load'});
        // this.setYearState([this.model.years[0], null, 0]);
-        this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
+        
         this.checkHeight();
         this.initializeYearButtons();
         this.initializeAnimateOnOff();
@@ -564,6 +564,11 @@ export default class VizView extends Element {
                     this.addIdsAndClasses(this.columns[type][j].children[k], drug);
                 });
             });
+        });
+        this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
+        tippy(this.nonEmptyDrugs,{
+            arrow: true,
+            distance: 3
         });
     }
     updateText(){
