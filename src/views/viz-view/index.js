@@ -21,7 +21,13 @@ const duration = 1200;
 
 var isFirstLoad = true;
 
-
+function arrayFromNumber(num, value){
+    var arr = [];
+    for ( let i = 0; i < num; i++){
+        arr.push(value);
+    }
+    return arr;
+}
 
 export default class VizView extends Element {
     prerender() { // this prerender is called as part of the super constructor
@@ -145,6 +151,111 @@ export default class VizView extends Element {
 
         return view;
     }
+    init() {
+        PS.setSubs([
+            ['resize', this.checkHeight.bind(this)],
+            ['year', this.update.bind(this)],
+          //  ['isBackward', this.toggleIsBackward.bind(this)],
+           // ['isSameYear', this.toggleIsSameYear.bind(this)]
+        ]);
+        this.columns = {};
+        this.columns.active = document.querySelector('.' + s.activeContainer).querySelectorAll('.' + s.column);
+        this.columns.discontinued = document.querySelector('.' + s.discontinuedContainer).querySelectorAll('.' + s.column);
+        this.positionMap = {
+            active: headers.map(() => arrayFromNumber(this.model.maxActive, 'empty')),
+            discontinued: headers.map(() => arrayFromNumber(this.model.maxDiscontinued, 'empty'))
+        };
+        console.log(this.positionMap);
+        S.setState('year',{ year: this.model.years[0], resolve: null, source: 'load'});
+       // this.setYearState([this.model.years[0], null, 0]);
+        
+        this.checkHeight();
+        this.initializeYearButtons();
+        this.initializeAnimateOnOff();
+        this.initializePlayButton();
+    }
+    update(msg,data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
+        
+        // find btn to be deselected and change its appearance
+        var toBeDeselectedActive = document.querySelector('.' + s.yearButtonActive);        //observationToCheckAgainst = !S.getState('isBackward') ? 0 : 1;
+        toBeDeselectedActive.classList.remove(s.yearButtonActive, s.observation, s.observation0, s.observation1)
+        
+        // find button that matches new selection and change its appearance
+        var btn = document.querySelector('button[value="' + data.year +'"]');
+        
+        //toggle observation 0 or observation 1
+        btn.classList.add(s.yearButtonActive);
+      
+        if ( data.source === 'load' ){
+            this.populateInitialDrugs(data.year);
+        }
+        if ( data.source === 'yearButton' ){
+            this.switchYears(data);
+        }
+        //this.FLIP(parseInt(data[0]), data[1], data[2]); // yearIndex, resolve fn, observation
+       // this.updateText();
+    }
+    addIdsAndClasses(placeholder, drug){
+        placeholder.id = drug.id;
+        placeholder.classList.remove(s.drugEmpty);
+        placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`);//, `${ previousStatuses && previousStatuses[drug.id] && previousStatuses[drug.id].isDiscontinued && !drug[model.years[yearIndex]].isDiscontinued ? s.wasDiscontinued : 'nope'}`);
+        if ( isNaN(drug.value) ){
+            placeholder.classList.add(s.isDiscontinued);
+        }
+        placeholder.setAttribute('data-tippy-content',`<strong>${drug.name}</strong><br />${drug.company}`);
+    }
+    populateInitialDrugs(year){
+        var yearMatches = this.model.normalized.filter(d => d.year === year);
+        ['active','discontinued'].forEach((type, i) => {
+            var typeMatches = i === 0 ? yearMatches.filter(d => !isNaN(d.value)) : yearMatches.filter(d => isNaN(d.value));
+            headers.forEach((phase, j) => {
+                var phaseMatches = typeMatches.filter(d => parseInt(d.value) === j + 1);
+                console.log(phaseMatches);
+                phaseMatches.forEach((drug, k) => {
+                    this.addIdsAndClasses(this.columns[type][j].children[k], drug);
+                });
+            });
+        });
+        this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
+        tippy(this.nonEmptyDrugs,{
+            arrow: true,
+            distance: 3
+        });
+        this.mapPositions()
+    }
+    mapPositions(){
+
+    }
+    switchYears(){
+
+    }
+    initializeYearButtons(){
+        document.querySelectorAll('.' + s.yearButton).forEach(button => {
+            
+            var _this = this;
+            button.addEventListener('click', function(){
+                var currentYear = S.getState('year')[0];
+                if ( currentYear != this.value ) { // is not the already selected button
+                    GTMPush('ABXAnimation|Year|' + this.value);
+                    S.setState('isPaused', false);
+                    this.blur();
+                    _this.disablePlayButton();
+                    _this.removeReplayOption();
+                    if ( +this.value > +currentYear ) {
+                        S.setState('isBackward', false);
+                        new Promise(() => {
+                            S.setState('year', {year: this.value, resolve: null, source: 'yearButton'});
+                        });
+                    } else {
+                        S.setState('isBackward', true);
+                        new Promise(() => {
+                            S.setState('year', {year: this.value, resolve: null, source: 'yearButton'});
+                        })
+                    }
+                }
+            });
+        });
+    }
     populatePlaceholders(yearIndex, observation) {
         console.log(this.previousStatuses);
 
@@ -261,24 +372,7 @@ export default class VizView extends Element {
         this.currentObservation = data[2];
 
     }
-    init() {
-        PS.setSubs([
-            ['resize', this.checkHeight.bind(this)],
-            ['year', this.update.bind(this)],
-          //  ['isBackward', this.toggleIsBackward.bind(this)],
-           // ['isSameYear', this.toggleIsSameYear.bind(this)]
-        ]);
-        this.columns = {};
-        this.columns.active = document.querySelector('.' + s.activeContainer).querySelectorAll('.' + s.column);
-        this.columns.discontinued = document.querySelector('.' + s.discontinuedContainer).querySelectorAll('.' + s.column);
-        S.setState('year',{ year: this.model.years[0], resolve: null, source: 'load'});
-       // this.setYearState([this.model.years[0], null, 0]);
-        
-        this.checkHeight();
-        this.initializeYearButtons();
-        this.initializeAnimateOnOff();
-        this.initializePlayButton();
-    }
+    
    /* toggleIsSameYear(msg,data){
         var container = this.controlContainer || document.querySelector('.' + s.controlContainer);
         if ( data ){
@@ -489,87 +583,6 @@ export default class VizView extends Element {
             */
         }
         adjustCSSVariables.call(this);
-    }
-    initializeYearButtons(){
-        document.querySelectorAll('.' + s.yearButton).forEach(button => {
-            
-            var _this = this;
-            button.addEventListener('click', function(){
-                var currentYear = S.getState('year')[0];
-                console.log(currentYear, this.value);
-                if ( currentYear != this.value ) { // is not the already selected button
-                    GTMPush('ABXAnimation|Year|' + this.value);
-                    S.setState('isPaused', false);
-                    this.blur();
-                    _this.disablePlayButton();
-                    _this.removeReplayOption();
-                //    S.setState('isSameYear', false);
-                    //let observations;
-                    if ( +this.value > +currentYear ) {
-                    //    observations = [0,1];
-                        S.setState('isBackward', false);
-                        new Promise(() => {
-                            _this.setYearState([this.value, null, 0]);
-                        });
-                    } else {
-                    //    observations = [1,0];
-                        S.setState('isBackward', true);
-                        new Promise(() => {
-                            _this.setYearState([this.value, null, 0]);
-                        })
-                    }
-                }/* else {
-                    let observation = this.classList.contains(s.observation0) ? 1 : 0;
-                    S.setState('isSameYear', true);
-                    _this.setYearState([this.value, null, observation]);   
-                }*/
-            });
-        });
-    }
-    update(msg,data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
-        
-        // find btn to be deselected and change its appearance
-        var toBeDeselectedActive = document.querySelector('.' + s.yearButtonActive);        //observationToCheckAgainst = !S.getState('isBackward') ? 0 : 1;
-        toBeDeselectedActive.classList.remove(s.yearButtonActive, s.observation, s.observation0, s.observation1)
-        
-        // find button that matches new selection and change its appearance
-        var btn = document.querySelector('button[value="' + data.year +'"]');
-        
-        //toggle observation 0 or observation 1
-        btn.classList.add(s.yearButtonActive);
-      
-        if ( data.source === 'load' ){
-            this.populateInitialDrugs(data.year);
-        }
-        //this.FLIP(parseInt(data[0]), data[1], data[2]); // yearIndex, resolve fn, observation
-       // this.updateText();
-    }
-    addIdsAndClasses(placeholder, drug){
-        placeholder.id = drug.id;
-        placeholder.classList.remove(s.drugEmpty);
-        placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`);//, `${ previousStatuses && previousStatuses[drug.id] && previousStatuses[drug.id].isDiscontinued && !drug[model.years[yearIndex]].isDiscontinued ? s.wasDiscontinued : 'nope'}`);
-        if ( isNaN(drug.value) ){
-            placeholder.classList.add(s.isDiscontinued);
-        }
-        placeholder.setAttribute('data-tippy-content',`<strong>${drug.name}</strong><br />${drug.company}`);
-    }
-    populateInitialDrugs(year){
-        var yearMatches = this.model.normalized.filter(d => d.year === year);
-        ['active','discontinued'].forEach((type, i) => {
-            var typeMatches = i === 0 ? yearMatches.filter(d => !isNaN(d.value)) : yearMatches.filter(d => isNaN(d.value));
-            headers.forEach((phase, j) => {
-                var phaseMatches = typeMatches.filter(d => parseInt(d.value) === j + 1);
-                console.log(phaseMatches);
-                phaseMatches.forEach((drug, k) => {
-                    this.addIdsAndClasses(this.columns[type][j].children[k], drug);
-                });
-            });
-        });
-        this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
-        tippy(this.nonEmptyDrugs,{
-            arrow: true,
-            distance: 3
-        });
     }
     updateText(){
         // phaseMembers[1] is the current state; [0] is the previous state
