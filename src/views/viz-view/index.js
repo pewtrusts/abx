@@ -245,7 +245,7 @@ export default class VizView extends Element {
                 for ( let i = length - 1; i >= 0; i-- ){
                     let drug = this.positionMap[type][phaseIndex][i];
                     console.log(drug[previousYear],drug[year]);
-                    if ( drug[year] !== drug[previousYear] ){
+                    if ( drug[year] !== drug[previousYear] && drug[year] != 0 ){
                         let newType = isNaN(drug[year]) ? 'discontinued' : 'active';
                         let newPhaseIndex = parseInt(drug[year]) - 1;
                         // add some attributes to the drug
@@ -256,10 +256,13 @@ export default class VizView extends Element {
                         console.log(this.positionMap[type][phaseIndex], i, splice);
                         drug.movedFromProcessedColumn = true;
                         drugsThatMove.push(drug);
-                    } else {
+                    } else if ( drug[year] != 0 ) {
                         drug.movedFromProcessedColumn = true;
                         drugsThatStay.push(drug);
+                    } else { // phase value for the drug this year is zero. ie, moving backward in years
+                        this.positionMap[type][phaseIndex].splice(i, 1);
                     }
+
                     drug.phaseIndex = parseInt(drug[year]) - 1;
                     drug.type = isNaN(drug[year]) ? 'discontinued' : 'active';
 
