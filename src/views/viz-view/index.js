@@ -173,6 +173,9 @@ export default class VizView extends Element {
         this.initializeYearButtons();
         this.initializeAnimateOnOff();
         this.initializePlayButton();
+        this.approvedSpan = document.querySelector('#total-approved');
+        this.discontinuedSpan = document.querySelector('#total-discontinued');
+        this.totals = document.querySelector('#abx-totals');
     }
     update(msg,data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
         
@@ -219,7 +222,7 @@ export default class VizView extends Element {
             console.log(this.positionMap);
         });
         this.setTippys();
-        
+        this.updateText(year);
     }
     setTippys(){
         tippy('[data-tippy-content]',{
@@ -275,6 +278,7 @@ export default class VizView extends Element {
                 this.enterDrugs(enteringDrugs, year);
                 //TODO: does data really need to be normalized after all?
                 this.setTippys();
+                this.updateText(year);
             }
         }
         var iterateBind = iterate.bind(this);
@@ -668,25 +672,20 @@ export default class VizView extends Element {
         }
         adjustCSSVariables.call(this);
     }
-    updateText(){
-        // phaseMembers[1] is the current state; [0] is the previous state
-        var totalActive = this.phaseMembers[1][this.phaseMembers[1].length - 1].active.length,
-            totalDiscontinued = this.phaseMembers[1].reduce((acc,cur) => {
-                return acc + cur.discontinued.length;
-            },0),
-            approvedSpan = document.querySelector('#total-approved'),
-            discontinuedSpan = document.querySelector('#total-discontinued'),
-            year = S.getState('year')[0],
-            totals = document.querySelector('#abx-totals');
+    updateText(year){
+        var totalNonzero = this.model.normalized.filter(d => d.year == year && parseInt(d.value) !== 0 ),
+             totalActive = totalNonzero.filter(d => d.value == 5).length,
+             totalDiscontinued = totalNonzero.filter(d => isNaN(d.value) ).length;
+            
         if ( +year > this.model.years[0] ){
-            totals.classList.add('is-subsequent');
+            this.totals.classList.add('is-subsequent');
         } else {
-            totals.classList.remove('is-subsequent');
+            this.totals.classList.remove('is-subsequent');
         }
-        if ( approvedSpan.innerHTML != totalActive) {
+        if ( this.approvedSpan.innerHTML != totalActive) {
             document.querySelector('#total-approved').fadeInContent(totalActive);
         }
-        if ( discontinuedSpan.innerHTML != totalDiscontinued ) {
+        if ( this.discontinuedSpan.innerHTML != totalDiscontinued ) {
             document.querySelector('#total-discontinued').fadeInContent(totalDiscontinued);
         }
     }
