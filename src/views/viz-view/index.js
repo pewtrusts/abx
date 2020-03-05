@@ -18,6 +18,7 @@ const headers = [
 ];
 
 const duration = 1200;
+//const transitionMS = 1000;
 
 var isFirstLoad = true;
 
@@ -244,8 +245,12 @@ export default class VizView extends Element {
                 var length = this.positionMap[type][phaseIndex].length;
                 for ( let i = length - 1; i >= 0; i-- ){
                     let drug = this.positionMap[type][phaseIndex][i];
-                    console.log(drug[previousYear],drug[year]);
-                    if ( drug[year] !== drug[previousYear] && drug[year] != 0 ){
+                    // if the drug being handled now was just moved from another column during the same round
+                    // we don't want to do anything to it again. set _previousYear to year so that it's treated as
+                    // a drug that stays
+                    let _previousYear = drug.movedFromProcessedColumn ? year : previousYear;
+                    console.log(drug[_previousYear],drug[year]);
+                    if ( drug[year] !== drug[_previousYear] && drug[year] != 0 ){
                         let newType = isNaN(drug[year]) ? 'discontinued' : 'active';
                         let newPhaseIndex = parseInt(drug[year]) - 1;
                         // add some attributes to the drug
@@ -273,7 +278,7 @@ export default class VizView extends Element {
             this.placeDrugs([...drugsThatMove, ...drugsThatStay.reverse()]);
             if ( phaseIndex > 0 ){
                 phaseIndex--;
-                setTimeout(iterateBind, 500);
+                setTimeout(iterateBind, 200);
             } else {
                 //gone through the phases and need to place entering drugs
                 let enteringDrugs = this.model.normalized.filter(d => d.year == this.model.years[0] && d.phaseIndex === undefined && d[year] != 0);
@@ -282,11 +287,20 @@ export default class VizView extends Element {
                 //TODO: does data really need to be normalized after all?
                 this.setTippys();
                 this.updateText(year);
+                this.model.normalized.forEach(d => {
+                    d.movedFromProcessedColumn = false;
+                });
+                this.removeTemporaryPlaceholders();
             }
         }
         var iterateBind = iterate.bind(this);
         iterateBind();
         // TODO: after first "column" will need to handle entering drugs
+    }
+    removeTemporaryPlaceholders(){
+        document.querySelectorAll('[data-temporary]').forEach(el => {
+            el.parentElement.removeChild(el);
+        });
     }
     enterDrugs(enteringDrugs, year){
         enteringDrugs.forEach(drug => {
@@ -301,7 +315,18 @@ export default class VizView extends Element {
     placeDrugs(drugs){
         function handler(drug){
             var slot = this.positionMap[drug.type][drug.phaseIndex].indexOf(drug);
-            this.addIdsAndClasses(this.columns[drug.type][drug.phaseIndex].children[slot], drug);
+            var placeholder = this.columns[drug.type][drug.phaseIndex].children[slot];
+            if ( !placeholder ){ // new method of moving drugs one column at a time may result in interim state of
+                                 // a column having to many drugs, ie more than the number of placeholders calculated when the 
+                                 // app first start. here, if placeholder is undefined, create and insert it.
+                let _placeholder = document.createElement('div');
+                _placeholder.classList.add(s.drug, s.drugEmpty);
+                _placeholder.setAttribute('tabindex',0);
+                _placeholder.setAttribute('data-temporary', true);
+                this.columns[drug.type][drug.phaseIndex].appendChild(_placeholder);
+                placeholder = _placeholder;
+            }
+            this.addIdsAndClasses(placeholder, drug);
         }
         var handlerBind = handler.bind(this);
         drugs.forEach(handlerBind);
