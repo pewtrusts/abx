@@ -234,13 +234,19 @@ export default class VizView extends Element {
     mapPositions({type, phaseIndex, slot, drug}){
         this.positionMap[type][phaseIndex][slot] = drug;
     }
+    recordScreenPosition(drug){
+        if ( !this.isBackward && this.animateYears ){
+            drug.previousScreenPosition = document.querySelector('#drug-' + drug.id).getBoundingClientRect();
+        }
+    }
     switchYears({year}){
-        var drugsThatMove = [];
-        var drugsThatStay = [];
+        
         var phaseIndex = headers.length - 1;
         var previousYear = S.getPreviousState('year').year;
-        this.isBackward = ( +previousYear < year );
+        this.isBackward = ( +previousYear > year );
         function iterate(){
+            var drugsThatMove = [];
+            var drugsThatStay = [];
             ['active','discontinued'].forEach(type => {
                 var length = this.positionMap[type][phaseIndex].length;
                 var _drugsThatStay = [];
@@ -252,9 +258,9 @@ export default class VizView extends Element {
                     drug.previousSlot = i;
                     let _previousYear = drug.movedFromProcessedColumn ? year : previousYear;
                     console.log(drug[_previousYear],drug[year]);
-                    if ( drug[year] !== drug[_previousYear] && drug[year] != 0 ){
+                    if ( drug[year] != drug[_previousYear] && drug[year] != 0 ){
                         // if drug moves columns, record its position on screen
-                        drug.previousScreenPosition = document.querySelector('#drug-' + drug.id).getBoundingClientRect();
+                        this.recordScreenPosition(drug);
                         let newType = isNaN(drug[year]) ? 'discontinued' : 'active';
                         let newPhaseIndex = parseInt(drug[year]) - 1;
                         // add some attributes to the drug
@@ -280,15 +286,15 @@ export default class VizView extends Element {
                 }
                 // drugs that stay (in a column) may still moved, ie, change slots.
                 // compare their previous slot with their new one
-                _drugsThatStay.forEach((drug, i) => {
+                _drugsThatStay.reverse().forEach((drug, i) => {
                     if ( drug.previousSlot != i ){
                         drug.moved = true;
-                        drug.previousScreenPosition = document.querySelector('#drug-' + drug.id).getBoundingClientRect();
+                         this.recordScreenPosition(drug);
                     } else {
                         drug.moved = false;
                     }
                 });
-                drugsThatStay.push(..._drugsThatStay);
+                drugsThatStay.push(..._drugsThatStay.reverse());
             });
 
             console.log(this.positionMap, drugsThatMove, drugsThatStay);
@@ -348,6 +354,20 @@ export default class VizView extends Element {
         }
         var handlerBind = handler.bind(this);
         drugs.forEach(handlerBind);
+        if ( this.animateYears && !this.isBackward ){
+            this.animateDrugs(drugs);
+        }
+    }
+    animateDrugs(drugs){
+        // INVERT
+        drugs.filter(d => d.moved).forEach(drug => {
+            var domDrug = document.querySelector('#drug-' + drug.id);
+            domDrug.style.transitionDuration = '0s';
+            var currentScreenPosition = domDrug.getBoundingClientRect(),
+                deltaY = drug.previousScreenPosition.top - currentScreenPosition.top,
+                deltaX = drug.previousScreenPosition.left - currentScreenPosition.left;
+            domDrug.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        });
     }
     clearPhase(phaseIndex){
         
