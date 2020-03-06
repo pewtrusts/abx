@@ -244,77 +244,87 @@ export default class VizView extends Element {
             var phaseIndex = headers.length - 1;
             var previousYear = S.getPreviousState('year').year;
             this.isBackward = ( +previousYear > year );
-            function iterate(){
+            function iteratePhase(){
                 //set up a promise for each phase. this way we can pass the resolve function around and reolve it later,
                 // after animation has finish orsooner if there is no animation
                 new Promise(resolvePhase => {
-                    var drugsThatMove = [];
-                    var drugsThatStay = [];
-                    // TO DO : need to animate each type separately, resolve a promise when done 
-                    ['active','discontinued'].forEach(type => {
-                        var length = this.positionMap[type][phaseIndex].length;
-                        var _drugsThatStay = [];
-                        for ( let i = length - 1; i >= 0; i-- ){
-                            let drug = this.positionMap[type][phaseIndex][i];
-                            // skip drugs that moved from one type to another during same phase loop, ie, active to discontinued only
-                            if ( !drug.movedFromSamePhase ){
-                                // if the drug being handled now was just moved from another column during the same round
-                                // we don't want to do anything to it again. set _previousYear to year so that it's treated as
-                                // a drug that stays
-                                drug.previousSlot = i;
-                                let _previousYear = drug.movedFromProcessedColumn ? year : previousYear;
-                                console.log(drug[_previousYear],drug[year]);
-                                if ( drug[year] != drug[_previousYear] && drug[year] != 0 ){
-                                    // if drug moves columns, record its position on screen
-                                    this.recordScreenPosition(drug);
-                                    let newType = isNaN(drug[year]) ? 'discontinued' : 'active';
-                                    let newPhaseIndex = parseInt(drug[year]) - 1;
-                                    // add some attributes to the drug
-                                    // put the drug in its new position in the positionMap, ie, the first empty slot of the relevant "column"
-                                    this.mapPositions({type: newType, phaseIndex: newPhaseIndex, slot: this.positionMap[newType][newPhaseIndex].length, drug});
-                                    // remove the drug from the original position. should be ok bc we are looping in reverse. shouldn't leave gaps
-                                    let splice = this.positionMap[type][phaseIndex].splice(i, 1);
-                                    console.log(this.positionMap[type][phaseIndex], i, splice);
-                                    drug.movedFromProcessedColumn = true;
-                                    drug.moved = true;
-                                    
-                                    // need to mark drugs that move from one type to another but within same phase. ie phase 2 to 2d (discontinued)
-                                    // bc we need to exclude that drug from being processed again in the same phase loop
-                                    drug.movedFromSamePhase = parseInt(drug[year]) === parseInt(drug[_previousYear]);
-                                    
-                                    drugsThatMove.push(drug);
-                                } else if ( drug[year] != 0 ) {
-                                    // may not need to record its position on screen. expensive computation
-                                    _drugsThatStay.push(drug);
-                                } else { // phase value for the drug this year is zero. ie, moving backward in years
-                                    // TO DO : also put in another place "exiting"
-                                    this.positionMap[type][phaseIndex].splice(i, 1);
+                    // TO DO : need to animate each type separately, resolve a promise when done
+                    var type = 'active';
+                    var iterateTypeBind;
+                    new Promise(resolveType => {
+                        function iterateType(type){
+                            var drugsThatMove = [];
+                            var drugsThatStay = [];
+                            var length = this.positionMap[type][phaseIndex].length;
+                            for ( let i = length - 1; i >= 0; i-- ){
+                                let drug = this.positionMap[type][phaseIndex][i];
+                                // skip drugs that moved from one type to another during same phase loop, ie, active to discontinued only
+                                if ( !drug.movedFromSamePhase ){
+                                    // if the drug being handled now was just moved from another column during the same round
+                                    // we don't want to do anything to it again. set _previousYear to year so that it's treated as
+                                    // a drug that stays
+                                    drug.previousSlot = i;
+                                    let _previousYear = drug.movedFromProcessedColumn ? year : previousYear;
+                                    console.log(drug[_previousYear],drug[year]);
+                                    if ( drug[year] != drug[_previousYear] && drug[year] != 0 ){
+                                        // if drug moves columns, record its position on screen
+                                        this.recordScreenPosition(drug);
+                                        let newType = isNaN(drug[year]) ? 'discontinued' : 'active';
+                                        let newPhaseIndex = parseInt(drug[year]) - 1;
+                                        // add some attributes to the drug
+                                        // put the drug in its new position in the positionMap, ie, the first empty slot of the relevant "column"
+                                        this.mapPositions({type: newType, phaseIndex: newPhaseIndex, slot: this.positionMap[newType][newPhaseIndex].length, drug});
+                                        // remove the drug from the original position. should be ok bc we are looping in reverse. shouldn't leave gaps
+                                        let splice = this.positionMap[type][phaseIndex].splice(i, 1);
+                                        console.log(this.positionMap[type][phaseIndex], i, splice);
+                                        drug.movedFromProcessedColumn = true;
+                                        drug.moved = true;
+                                        
+                                        // need to mark drugs that move from one type to another but within same phase. ie phase 2 to 2d (discontinued)
+                                        // bc we need to exclude that drug from being processed again in the same phase loop
+                                        drug.movedFromSamePhase = parseInt(drug[year]) === parseInt(drug[_previousYear]);
+                                        
+                                        drugsThatMove.push(drug);
+                                    } else if ( drug[year] != 0 ) {
+                                        // may not need to record its position on screen. expensive computation
+                                        drugsThatStay.push(drug);
+                                    } else { // phase value for the drug this year is zero. ie, moving backward in years
+                                        // TO DO : also put in another place "exiting"
+                                        this.positionMap[type][phaseIndex].splice(i, 1);
+                                    }
+
+                                    drug.phaseIndex = parseInt(drug[year]) - 1;
+                                    drug.type = isNaN(drug[year]) ? 'discontinued' : 'active';
                                 }
-
-                                drug.phaseIndex = parseInt(drug[year]) - 1;
-                                drug.type = isNaN(drug[year]) ? 'discontinued' : 'active';
                             }
+                            // drugs that stay (in a column) may still moved, ie, change slots.
+                            // compare their previous slot with their new one
+                            drugsThatStay.reverse().forEach((drug, i) => {
+                                if ( drug.previousSlot != i ){
+                                    drug.moved = true;
+                                     this.recordScreenPosition(drug);
+                                } else {
+                                    drug.moved = false;
+                                }
+                            });
+                            drugsThatStay.reverse();
+                            this.clearPhase(phaseIndex, type);
+                            this.placeDrugs([...drugsThatMove, ...drugsThatStay.reverse()], resolveType, year);
+                        } // end fn iterateType
+                        iterateTypeBind = iterateType.bind(this);
+                        iterateTypeBind(type);
+                    }).then(() => {
+                        if ( type == 'active' ){
+                            type = 'discontinued';
+                            iterateTypeBind(type);
+                        } else {
+                            resolvePhase(true);
                         }
-                        // drugs that stay (in a column) may still moved, ie, change slots.
-                        // compare their previous slot with their new one
-                        _drugsThatStay.reverse().forEach((drug, i) => {
-                            if ( drug.previousSlot != i ){
-                                drug.moved = true;
-                                 this.recordScreenPosition(drug);
-                            } else {
-                                drug.moved = false;
-                            }
-                        });
-                        drugsThatStay.unshift(..._drugsThatStay.reverse());
-                    }); // end active,discontinued forEach
-
-                    console.log(this.positionMap, drugsThatMove, drugsThatStay);
-                    this.clearPhase(phaseIndex);
-                    this.placeDrugs([...drugsThatMove, ...drugsThatStay.reverse()], resolvePhase, year);
+                    });
                 }).then(() => {
                     if ( phaseIndex > 0 ){
                         phaseIndex--;
-                        iterateBind();
+                        iteratePhaseBind();
                     } else {
                         //gone through the phases and need to place entering drugs
                         let enteringDrugs = this.model.unnestedData.filter(d => d[previousYear] == 0 && d[year] != 0);
@@ -336,8 +346,8 @@ export default class VizView extends Element {
                 });
                
             }
-            var iterateBind = iterate.bind(this);
-            iterateBind();
+            var iteratePhaseBind = iteratePhase.bind(this);
+            iteratePhaseBind();
         });
     }
     clearAddedDrugAttributes(){
@@ -437,20 +447,17 @@ export default class VizView extends Element {
             resolvePlaceDrugs(true);
         }
     }
-    clearPhase(phaseIndex){
-        
-        ['active','discontinued'].forEach(type => {
-            this.columns[type][phaseIndex].childNodes.forEach(drugNode => {
-                drugNode.className =  `${s.drug} ${s.drugEmpty}`;
-                drugNode.id = '';
-                drugNode.removeAttribute('data-tippy-content');
-                drugNode.innerHTML = '';
-                if ( drugNode._tippy ){
-                    drugNode.removeAttribute('tabindex');
-                    drugNode._tippy.destroy();
-                }
-            }) 
-        });
+    clearPhase(phaseIndex, type){
+        this.columns[type][phaseIndex].childNodes.forEach(drugNode => {
+            drugNode.className =  `${s.drug} ${s.drugEmpty}`;
+            drugNode.id = '';
+            drugNode.removeAttribute('data-tippy-content');
+            drugNode.innerHTML = '';
+            if ( drugNode._tippy ){
+                drugNode.removeAttribute('tabindex');
+                drugNode._tippy.destroy();
+            }
+        }); 
     }
     initializeYearButtons(){
         document.querySelectorAll('.' + s.yearButton).forEach(button => {
