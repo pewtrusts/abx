@@ -17,7 +17,7 @@ const headers = [
     ['Approved', '&#x2713']
 ];
 
-const duration = 200;
+const duration = 800;
 //const transitionMS = 1000;
 
 var isFirstLoad = true;
@@ -217,7 +217,7 @@ export default class VizView extends Element {
                 phaseMatches.forEach((drug, k) => {
                     this.addIdsAndClasses(this.columns[type][j].children[k], drug, year);
                     this.mapPositions({type, phaseIndex: j, slot: k, drug});
-                    drug.domDrug = document.querySelector('#drug-' + drug.id);
+                    drug.domDrug = this.columns[type][j].children[k];
                 });
             });
             console.log(this.positionMap);
@@ -250,6 +250,7 @@ export default class VizView extends Element {
                 new Promise(resolvePhase => {
                     var drugsThatMove = [];
                     var drugsThatStay = [];
+                    // TO DO : need to animate each type separately, resolve a promise when done 
                     ['active','discontinued'].forEach(type => {
                         var length = this.positionMap[type][phaseIndex].length;
                         var _drugsThatStay = [];
@@ -305,7 +306,7 @@ export default class VizView extends Element {
                             }
                         });
                         drugsThatStay.unshift(..._drugsThatStay.reverse());
-                    });
+                    }); // end active,discontinued forEach
 
                     console.log(this.positionMap, drugsThatMove, drugsThatStay);
                     this.clearPhase(phaseIndex);
