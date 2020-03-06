@@ -199,25 +199,23 @@ export default class VizView extends Element {
         //this.FLIP(parseInt(data[0]), data[1], data[2]); // yearIndex, resolve fn, observation
        // this.updateText();
     }
-    addIdsAndClasses(placeholder, drug){
+    addIdsAndClasses(placeholder, drug, year){
         placeholder.id = 'drug-' + drug.id;
         placeholder.classList.remove(s.drugEmpty);
         placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`);//, `${ previousStatuses && previousStatuses[drug.id] && previousStatuses[drug.id].isDiscontinued && !drug[model.years[yearIndex]].isDiscontinued ? s.wasDiscontinued : 'nope'}`);
-        if ( isNaN(drug.value) ){
+        if ( isNaN(drug[year]) ){
             placeholder.classList.add(s.isDiscontinued);
         }
         placeholder.setAttribute('data-tippy-content',`<strong>${drug.name}</strong><br />${drug.company}`);
         placeholder.innerHTML = `<span style="position:absolute;">${drug.id}</span>`;
     }
     populateInitialDrugs(year){
-        var yearMatches = this.model.normalized.filter(d => d.year === year);
         ['active','discontinued'].forEach((type, i) => {
-            var typeMatches = i === 0 ? yearMatches.filter(d => !isNaN(d.value)) : yearMatches.filter(d => isNaN(d.value));
+            var typeMatches = i === 0 ? this.model.unnestedData.filter(d => !isNaN(d[year])) : this.model.unnestedData.filter(d => isNaN(d[year]));
             headers.forEach((phase, j) => {
-                var phaseMatches = typeMatches.filter(d => parseInt(d.value) === j + 1);
-                console.log(phaseMatches);
+                var phaseMatches = typeMatches.filter(d => parseInt(d[year]) === j + 1);
                 phaseMatches.forEach((drug, k) => {
-                    this.addIdsAndClasses(this.columns[type][j].children[k], drug);
+                    this.addIdsAndClasses(this.columns[type][j].children[k], drug, year);
                     this.mapPositions({type, phaseIndex: j, slot: k, drug});
                     drug.domDrug = document.querySelector('#drug-' + drug.id);
                 });
@@ -311,14 +309,14 @@ export default class VizView extends Element {
 
                     console.log(this.positionMap, drugsThatMove, drugsThatStay);
                     this.clearPhase(phaseIndex);
-                    this.placeDrugs([...drugsThatMove, ...drugsThatStay.reverse()], resolvePhase);
+                    this.placeDrugs([...drugsThatMove, ...drugsThatStay.reverse()], resolvePhase, year);
                 }).then(() => {
                     if ( phaseIndex > 0 ){
                         phaseIndex--;
                         iterateBind();
                     } else {
                         //gone through the phases and need to place entering drugs
-                        let enteringDrugs = this.model.normalized.filter(d => d.year == year && d[previousYear] == 0 && d[year] != 0);
+                        let enteringDrugs = this.model.unnestedData.filter(d => d[previousYear] == 0 && d[year] != 0);
                         console.log('foo', enteringDrugs);
                         new Promise(resolveEntering => {
                             this.enterDrugs(enteringDrugs, year, resolveEntering)
@@ -326,7 +324,7 @@ export default class VizView extends Element {
                             //TODO: does data really need to be normalized after all?
                             this.setTippys();
                             this.updateText(year);
-                            this.model.normalized.forEach(d => {
+                            this.model.unnestedData.forEach(d => {
                                 d.movedFromProcessedColumn = false;
                             });
                             this.removeTemporaryPlaceholders();
@@ -342,7 +340,7 @@ export default class VizView extends Element {
         });
     }
     clearAddedDrugAttributes(){
-        this.model.normalized.forEach(drug => {
+        this.model.unnestedData.forEach(drug => {
             delete drug.previousSlot;
             delete drug.slot;
             delete drug.phaseIndex;
@@ -376,9 +374,9 @@ export default class VizView extends Element {
             drug.slot = slot;
             this.mapPositions({type, phaseIndex, slot, drug});
         }); 
-        this.placeDrugs(enteringDrugs.sort(this.sortBySlot).sort(this.sortByPhase), resolveEntering);
+        this.placeDrugs(enteringDrugs.sort(this.sortBySlot).sort(this.sortByPhase), resolveEntering, year);
     }
-    placeDrugs(drugs, resolvePlaceDrugs){
+    placeDrugs(drugs, resolvePlaceDrugs, year){
         function handler(drug){
             var slot = this.positionMap[drug.type][drug.phaseIndex].indexOf(drug);
             var placeholder = this.columns[drug.type][drug.phaseIndex].children[slot];
@@ -392,8 +390,11 @@ export default class VizView extends Element {
                 this.columns[drug.type][drug.phaseIndex].appendChild(_placeholder);
                 placeholder = _placeholder;
             }
-            this.addIdsAndClasses(placeholder, drug);
+            this.addIdsAndClasses(placeholder, drug, year);
             drug.domDrug = placeholder;
+            if ( this.animateYears && !this.isBackward ){
+                this.invertDrug(drug);
+            }
         }
         var handlerBind = handler.bind(this);
         drugs.forEach(handlerBind);
@@ -403,23 +404,22 @@ export default class VizView extends Element {
             resolvePlaceDrugs(true);
         }
     }
+    invertDrug(drug){
+        if ( drug.moved ){
+            drug.domDrug.style.transitionDuration = '0s';
+            //drug.domDrug.style.transitionDuration = duration + 'ms';
+            var currentScreenPosition = drug.domDrug.getBoundingClientRect(),
+                deltaY = drug.previousScreenPosition.top - currentScreenPosition.top,
+                deltaX = drug.previousScreenPosition.left - currentScreenPosition.left;
+            drug.domDrug.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        }
+    }
     animateDrugs(drugs, resolvePlaceDrugs){
         var movedDrugs = drugs.filter(d => d.moved);
         if ( movedDrugs.length > 0 ){
-            // INVERT
-            movedDrugs.forEach(drug => {
-                console.log(drug.domDrug);
-                drug.domDrug = document.querySelector('#drug-' + drug.id);
-                drug.domDrug.style.transitionDuration = '0s';
-                //drug.domDrug.style.transitionDuration = duration + 'ms';
-                var currentScreenPosition = drug.domDrug.getBoundingClientRect(),
-                    deltaY = drug.previousScreenPosition.top - currentScreenPosition.top,
-                    deltaX = drug.previousScreenPosition.left - currentScreenPosition.left;
-                drug.domDrug.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-            });
             //PLAY
-            requestAnimationFrame(() => {
-                movedDrugs.forEach((drug, i, array) => {
+            movedDrugs.forEach((drug, i, array) => {
+                requestAnimationFrame(() => {
                     drug.domDrug.style.transitionDelay = i * duration + 'ms';
                     drug.domDrug.style.transitionDuration = duration + 'ms';
                     drug.domDrug.style.transform = 'translate(0, 0)';
@@ -809,9 +809,9 @@ export default class VizView extends Element {
         adjustCSSVariables.call(this);
     }
     updateText(year){
-        var totalNonzero = this.model.normalized.filter(d => d.year == year && parseInt(d.value) !== 0 ),
-             totalActive = totalNonzero.filter(d => d.value == 5).length,
-             totalDiscontinued = totalNonzero.filter(d => isNaN(d.value) ).length;
+        var totalNonzero = this.model.unnestedData.filter(d => parseInt(d[year]) !== 0 ),
+             totalActive = totalNonzero.filter(d => d[year] == 5).length,
+             totalDiscontinued = totalNonzero.filter(d => isNaN(d[year]) ).length;
             
         if ( +year > this.model.years[0] ){
             this.totals.classList.add('is-subsequent');

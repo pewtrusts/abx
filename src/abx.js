@@ -107,22 +107,17 @@ function getRuntimeData(){
                         })
                     };
                 });*/
-                model.normalized = [];
                 const activeLengths =       [1,2,3,4,5].map(() => model.years.map(() => 0));
                 const discontinuedLengths = [1,2,3,4,5].map(() => model.years.map(() => 0));
                 console.log(activeLengths,discontinuedLengths);
                 model.unnestedData.forEach(drug => {
                     model.years.forEach((year, i) => {
-                        var copy = JSON.parse(JSON.stringify(drug)); // copy not reference
-                        copy.year = year;
-                        copy.value = copy[year];
-                        var phase = parseInt(copy.value);
-                        if ( isNaN(copy.value) && copy.value.charAt(1) === 'd' ){
+                        var phase = parseInt(drug[year]);
+                        if ( isNaN(drug[year]) && drug[year].charAt(1) === 'd' ){
                             discontinuedLengths[phase - 1][i]++;
-                        } else if ( copy.value !== 0 ){
+                        } else if ( drug[year] !== 0 ){
                             activeLengths[phase - 1][i]++;
                         }
-                        model.normalized.push(copy);
                     });
                 });
                 console.log(model, activeLengths, discontinuedLengths);
