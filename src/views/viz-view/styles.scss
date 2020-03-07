@@ -104,12 +104,13 @@
     position: relative;
     border: 2px solid transparent;
     transition: transform 0s ease-in-out;
+    transform: translateZ(0);
+    will-change: transform;
     .superSquat & {
         height: calc(var(--unit-dimension) * 0.9);
     }
     &:not(.drugEmpty){
         background-color: $gray;
-        border-collapse: $gray;
     }
     .activeContainer & {
         margin-bottom: var(--unit-padding);
