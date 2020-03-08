@@ -202,15 +202,22 @@ export default class VizView extends Element {
         //this.FLIP(parseInt(data[0]), data[1], data[2]); // yearIndex, resolve fn, observation
         // this.updateText();
     }
-    addIdsAndClasses(drug, year) {
-        drug.domDrug.id = 'drug-' + drug.id;
-        drug.domDrug.classList.remove(s.drugEmpty);
-        drug.domDrug.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`); //, `${ previousStatuses && previousStatuses[drug.id] && previousStatuses[drug.id].isDiscontinued && !drug[model.years[yearIndex]].isDiscontinued ? s.wasDiscontinued : 'nope'}`);
-        if (isNaN(drug[year])) {
-            drug.domDrug.classList.add(s.isDiscontinued);
-        }
-        drug.domDrug.setAttribute('data-tippy-content', `<strong>${drug.name}</strong><br />${drug.company}`);
-        drug.domDrug.innerHTML = `<span style="position:absolute;">${drug.id}</span>`;
+    addIdsAndClasses(drugs, year) {
+        return new Promise(resolve => {
+            drugs.forEach(drug => {
+                drug.domDrug.id = 'drug-' + drug.id;
+                drug.domDrug.classList.remove(s.drugEmpty);
+                drug.domDrug.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`); //, `${ previousStatuses && previousStatuses[drug.id] && previousStatuses[drug.id].isDiscontinued && !drug[model.years[yearIndex]].isDiscontinued ? s.wasDiscontinued : 'nope'}`);
+                if (isNaN(drug[year])) {
+                    drug.domDrug.classList.add(s.isDiscontinued);
+                }
+                drug.domDrug.setAttribute('data-tippy-content', `<strong>${drug.name}</strong><br />${drug.company}`);
+                drug.domDrug.innerHTML = `<span style="position:absolute;">${drug.id}</span>`;
+            });
+            setTimeout(() => {
+                resolve(true);
+            },20);
+        });
     }
     populateInitialDrugs(year) {
         ['active', 'discontinued'].forEach((type, i) => {
@@ -219,9 +226,9 @@ export default class VizView extends Element {
                 var phaseMatches = typeMatches.filter(d => parseInt(d[year]) === j + 1);
                 phaseMatches.forEach((drug, k) => {
                     drug.domDrug = this.columns[type][j].children[k];
-                    this.addIdsAndClasses(drug, year);
                     this.mapPositions({ type, phaseIndex: j, slot: k, drug });
                 });
+                this.addIdsAndClasses(phaseMatches, year);
             });
             console.log(this.positionMap);
         });
@@ -252,7 +259,7 @@ export default class VizView extends Element {
             this.isBackward = (+previousYear > year);
 
             function iteratePhase() {
-                //set up a promise for each phase. this way we can pass the resolve function around and reolve it later,
+                //set up a promise for each phase. this way we can pass the resolve function around and resolve it later,
                 // after animation has finish orsooner if there is no animation
                 new Promise(resolvePhase => {
                     // TO DO : need to animate each type separately, resolve a promise when done
@@ -297,7 +304,7 @@ export default class VizView extends Element {
                                     // TO DO : also put in another place "exiting"
                                     this.recordMapPosition({type, phaseIndex, slot: i, drug});
                                     this.positionMap[type][phaseIndex].splice(i, 1);
-                                    this.clearAddedDrugAttributes(drug);
+                                    //this.clearAddedDrugAttributes(drug);
                                 }
 
                                 drug.phaseIndex = parseInt(drug[year]) - 1;
@@ -341,10 +348,8 @@ export default class VizView extends Element {
                             //TODO: does data really need to be normalized after all?
                             this.setTippys();
                             this.updateText(year);
-                            this.model.unnestedData.forEach(d => {
-                                d.movedFromProcessedColumn = false;
-                            });
                             this.removeTemporaryPlaceholders();
+                            this.clearAddedDrugAttributes();
                             resolveYear(true);
                         });
                     }
@@ -355,15 +360,17 @@ export default class VizView extends Element {
             iteratePhaseBind();
         });
     }
-    clearAddedDrugAttributes(drug) {
-        delete drug.previousSlot;
-        delete drug.slot;
-        delete drug.phaseIndex;
-        delete drug.moved;
-        delete drug.previousScreenPosition;
-        delete drug.movedFromProcessedColumn;
-        delete drug.movedFromSamePhase;
-        delete drug.previousMapPosition;
+    clearAddedDrugAttributes() {
+        this.model.unnestedData.forEach(drug => {
+            delete drug.previousSlot;
+            delete drug.slot;
+            delete drug.phaseIndex;
+            delete drug.moved;
+            delete drug.previousScreenPosition;
+            delete drug.movedFromProcessedColumn;
+            delete drug.movedFromSamePhase;
+            delete drug.previousMapPosition;
+        });
     }
     removeTemporaryPlaceholders() {
         document.querySelectorAll('[data-temporary]').forEach(el => {
@@ -391,31 +398,6 @@ export default class VizView extends Element {
         this.placeDrugs(enteringDrugs.sort(this.sortBySlot).sort(this.sortByPhase), resolveEntering, year);
     }
     placeDrugs(drugs, resolvePlaceDrugs, year) {
-        function asyncHandler(drug, isLast){
-            new Promise(resolve => {
-                setTimeout(() => {
-                    console.log(drug.moved);
-                    //without the setTimeout the inversion might not be painted properly
-                    if (this.animateYears && !this.isBackward && drug.moved) {
-                        this.invertDrug(drug);
-                    }
-                    this.addIdsAndClasses(drug, year);
-                    if (isLast){
-                        resolve( isLast );
-                    }
-                });
-            }).then(() => {
-                setTimeout(() => {
-                  if (this.animateYears && !this.isBackward) {
-                      this.animateDrugs(drugs, resolvePlaceDrugs);
-                //      resolvePlaceDrugs(true);
-                  } else {
-                      resolvePlaceDrugs(true);
-                  }
-              });
-
-            });
-        }
         if ( drugs.length == 0 ){
             resolvePlaceDrugs(true);
             return;
@@ -434,23 +416,32 @@ export default class VizView extends Element {
                 placeholder = _placeholder;
             }
             drugs[i].domDrug = placeholder;
-            //console.log(drugs[i].moved);
-            let isLast = i == drugs.length - 1;
-            console.log('islast', isLast);
-            asyncHandler.call(this, drugs[i], isLast);
         }
-          
+        if ( this.animate && !this.isBackward ){
+            this.invertDrugs(drugs).then(() => {
+                this.addIdsAndClasses(drugs, year).then(() => {
+                    this.animateDrugs(drugs, resolvePlaceDrugs);
+                });
+
+            });
+        } else {
+            this.addIdsAndClasses(drugs, year);
+            resolvePlaceDrugs(true);
+        }
     }
-    invertDrug(drug) {
-            drug.domDrug.style.transitionDuration = '0s';
+    invertDrugs(drugs) {
+        return new Promise(resolve => {
+            drugs.filter(d => d.moved).forEach(drug => {
                 var currentScreenPosition = drug.domDrug.getBoundingClientRect(),
                     deltaY = drug.previousScreenPosition.top - currentScreenPosition.top,
                     deltaX = drug.previousScreenPosition.left - currentScreenPosition.left;
-               // setTimeout(() => {
-                    requestAnimationFrame(() => {
-                        drug.domDrug.style.transform = `translate(${deltaX}px, ${deltaY}px) translateZ(0)`;
-                    });
-              //  });
+                drug.domDrug.style.transform = `translate(${deltaX}px, ${deltaY}px) translateZ(0)`;
+                drug.domDrug.style.transitionDuration = '0s';
+            });
+            setTimeout(() => {
+                resolve(true);
+            },20);
+        })
        
     }
     /******* HERE YOU NEED TO DO SOMETHING TO FORCE A REPAINT ********/
@@ -459,7 +450,7 @@ export default class VizView extends Element {
         console.log('animateDrugs');
             var movedDrugs = drugs.filter(d => d.moved);
             if (movedDrugs.length > 0) {
-                setTimeout(() => {
+               // setTimeout(() => {
                     // TO DO. PUT A break point here and watch the boxes fill in after the break point is passed.
                     // as if the settimeout from inverting is not complete before the animation starts. need to chain
                     // the async stuff as promises, on after anither or maybe try getting rid of all asyncs
@@ -475,7 +466,7 @@ export default class VizView extends Element {
                             }
                         })
                     });
-                },20);
+            //    },20);
             } else {
                 resolvePlaceDrugs(true);
             }
