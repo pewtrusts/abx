@@ -19,6 +19,8 @@ const headers = [
 
 const duration = 200;
 //const transitionMS = 1000;
+const dummy = document.createElement('style');
+dummy.setAttribute('type', 'text/css');
 
 var isFirstLoad = true;
 
@@ -200,15 +202,15 @@ export default class VizView extends Element {
         //this.FLIP(parseInt(data[0]), data[1], data[2]); // yearIndex, resolve fn, observation
         // this.updateText();
     }
-    addIdsAndClasses(placeholder, drug, year) {
-        placeholder.id = 'drug-' + drug.id;
-        placeholder.classList.remove(s.drugEmpty);
-        placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`); //, `${ previousStatuses && previousStatuses[drug.id] && previousStatuses[drug.id].isDiscontinued && !drug[model.years[yearIndex]].isDiscontinued ? s.wasDiscontinued : 'nope'}`);
+    addIdsAndClasses(drug, year) {
+        drug.domDrug.id = 'drug-' + drug.id;
+        drug.domDrug.classList.remove(s.drugEmpty);
+        drug.domDrug.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`); //, `${ previousStatuses && previousStatuses[drug.id] && previousStatuses[drug.id].isDiscontinued && !drug[model.years[yearIndex]].isDiscontinued ? s.wasDiscontinued : 'nope'}`);
         if (isNaN(drug[year])) {
-            placeholder.classList.add(s.isDiscontinued);
+            drug.domDrug.classList.add(s.isDiscontinued);
         }
-        placeholder.setAttribute('data-tippy-content', `<strong>${drug.name}</strong><br />${drug.company}`);
-        placeholder.innerHTML = `<span style="position:absolute;">${drug.id}</span>`;
+        drug.domDrug.setAttribute('data-tippy-content', `<strong>${drug.name}</strong><br />${drug.company}`);
+        drug.domDrug.innerHTML = `<span style="position:absolute;">${drug.id}</span>`;
     }
     populateInitialDrugs(year) {
         ['active', 'discontinued'].forEach((type, i) => {
@@ -216,9 +218,9 @@ export default class VizView extends Element {
             headers.forEach((phase, j) => {
                 var phaseMatches = typeMatches.filter(d => parseInt(d[year]) === j + 1);
                 phaseMatches.forEach((drug, k) => {
-                    this.addIdsAndClasses(this.columns[type][j].children[k], drug, year);
-                    this.mapPositions({ type, phaseIndex: j, slot: k, drug });
                     drug.domDrug = this.columns[type][j].children[k];
+                    this.addIdsAndClasses(drug, year);
+                    this.mapPositions({ type, phaseIndex: j, slot: k, drug });
                 });
             });
             console.log(this.positionMap);
@@ -237,7 +239,7 @@ export default class VizView extends Element {
     }
     recordScreenPosition(drug) {
         if (!this.isBackward && this.animateYears) {
-            drug.previousScreenPosition = JSON.parse(JSON.stringify(drug.domDrug.getBoundingClientRect()));
+            drug.previousScreenPosition = drug.domDrug.getBoundingClientRect();
         }
     }
     recordMapPosition({type, phaseIndex, slot, drug}){
@@ -295,6 +297,7 @@ export default class VizView extends Element {
                                     // TO DO : also put in another place "exiting"
                                     this.recordMapPosition({type, phaseIndex, slot: i, drug});
                                     this.positionMap[type][phaseIndex].splice(i, 1);
+                                    this.clearAddedDrugAttributes(drug);
                                 }
 
                                 drug.phaseIndex = parseInt(drug[year]) - 1;
@@ -342,7 +345,6 @@ export default class VizView extends Element {
                                 d.movedFromProcessedColumn = false;
                             });
                             this.removeTemporaryPlaceholders();
-                            this.clearAddedDrugAttributes();
                             resolveYear(true);
                         });
                     }
@@ -353,18 +355,15 @@ export default class VizView extends Element {
             iteratePhaseBind();
         });
     }
-    clearAddedDrugAttributes() {
-        this.model.unnestedData.forEach(drug => {
-            delete drug.previousSlot;
-            delete drug.slot;
-            delete drug.phaseIndex;
-            delete drug.moved;
-            delete drug.previousScreenPosition;
-            delete drug.movedFromProcessedColumn;
-            delete drug.movedFromSamePhase;
-            delete drug.previousMapPosition;
-        });
-        console.log(this.positionMap);
+    clearAddedDrugAttributes(drug) {
+        delete drug.previousSlot;
+        delete drug.slot;
+        delete drug.phaseIndex;
+        delete drug.moved;
+        delete drug.previousScreenPosition;
+        delete drug.movedFromProcessedColumn;
+        delete drug.movedFromSamePhase;
+        delete drug.previousMapPosition;
     }
     removeTemporaryPlaceholders() {
         document.querySelectorAll('[data-temporary]').forEach(el => {
@@ -392,9 +391,38 @@ export default class VizView extends Element {
         this.placeDrugs(enteringDrugs.sort(this.sortBySlot).sort(this.sortByPhase), resolveEntering, year);
     }
     placeDrugs(drugs, resolvePlaceDrugs, year) {
-        function handler(drug) {
-            var slot = this.positionMap[drug.type][drug.phaseIndex].indexOf(drug);
-            var placeholder = this.columns[drug.type][drug.phaseIndex].children[slot];
+        function asyncHandler(drug, isLast){
+            new Promise(resolve => {
+                setTimeout(() => {
+                    console.log(drug.moved);
+                    //without the setTimeout the inversion might not be painted properly
+                    if (this.animateYears && !this.isBackward && drug.moved) {
+                        this.invertDrug(drug);
+                    }
+                    this.addIdsAndClasses(drug, year);
+                    if (isLast){
+                        resolve( isLast );
+                    }
+                });
+            }).then(() => {
+                setTimeout(() => {
+                  if (this.animateYears && !this.isBackward) {
+                      this.animateDrugs(drugs, resolvePlaceDrugs);
+                //      resolvePlaceDrugs(true);
+                  } else {
+                      resolvePlaceDrugs(true);
+                  }
+              });
+
+            });
+        }
+        if ( drugs.length == 0 ){
+            resolvePlaceDrugs(true);
+            return;
+        }
+        for ( let i = 0; i < drugs.length; i++ ){
+            let slot = this.positionMap[drugs[i].type][drugs[i].phaseIndex].indexOf(drugs[i]);
+            let placeholder = this.columns[drugs[i].type][drugs[i].phaseIndex].children[slot];
             if (!placeholder) { // new method of moving drugs one column at a time may result in interim state of
                 // a column having to many drugs, ie more than the number of placeholders calculated when the 
                 // app first start. here, if placeholder is undefined, create and insert it.
@@ -402,72 +430,55 @@ export default class VizView extends Element {
                 _placeholder.classList.add(s.drug, s.drugEmpty);
                 _placeholder.setAttribute('tabindex', 0);
                 _placeholder.setAttribute('data-temporary', true);
-                this.columns[drug.type][drug.phaseIndex].appendChild(_placeholder);
+                this.columns[drugs[i].type][drugs[i].phaseIndex].appendChild(_placeholder);
                 placeholder = _placeholder;
             }
-            this.addIdsAndClasses(placeholder, drug, year);
-            drug.domDrug = placeholder;
-            if (this.animateYears && !this.isBackward && drug.moved) {
-                this.invertDrug(drug);
-            }
+            drugs[i].domDrug = placeholder;
+            //console.log(drugs[i].moved);
+            let isLast = i == drugs.length - 1;
+            console.log('islast', isLast);
+            asyncHandler.call(this, drugs[i], isLast);
         }
-        var handlerBind = handler.bind(this);
-        drugs.forEach(handlerBind);
-        if (this.animateYears && !this.isBackward) {
-            this.animateDrugs(drugs, resolvePlaceDrugs);
-        } else {
-            resolvePlaceDrugs(true);
-        }
+          
     }
     invertDrug(drug) {
-        drug.domDrug.style.transitionDuration = '0s';
-        //drug.domDrug.style.transitionDuration = duration + 'ms';
-        var currentScreenPosition = drug.domDrug.getBoundingClientRect(),
-            deltaY = drug.previousScreenPosition.top - currentScreenPosition.top,
-            deltaX = drug.previousScreenPosition.left - currentScreenPosition.left;
-       // setTimeout(() => {
-          //  requestAnimationFrame(() => {
-                drug.domDrug.style.transform = `translate(${deltaX}px, ${deltaY}px) translateZ(0)`;
-          //  });
-      //  });
+            drug.domDrug.style.transitionDuration = '0s';
+                var currentScreenPosition = drug.domDrug.getBoundingClientRect(),
+                    deltaY = drug.previousScreenPosition.top - currentScreenPosition.top,
+                    deltaX = drug.previousScreenPosition.left - currentScreenPosition.left;
+               // setTimeout(() => {
+                    requestAnimationFrame(() => {
+                        drug.domDrug.style.transform = `translate(${deltaX}px, ${deltaY}px) translateZ(0)`;
+                    });
+              //  });
        
     }
     /******* HERE YOU NEED TO DO SOMETHING TO FORCE A REPAINT ********/
     /// these methods are causing unacceptable flashes. try adding stylesheet to repaint entire page'
     animateDrugs(drugs, resolvePlaceDrugs) {
-        this.container.style.display = 'none';
-        requestAnimationFrame(() => {
-            this.container.style.display = 'block';
+        console.log('animateDrugs');
             var movedDrugs = drugs.filter(d => d.moved);
             if (movedDrugs.length > 0) {
-                //PLAY
-      //          movedDrugs.forEach(drug => {
-                    //drug.domDrug.style.visibility = 'hidden';
-    //                drug.domDrug.style.display = 'none';
-        //        });
-                //setTimeout(() => {
+                setTimeout(() => {
+                    // TO DO. PUT A break point here and watch the boxes fill in after the break point is passed.
+                    // as if the settimeout from inverting is not complete before the animation starts. need to chain
+                    // the async stuff as promises, on after anither or maybe try getting rid of all asyncs
                     movedDrugs.forEach((drug, i, array) => {
-                        //drug.domDrug.style.visibility = '';
-                      //  drug.domDrug.style.display = 'none';
-                        
+                        drug.domDrug.style.transitionDelay = i * duration + 'ms';
+                        drug.domDrug.style.transitionDuration = duration + 'ms';
                         requestAnimationFrame(() => {
-                            drug.domDrug.style.transitionDelay = i * duration + 'ms';
-                            drug.domDrug.style.transitionDuration = duration + 'ms';
                             drug.domDrug.style.transform = 'translate(0, 0) translateZ(0)';
                             if (i == array.length - 1) {
                                 setTimeout(() => {
                                     resolvePlaceDrugs(true);
                                 }, array.length * duration);
                             }
-                        });
-                    })
-               // });
-                
+                        })
+                    });
+                },20);
             } else {
                 resolvePlaceDrugs(true);
             }
-
-        });
     }
     clearPhase(phaseIndex, type) {
         this.columns[type][phaseIndex].childNodes.forEach(drugNode => {

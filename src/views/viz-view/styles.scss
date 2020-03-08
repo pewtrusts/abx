@@ -106,6 +106,7 @@
     transition: transform 0s ease-in-out;
     transform: translateZ(0);
     will-change: transform;
+    border-color: cyan;
     .superSquat & {
         height: calc(var(--unit-dimension) * 0.9);
     }
