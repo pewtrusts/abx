@@ -204,19 +204,23 @@ export default class VizView extends Element {
     }
     addIdsAndClasses(drugs, year) {
         return new Promise(resolve => {
-            drugs.forEach(drug => {
-                drug.domDrug.id = 'drug-' + drug.id;
-                drug.domDrug.classList.remove(s.drugEmpty);
-                drug.domDrug.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`); //, `${ previousStatuses && previousStatuses[drug.id] && previousStatuses[drug.id].isDiscontinued && !drug[model.years[yearIndex]].isDiscontinued ? s.wasDiscontinued : 'nope'}`);
-                if (isNaN(drug[year])) {
-                    drug.domDrug.classList.add(s.isDiscontinued);
-                }
-                drug.domDrug.setAttribute('data-tippy-content', `<strong>${drug.name}</strong><br />${drug.company}`);
-                drug.domDrug.innerHTML = `<span style="position:absolute;">${drug.id}</span>`;
+            requestAnimationFrame(() => {
+                drugs.forEach((drug, i, array) => {
+                    drug.domDrug.id = 'drug-' + drug.id;
+                    drug.domDrug.classList.remove(s.drugEmpty);
+                    drug.domDrug.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`); //, `${ previousStatuses && previousStatuses[drug.id] && previousStatuses[drug.id].isDiscontinued && !drug[model.years[yearIndex]].isDiscontinued ? s.wasDiscontinued : 'nope'}`);
+                    if (isNaN(drug[year])) {
+                        drug.domDrug.classList.add(s.isDiscontinued);
+                    }
+                    drug.domDrug.setAttribute('data-tippy-content', `<strong>${drug.name}</strong><br />${drug.company}`);
+                    drug.domDrug.innerHTML = `<span style="position:absolute;">${drug.id}</span>`;
+                    if ( i == array.length - 1 ){
+                        setTimeout(() => {
+                            resolve(true);
+                        });
+                    }
+                });
             });
-            setTimeout(() => {
-                resolve(true);
-            },20);
         });
     }
     populateInitialDrugs(year) {
@@ -321,8 +325,9 @@ export default class VizView extends Element {
                                 }
                             });
                             drugsThatStay.reverse();
-                            this.clearPhase(phaseIndex, type);
-                            this.placeDrugs([...drugsThatMove, ...drugsThatStay.reverse()], resolveType, year);
+                            this.clearPhase(phaseIndex, type).then(() => {
+                                this.placeDrugs([...drugsThatMove, ...drugsThatStay.reverse()], resolveType, year);
+                            });
                         }).then(() => {
                             if (type == 'active') {
                                 type = 'discontinued';
@@ -370,6 +375,8 @@ export default class VizView extends Element {
             delete drug.movedFromProcessedColumn;
             delete drug.movedFromSamePhase;
             delete drug.previousMapPosition;
+            delete drug.deltaX;
+            delete drug.deltaY;
         });
     }
     removeTemporaryPlaceholders() {
@@ -417,32 +424,45 @@ export default class VizView extends Element {
             }
             drugs[i].domDrug = placeholder;
         }
-        if ( this.animate && !this.isBackward ){
+        if ( this.animateYears && !this.isBackward ){
             this.invertDrugs(drugs).then(() => {
                 this.addIdsAndClasses(drugs, year).then(() => {
                     this.animateDrugs(drugs, resolvePlaceDrugs);
                 });
-
             });
         } else {
-            this.addIdsAndClasses(drugs, year);
-            resolvePlaceDrugs(true);
+            this.addIdsAndClasses(drugs, year).then(() => {
+                resolvePlaceDrugs(true);
+            });
         }
     }
     invertDrugs(drugs) {
-        return new Promise(resolve => {
-            drugs.filter(d => d.moved).forEach(drug => {
-                var currentScreenPosition = drug.domDrug.getBoundingClientRect(),
-                    deltaY = drug.previousScreenPosition.top - currentScreenPosition.top,
-                    deltaX = drug.previousScreenPosition.left - currentScreenPosition.left;
-                drug.domDrug.style.transform = `translate(${deltaX}px, ${deltaY}px) translateZ(0)`;
-                drug.domDrug.style.transitionDuration = '0s';
+        return new Promise(resolveInvert => {
+            var filtered = drugs.filter(d => d.moved);
+            if ( filtered.length == 0 ){
+                resolveInvert(true);
+            }
+            for ( let i = 0; i < filtered.length; i++ ){
+                filtered[i].domDrug.style.transitionDuration = '0s';
+                let currentScreenPosition = filtered[i].domDrug.getBoundingClientRect();
+                filtered[i].deltaY = filtered[i].previousScreenPosition.top - currentScreenPosition.top;
+                filtered[i].deltaX = filtered[i].previousScreenPosition.left - currentScreenPosition.left;
+            }
+            requestAnimationFrame(() => {
+                for ( let i = 0; i < filtered.length; i++ ){
+                    filtered[i].domDrug.style.transform = `translate(${filtered[i].deltaX}px, ${filtered[i].deltaY}px)`;
+                    filtered[i].domDrug.style.display = 'none';
+                    setTimeout(() => {
+                        filtered[i].domDrug.style.display = 'block';
+                        if ( i == filtered.length - 1 ){
+                            setTimeout(() => {
+                                resolveInvert(true);
+                            })
+                        }
+                    },3000)
+                }
             });
-            setTimeout(() => {
-                resolve(true);
-            },20);
-        })
-       
+        });
     }
     /******* HERE YOU NEED TO DO SOMETHING TO FORCE A REPAINT ********/
     /// these methods are causing unacceptable flashes. try adding stylesheet to repaint entire page'
@@ -458,7 +478,7 @@ export default class VizView extends Element {
                         drug.domDrug.style.transitionDelay = i * duration + 'ms';
                         drug.domDrug.style.transitionDuration = duration + 'ms';
                         requestAnimationFrame(() => {
-                            drug.domDrug.style.transform = 'translate(0, 0) translateZ(0)';
+                            drug.domDrug.style.transform = 'translate(0, 0)';
                             if (i == array.length - 1) {
                                 setTimeout(() => {
                                     resolvePlaceDrugs(true);
@@ -472,15 +492,24 @@ export default class VizView extends Element {
             }
     }
     clearPhase(phaseIndex, type) {
-        this.columns[type][phaseIndex].childNodes.forEach(drugNode => {
-            drugNode.className = `${s.drug} ${s.drugEmpty}`;
-            drugNode.id = '';
-            drugNode.removeAttribute('data-tippy-content');
-            drugNode.innerHTML = '';
-            if (drugNode._tippy) {
-                drugNode.removeAttribute('tabindex');
-                drugNode._tippy.destroy();
-            }
+        return new Promise(resolveClear => {
+            requestAnimationFrame(() => {
+                this.columns[type][phaseIndex].childNodes.forEach((drugNode, i, array) => {
+                    drugNode.className = `${s.drug} ${s.drugEmpty}`;
+                    drugNode.id = '';
+                    drugNode.removeAttribute('data-tippy-content');
+                    drugNode.innerHTML = '';
+                    if (drugNode._tippy) {
+                        drugNode.removeAttribute('tabindex');
+                        drugNode._tippy.destroy();
+                    }
+                    if ( i == array.length - 1 ){
+                        setTimeout(() => {
+                            resolveClear(true);
+                        }); 
+                    }
+                });
+            });
         });
     }
     initializeYearButtons() {
