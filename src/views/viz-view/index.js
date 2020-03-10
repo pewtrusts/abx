@@ -187,6 +187,7 @@ export default class VizView extends Element {
                     }
                     drug.domDrug.setAttribute('data-tippy-content', `<strong>${drug.name}</strong><br />${drug.company}`);
                     drug.domDrug.innerHTML = `<span style="position:absolute;">${drug.id}</span>`;
+                    this.setTippys(drug.domDrug);
                     if ( i == array.length - 1 ){
                         setTimeout(() => {
                             resolve(true);
@@ -209,11 +210,11 @@ export default class VizView extends Element {
             });
             console.log(this.positionMap);
         });
-        this.setTippys();
+      //  this.setTippys();
         this.updateText(year);
     }
-    setTippys() {
-        tippy('[data-tippy-content]', {
+    setTippys(drug = '[data-tippy-content]') {
+        tippy(drug, {
             arrow: true,
             distance: 3
         });
@@ -324,7 +325,7 @@ export default class VizView extends Element {
                         new Promise(resolveEntering => {
                             this.enterDrugs(enteringDrugs, year, resolveEntering)
                         }).then(() => {
-                            this.setTippys();
+                            //this.setTippys();
                             this.updateText(year);
                             this.removeTemporaryPlaceholders();
                             this.clearAddedDrugAttributes();
@@ -446,17 +447,34 @@ export default class VizView extends Element {
             if (movedDrugs.length > 0) {
                 movedDrugs.forEach((drug, i, array) => {
                     var _duration = drug.keptSameStatus ? shortDuration : duration; 
-                    drug.domDrug.style.transitionDelay = totalDelay + 'ms';
                     drug.domDrug.style.transitionDuration = _duration + 'ms';
-                    totalDelay += _duration;
-                    requestAnimationFrame(() => {
-                        drug.domDrug.style.transform = 'translate(0, 0)';
-                        if (i == array.length - 1) {
+                    setTimeout(() => {
+                        requestAnimationFrame(() => {
+                            var popperXYZ;
+                            if ( !drug.keptSameStatus && !drug.isEntering ){
+                                drug.domDrug._tippy.show();
+                                setTimeout(() => {
+                                    console.log(drug.domDrug._tippy.popper.style.transform);
+                                    popperXYZ = drug.domDrug._tippy.popper.style
+                                        .transform.match(/translate3d\((.*?)\)/)[1]
+                                        .split(',').map(xy => parseInt(xy));
+                                    drug.domDrug._tippy.popper.style.transitionDuration = _duration + 'ms';
+                                    drug.domDrug._tippy.popper.style.transitionTimingFunction = 'ease-in-out';
+                                    drug.domDrug._tippy.popper.style.transform = `translate3d(${popperXYZ[0] - drug.deltaX}px, ${popperXYZ[1] - drug.deltaY}px, ${popperXYZ[2]}px)`;
+                                    drug.domDrug.style.transform = 'translate(0, 0)';
+                                });
+                            } else {
+                                drug.domDrug.style.transform = 'translate(0, 0)';
+                            }
                             setTimeout(() => {
-                                resolvePlaceDrugs(true);
-                            }, totalDelay);
-                        }
-                    })
+                                drug.domDrug._tippy.hide();
+                                if (i == array.length - 1) {
+                                    resolvePlaceDrugs(true);
+                                }
+                            }, _duration);
+                        });
+                    },totalDelay);
+                    totalDelay += _duration;
                 });
             } else {
                 resolvePlaceDrugs(true);
