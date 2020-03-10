@@ -17,7 +17,8 @@ const headers = [
     ['Approved', '&#x2713']
 ];
 
-const duration = 200;
+const duration = 1200;
+const shortDuration = 50;
 //const transitionMS = 1000;
 const dummy = document.createElement('style');
 dummy.setAttribute('type', 'text/css');
@@ -319,6 +320,7 @@ export default class VizView extends Element {
                             drugsThatStay.reverse().forEach((drug, i) => {
                                 if (drug.previousSlot != i) {
                                     drug.moved = true;
+                                    drug.keptSameStatus = true;
                                     this.recordScreenPosition(drug);
                                 } else {
                                     drug.moved = false;
@@ -377,6 +379,8 @@ export default class VizView extends Element {
             delete drug.previousMapPosition;
             delete drug.deltaX;
             delete drug.deltaY;
+            delete drug.isEntering;
+            delete drug.keptSameStatus;
         });
     }
     removeTemporaryPlaceholders() {
@@ -400,6 +404,7 @@ export default class VizView extends Element {
             drug.previousScreenPosition = { top: -3000, left: -3000 };
             drug.moved = true;
             drug.slot = slot;
+            drug.isEntering = true;
             this.mapPositions({ type, phaseIndex, slot, drug });
         });
         this.placeDrugs(enteringDrugs.sort(this.sortBySlot).sort(this.sortByPhase), resolveEntering, year);
@@ -448,34 +453,37 @@ export default class VizView extends Element {
                 filtered[i].deltaY = filtered[i].previousScreenPosition.top - currentScreenPosition.top;
                 filtered[i].deltaX = filtered[i].previousScreenPosition.left - currentScreenPosition.left;
             }
-                for ( let i = 0; i < filtered.length; i++ ){
+            for ( let i = 0; i < filtered.length; i++ ){
+                requestAnimationFrame(() => {
+                    filtered[i].domDrug.style.transform = `translate(${filtered[i].deltaX}px, ${filtered[i].deltaY}px)`;
+                    /* need to toggle display of the drugs from none back to block to force browsers to repaint them. otherwise 
+                    the invertion doens't appear correctly and drugs will appear to start their animations from the wrong spot */
+                    filtered[i].domDrug.style.display = 'none';
                     requestAnimationFrame(() => {
-                        filtered[i].domDrug.style.transform = `translate(${filtered[i].deltaX}px, ${filtered[i].deltaY}px)`;
-                        /* need to toggle display of the drugs from none back to block to force browsers to repaint them. otherwise 
-                        the invertion doens't appear correctly and drugs will appear to start their animations from the wrong spot */
-                        filtered[i].domDrug.style.display = 'none';
-                        requestAnimationFrame(() => {
-                            filtered[i].domDrug.style.display = 'block';
-                            if ( i == filtered.length - 1 ){
-                                resolveInvert(true);
-                            }
-                        });
+                        filtered[i].domDrug.style.display = 'block';
+                        if ( i == filtered.length - 1 ){
+                            resolveInvert(true);
+                        }
                     });
-                }
+                });
+            }
         });
     }
     animateDrugs(drugs, resolvePlaceDrugs) {
             var movedDrugs = drugs.filter(d => d.moved);
+            var totalDelay = 0;
             if (movedDrugs.length > 0) {
                 movedDrugs.forEach((drug, i, array) => {
-                    drug.domDrug.style.transitionDelay = i * duration + 'ms';
-                    drug.domDrug.style.transitionDuration = duration + 'ms';
+                    var _duration = drug.keptSameStatus ? shortDuration : duration; 
+                    drug.domDrug.style.transitionDelay = totalDelay + 'ms';
+                    drug.domDrug.style.transitionDuration = _duration + 'ms';
+                    totalDelay += _duration;
                     requestAnimationFrame(() => {
                         drug.domDrug.style.transform = 'translate(0, 0)';
                         if (i == array.length - 1) {
                             setTimeout(() => {
                                 resolvePlaceDrugs(true);
-                            }, array.length * duration);
+                            }, totalDelay);
                         }
                     })
                 });
@@ -495,9 +503,7 @@ export default class VizView extends Element {
                     drugNode._tippy.destroy();
                 }
                 if ( i == array.length - 1 ){
-                   // setTimeout(() => {
-                        resolveClear(true);
-                    //}); 
+                    resolveClear(true);
                 }
             });
         });
