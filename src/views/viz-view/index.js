@@ -19,19 +19,6 @@ const headers = [
 
 const duration = 1200;
 const shortDuration = 50;
-//const transitionMS = 1000;
-const dummy = document.createElement('style');
-dummy.setAttribute('type', 'text/css');
-
-var isFirstLoad = true;
-
-/*function arrayFromNumber(num, value){
-    var arr = [];
-    for ( let i = 0; i < num; i++){
-        arr.push(value);
-    }
-    return arr;
-}*/
 
 export default class VizView extends Element {
     prerender() { // this prerender is called as part of the super constructor
@@ -41,16 +28,6 @@ export default class VizView extends Element {
         this.headerHeight = headerHeight;
         this.unitPadding = unitPadding;
         this.headers = headers;
-        this.phaseMembers = [0, 1].map(() => {
-            return [0, ...headers].map(d => { // will keep track of which drugs are in which column so that animations can be timed and so that 
-                // drugs that stay in their column from one step to another can be placed before those entering the
-                // column
-                return {
-                    active: d === 0 ? this.model.unnestedData.map(drug => drug.id) : [],
-                    discontinued: []
-                };
-            });
-        });
 
         this.heightNeeded = (this.model.maxActive + this.model.maxDiscontinued + 1) * (this.minUnitDimension + this.unitPadding) + this.headerHeight + this.unitPadding + 200;
         //container
@@ -169,10 +146,6 @@ export default class VizView extends Element {
             active: headers.map(() => []),
             discontinued: headers.map(() => [])
         };
-        console.log(this.positionMap);
-        S.setState('year', { year: this.model.years[0], resolve: null, source: 'load' });
-        // this.setYearState([this.model.years[0], null, 0]);
-
         this.checkHeight();
         this.initializeYearButtons();
         this.initializeAnimateOnOff();
@@ -181,6 +154,7 @@ export default class VizView extends Element {
         this.discontinuedSpan = document.querySelector('#total-discontinued');
         this.totals = document.querySelector('#abx-totals');
         this.container = document.querySelector('.' + s.container);
+        S.setState('year', { year: this.model.years[0], resolve: null, source: 'load' });
     }
     update(msg, data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
 
@@ -200,8 +174,6 @@ export default class VizView extends Element {
         if (data.source === 'yearButton') {
             this.switchYears(data);
         }
-        //this.FLIP(parseInt(data[0]), data[1], data[2]); // yearIndex, resolve fn, observation
-        // this.updateText();
     }
     addIdsAndClasses(drugs, year) {
         return new Promise(resolve => {
@@ -352,7 +324,6 @@ export default class VizView extends Element {
                         new Promise(resolveEntering => {
                             this.enterDrugs(enteringDrugs, year, resolveEntering)
                         }).then(() => {
-                            //TODO: does data really need to be normalized after all?
                             this.setTippys();
                             this.updateText(year);
                             this.removeTemporaryPlaceholders();
@@ -535,141 +506,6 @@ export default class VizView extends Element {
             });
         });
     }
-    populatePlaceholders(yearIndex, observation) {
-        console.log(this.previousStatuses);
-
-        function addIdsAndClasses(placeholder, drug, containerIndex, previousStatuses, model) {
-
-            placeholder.id = drug.id;
-            placeholder.classList.remove(s.drugEmpty);
-            placeholder.classList.add(`${ drug.gramNegative ? s.gramNegative : 'nope' }`, `${ drug.novel ? s.novel : 'nope' }`, `${ drug.urgent ? s.urgent : 'nope' }`, `${ previousStatuses && previousStatuses[drug.id] && previousStatuses[drug.id].isDiscontinued && !drug[model.years[yearIndex]].isDiscontinued ? s.wasDiscontinued : 'nope'}`);
-            if (containerIndex === 1) {
-                placeholder.classList.add(s.isDiscontinued);
-            }
-            placeholder.setAttribute('data-tippy-content', `<strong>${drug.name}</strong><br />${drug.company}`);
-            placeholder.innerText = drug.id;
-        }
-
-        var activeContainer = document.querySelector('.' + s.activeContainer),
-            discontinuedContainer = document.querySelector('.' + s.discontinuedContainer);
-
-        // copy index 1 of phaseMembers to index 0. JSON parse/stringify to make deep copy
-        this.phaseMembers[0] = JSON.parse(JSON.stringify(this.phaseMembers[1]));
-        console.log(this.phaseMembers, this.previousStatuses);
-        [activeContainer, discontinuedContainer].forEach((container, k) => {
-            var isDiscontinued = k === 0 ? false : true;
-
-            this.model.data[yearIndex].observations[observation].forEach((phase, i) => {
-                function getPhaseMembersIndex(id) {
-                    return this.phaseMembers[1][i + 1][(isDiscontinued ? 'discontinued' : 'active')].indexOf(id)
-                }
-                // filter drugs by whether they're active or discontinued; also sort them based on whether they were already in the column
-                //  they are about to be placed in
-                var filtered = phase.values.filter(d => k === 0 ? !d[this.model.years[yearIndex]][observation].isDiscontinued : d[this.model.years[yearIndex]][observation].isDiscontinued).sort((a, b) => {
-
-                        /* ENTERING / NOT ENTERING */
-                        if (this.previousStatuses === undefined) { // should be true only on first load
-                            return a.id - b.id; // lower ids first
-                        }
-
-                        if (!this.previousStatuses[a.id] && !this.previousStatuses[b.id]) { // both are entering. coercing !true to catch undefined or zero
-                            return a.id - b.id; // lower ids first
-                        }
-
-                        if (!this.previousStatuses[a.id]) { // a is entering but b is not. coercing !true to catch undefined or zero
-                            return 1;
-                        }
-
-                        if (!this.previousStatuses[b.id]) { // b is entering but a is not. coercing !true to catch undefined or zero
-                            return -1;
-                        }
-
-                        /* STAYING IN COLUMN / NOT STAYING IN COLUMN */
-                        // .column is 1-indexed, i is zero indexed
-                        if (this.previousStatuses[a.id].column === i + 1 && this.previousStatuses[a.id].isDiscontinued === isDiscontinued) { // a is in current column and matches current discontinued state
-                            if (this.previousStatuses[b.id].column === i + 1 && this.previousStatuses[b.id].isDiscontinued === isDiscontinued) { // also true for b 
-                                // i.e. BOTH ARE IN SAME COLUMN
-                                return getPhaseMembersIndex.call(this, a.id) < getPhaseMembersIndex.call(this, b.id) ? -1 : 1;
-                            }
-                            // not also true for b
-                            return -1;
-                        }
-                        if (this.previousStatuses[b.id].column === i + 1 && this.previousStatuses[b.id].isDiscontinued === isDiscontinued) { // b is in current column and matches current discontinued state. not true for a
-                            return 1;
-                        }
-                        if (this.previousStatuses[a.id].column === i + 1) { // A is in current column but changing status
-                            if (this.previousStatuses[b.id].column === i + 1 && this.previousStatuses[b.id].isDiscontinued !== isDiscontinued) { // same is true for B
-                                return a.id - b.id;
-                            }
-                            if (this.previousStatuses[b.id].column === i + 1) { // B is also in current column but is not changing status
-                                return 1;
-                            } else {
-                                return -1;
-                            }
-                        }
-                        if (this.previousStatuses[b.id].column === i + 1) {
-                            return 1;
-                        }
-
-                        // process of elimination, below both a and b have been present but are coming from columns other than the current
-                        if (this.previousStatuses[a.id].column > this.previousStatuses[b.id].column) { // sort drugs coming from greater columns first
-                            return -1;
-                        }
-                        if (this.previousStatuses[a.id].column < this.previousStatuses[b.id].column) { // sort drugs coming from lesser columns last
-                            return 1;
-                        }
-                        // process of elimination, below both and b coming from the same column
-                        if (this.previousStatuses[a.id].isDiscontinued === isDiscontinued && this.previousStatuses[b.id].isDiscontinued !== isDiscontinued) { // A was discontinued/notDiscontinued; B was not
-                            return -1;
-                        }
-                        if (this.previousStatuses[b.id].isDiscontinued === isDiscontinued && this.previousStatuses[a.id].isDiscontinued !== isDiscontinued) { // B was discontinued/notDiscontinued; A was not
-                            return 1;
-                        }
-                        return a.id - b.id; // lower ids first
-                    }),
-                    column = container.querySelectorAll('.' + s.column)[i];
-
-
-                // clear the phaseMember array now that its previous contents have been utilized
-                this.phaseMembers[1][i + 1][(k === 0 ? 'active' : 'discontinued')].length = 0;
-                filtered.forEach((drug, j) => {
-                    var placeholder = column.querySelectorAll('.' + s.drug)[j];
-                    addIdsAndClasses(placeholder, drug, k, this.previousStatuses, this.model);
-                    this.phaseMembers[1][i + 1][(k === 0 ? 'active' : 'discontinued')].push(drug.id); // place the drug in the proper bucket tracking its column
-                });
-                this.phaseMembers[1][0].active = this.model.unnestedData.filter(d => d[+this.currentYear][this.currentObservation].column === 0).map(each => each.id);
-                //   console.log(this.phaseMembers);
-            });
-        });
-
-    }
-    setYearState(data, isRestart) {
-        var stateBeforeChange = S.getState('year');
-        if (stateBeforeChange && !isRestart) {
-            this.recordStatuses(stateBeforeChange[0], stateBeforeChange[2]);
-        }
-        S.setState('year', data);
-        this.currentYear = data[0];
-        this.currentObservation = data[2];
-
-    }
-
-    /* toggleIsSameYear(msg,data){
-         var container = this.controlContainer || document.querySelector('.' + s.controlContainer);
-         if ( data ){
-             container.classList.add(s.isSameYearSelected);
-         } else {
-             container.classList.remove(s.isSameYearSelected);
-         }
-     }*/
-    /*  toggleIsBackward(msg, data){
-          var container = this.controlContainer || document.querySelector('.' + s.controlContainer);
-          if ( data ){
-              container.classList.add(s.isMovingBackward);
-          } else {
-              container.classList.remove(s.isMovingBackward);
-          }
-      }*/
     initializeAnimateOnOff() {
         this.animateYears = true;
 
@@ -724,8 +560,8 @@ export default class VizView extends Element {
             btn.removeAttribute('disabled');
         });
     }
-    playYears(event) {
-        if (event === 'reciprocal') {
+    playYears() {
+     /*   if (event === 'reciprocal') {
             GTMPush('ABXAnimation|Replay');
         } else {
             GTMPush('ABXAnimation|Play');
@@ -775,7 +611,6 @@ export default class VizView extends Element {
                 this.playYears('reciprocal');
             }, _duration);
         } else {
-
             new Promise((resolve) => {
                 if (S.getState('isPaused')) {
                     this.enableYearButtons();
@@ -790,9 +625,7 @@ export default class VizView extends Element {
                     nextPromise.call(this);
                 }
             });
-        }
-
-
+        }*/
     }
     showReplayOption() {
         this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
@@ -829,19 +662,11 @@ export default class VizView extends Element {
     }
     checkHeight() {
 
-
-
-        /* add 'squat' class to body for small screens */
         if (window.innerHeight < this.heightNeeded) {
             document.body.classList.add(s.squat);
         } else {
             document.body.classList.remove(s.squat);
         }
-        /*if ( document.querySelector('#section-comparison .js-inner-content').offsetHeight > window.innerHeight ) {
-            document.body.classList.add(s.superSquat);
-        } else {
-            document.body.classList.remove(s.superSquat);
-        }*/
 
         function adjustCSSVariables() {
             var root = document.documentElement;
@@ -852,18 +677,6 @@ export default class VizView extends Element {
             root.style.setProperty('--active-max-height', activeMax + 'px');
             root.style.setProperty('--discontinued-max-height', Math.floor(this.heightNeeded - activeMax - this.headerHeight) + 'px');
 
-            /*
-            :root {
-                --max-container-height: 800px;
-                --active-max-height: 368px;
-                --discontinued-max-height: 368px;
-                --squat-active-proportion: 50vh;
-                --squat-discontinued-proportion: 50vh;
-                --unit-dimension: 30px;
-                --header-height: 45px;
-            }
-
-            */
         }
         adjustCSSVariables.call(this);
     }
@@ -883,65 +696,6 @@ export default class VizView extends Element {
         if (this.discontinuedSpan.innerHTML != totalDiscontinued) {
             document.querySelector('#total-discontinued').fadeInContent(totalDiscontinued);
         }
-    }
-    FLIP(data, resolve, observation = 0) { // observation defaults to 0 for the initial page load animation.  LEGACY FROM WHEN THERE WERE TWO OBSRVATIONS PER YEAR
-        this.recordFirstPositions(); // first positions on page
-        //this.recordStatuses(data, observation);
-        this.clearAttributesAndDetails(); // removes classNames and IDs of nonempty drug
-
-        // params 1. index of the year (2014 -> 0); 2. index of the observation; 
-        this.populatePlaceholders(this.model.years.indexOf(data), observation); // last  
-
-        this.nonEmptyDrugs = document.querySelectorAll('.' + s.drug + ':not(.' + s.drugEmpty + ')');
-        tippy(this.nonEmptyDrugs, {
-            arrow: true,
-            distance: 3
-        });
-        console.log(this.animateYears !== false);
-        var isBackward = S.getState('isBackward');
-        if (this.animateYears !== false && isBackward == false) {
-            this.invertPositions();
-        }
-        this.playAnimation(resolve, (this.animateYears && !isBackward)); // pass in the `resolve` function from the promise initiated when the year button was pressed or Play loop cycled
-        /* if ( !resolve ){
-             setTimeout(() => {
-                 this.enablePlayButton();
-             }, duration);
-         }*/
-        //} else {
-        /*if ( resolve ){
-            setTimeout(() => {
-                this.enablePlayButton();
-                resolve(true);
-            }, duration);
-        } else {
-            this.enablePlayButton();
-        }*/
-        /*  this.playAnimation(resolve);
-
-        }*/
-
-
-
-    }
-    recordStatuses(year, observation) {
-
-        this.previousStatuses = this.model.data[this.model.years.indexOf(+year)].observations[observation].reduce((acc, phase) => { // cur is the phase object
-            phase.values.forEach(drug => {
-                acc[drug.id] = {
-                    column: drug[year][observation].column,
-                    isDiscontinued: drug[year][observation].isDiscontinued
-                };
-            })
-            return acc;
-        }, {});
-    }
-    recordFirstPositions() {
-        this.firstPositions = Array.from(document.querySelectorAll('.' + s.drug + ':not(' + s.drugEmpty + ')')).reduce((acc, cur) => {
-
-            acc[cur.id] = cur.getBoundingClientRect();
-            return acc;
-        }, {});
     }
     clearAttributesAndDetails() {
         this.nonEmptyDrugs.forEach(drug => {
@@ -970,203 +724,14 @@ export default class VizView extends Element {
             }
         });
     }
-    playAnimation(resolve, animateYears) {
-        console.log(S.getState('isBackward'));
-        var column = headers.length,
-            currentState = S.getState('year'),
-            currentYear = currentState[0],
-            currentObservation = currentState[2];
-        //console.log(currentYear, currentObservation);
-
-        function testColumn() {
-            return column > 0;
-        }
-
-        function incrementColumn() {
-            column--;
-        }
-
-        function resolveTrue(duration) {
-            if (resolve) {
-
-                setTimeout(function() {
-                    resolve(true);
-                }, duration);
-
+    highlightColumn() {
+       /* if (column > 0) {
+            let header = document.querySelectorAll('.' + s.headerDiv)[column - 1];
+            if (bool) {
+                header.classList.add(s.isAnimating);
+            } else {
+                header.classList.remove(s.isAnimating);
             }
-        }
-
-        function transition(DOMDrug, dur = duration, index = null) {
-            let _index = index;
-            // var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ','').split(',');
-            // var distanceToTravel = Math.sqrt( Math.abs(parseInt(translateXY[0])) ** 2 + Math.abs(parseInt(translateXY[0])) ** 2 );
-            var styleMatch = DOMDrug.style.transform.match(/translate\((.*?)\)/);
-            var translateXY = styleMatch ? styleMatch[1].replace(' ', '').split(',').map(d => parseInt(d)) : [0, 0];
-            console.log(translateXY);
-            if ((translateXY[0] !== 0 || translateXY[1] !== 0) && (index === 0 || index === 1 || index === 3)) {
-                DOMDrug.classList.add(s.isMoving);
-                DOMDrug._tippy.show(0);
-            }
-            DOMDrug.style.transitionDuration = dur / 1000 + 's';
-            setTimeout(() => {
-                console.log(DOMDrug._tippy.popper.style);
-                var match = DOMDrug._tippy.popper.style.transform.match(/translate3d\((.*?)\)/);
-                var popperCurrentTranslate3d = match ? match[1].replace(' ', '').split(',').map(d => parseInt(d)) : [0, 0, 0];
-                console.log(popperCurrentTranslate3d);
-                if (_index === 0 || _index === 1 || _index === 3) {
-                    DOMDrug._tippy.popper.style.transitionDuration = dur / 1000 + 's';
-                    DOMDrug._tippy.popper.style.transitionTimingFunction = 'ease-in-out';
-                }
-                window.requestAnimationFrame(function() {
-                    if (_index === 0 || _index === 1 || _index === 3) {
-                        DOMDrug._tippy.popper.style.transform = `translate3d(${parseInt(popperCurrentTranslate3d[0]) - parseInt(translateXY[0])}px, ${parseInt(popperCurrentTranslate3d[1]) - parseInt(translateXY[1])}px, 0px)`;
-                    }
-                    DOMDrug.style.transform = 'translate(0px,0px)';
-                });
-                setTimeout(function() {
-                    DOMDrug.classList.remove(s.isMoving);
-                    DOMDrug.classList.remove(s.isTranslated);
-                    DOMDrug._tippy.popper.style.transitionDuration = '0s';
-                    DOMDrug._tippy.hide();
-                }, dur);
-            });
-        }
-
-        function highlightColumn(bool) {
-            if (column > 0) {
-                let header = document.querySelectorAll('.' + s.headerDiv)[column - 1];
-                if (bool) {
-                    header.classList.add(s.isAnimating);
-                } else {
-                    header.classList.remove(s.isAnimating);
-                }
-            }
-        }
-
-        function animateSingleColumn(resolve) {
-            let subsetDelay = animateYears ? 500 : 0;
-            highlightColumn(true);
-            this.disableYearButtons();
-
-            var matchingDrugIDs = Object.keys(this.previousStatuses).filter(id => this.previousStatuses[id].column === column),
-                matchingDOMDrugs = Array.from(this.nonEmptyDrugs).filter(DOMDrug => matchingDrugIDs.includes(DOMDrug.id));
-            var elementsWillStayButMove = matchingDOMDrugs.filter(el => {
-                var currentDatum = this.model.unnestedData.find(d => d.id === el.id)[currentYear][currentObservation];
-                var translateXY = el.style.transform.match(/translate\((.*?)\)/) ? el.style.transform.match(/translate\((.*?)\)/)[1].replace(' ', '').split(',') : [0, 0];
-                el.translateXY = translateXY;
-                return (this.previousStatuses[el.id].column === currentDatum.column && this.previousStatuses[el.id].isDiscontinued === currentDatum.isDiscontinued && (translateXY[0] !== '0px' || translateXY[1] !== '0px'));
-            });
-            var elementsWillChangeStatus = matchingDOMDrugs.filter(el => this.previousStatuses[el.id].isDiscontinued !== this.model.unnestedData.find(d => d.id === el.id)[currentYear][currentObservation].isDiscontinued);
-            var elementsWillMoveForward = matchingDOMDrugs.filter(el => this.previousStatuses[el.id].column !== 0 && this.previousStatuses[el.id].column < this.model.unnestedData.find(d => d.id === el.id)[currentYear][currentObservation].column);
-            var elementsWillMoveBackward = matchingDOMDrugs.filter(el => this.previousStatuses[el.id].column > this.model.unnestedData.find(d => d.id === el.id)[currentYear][currentObservation].column);
-            var elementsWillEnter = matchingDOMDrugs.filter(el => this.previousStatuses[el.id].column === 0);
-
-            var subsets = [elementsWillMoveForward, elementsWillMoveBackward, elementsWillStayButMove, elementsWillChangeStatus, elementsWillEnter];
-            // console.log(elementsWillStayButMove);
-            var lengthOfAllSubsets = subsets.reduce(function(acc, cur) {
-                return acc + cur.length;
-            }, 0);
-            console.log(lengthOfAllSubsets);
-
-            function handleSubset(index) {
-
-                let _index = index;
-                console.log('    subset ' + index, subsets[index]);
-                new Promise(resolve => {
-                    if (subsets[_index].length === 0) {
-                        console.log('      skipping ^');
-                        resolve(true); // if the subset is empty, resolve right away
-                    } else {
-                        subsets[_index].forEach((DOMDrug, i, array) => {
-                            //var translateXY = DOMDrug.style.transform.match(/translate\((.*?)\)/)[1].replace(' ').split(',');
-                            //var dur = translateXY[0] === 0 && translateXY[1] === 0 ? 0 : duration;
-                            var dur = _index === 2 ? duration / 12 : _index === 4 ? duration / 1.5 : duration; // speeds up transition for drugs that will stay but move; slows it down for  drugs that will enter
-                            var delay = _index === 2 ? dur * .5 * i : _index === 4 ? dur * .1 * i : dur * i;
-                            if (!animateYears) {
-                                dur = 0;
-                                delay = 0;
-                            }
-                            setTimeout(() => {
-                                console.log(dur);
-                                transition(DOMDrug, dur, _index); // passing in the existing translate coords so that timing can be base on distance
-                            }, delay);
-                            if (i === array.length - 1) {
-                                console.log(_index);
-                                let resolveDelay = _index === 4 ? dur * 2 + subsetDelay : _index === 2 ? 0 : dur * (i + 1) + subsetDelay;
-                                if (!animateYears) {
-                                    resolveDelay = 0;
-                                }
-                                setTimeout(() => {
-                                    resolve(true);
-                                }, resolveDelay); // wait until last item in subset has finished its transition
-                                // before resolving and triggering the next subset
-                            }
-                        });
-                    }
-                }).then(() => {
-                    index++;
-                    if (index < subsets.length) { // if there are still more subsets to handle, handle them
-                        handleSubset.call(this, index);
-                    } else {
-                        //return; // if not, stop
-
-                        if (testColumn()) {
-                            //setTimeout(() => {
-                            highlightColumn(false);
-                            incrementColumn();
-                            animateSingleColumn.call(this, resolve);
-                        } else {
-                            let delayBetweenObservation = animateYears ? 0 : 0
-                            setTimeout(() => {
-                                this.enableYearButtons();
-                                console.log(S.getState('year')[0], this.model.years[this.model.years.length - 1], S.getState('year')[2]);
-                                this.enablePlayButton();
-                                if (S.getState('year')[0] == this.model.years[this.model.years.length - 1]) {
-                                    highlightColumn(false);
-                                    this.showReplayOption();
-                                }
-                                if (!S.getState('isPaused')) {
-                                    highlightColumn(false);
-                                    resolve(true);
-                                } else {
-                                    highlightColumn(false);
-                                    this.removePauseOption();
-                                    this.enableYearButtons();
-                                }
-                            }, delayBetweenObservation);
-                        }
-                    }
-                });
-            }
-            setTimeout(() => {
-                handleSubset.call(this, 0);
-            }, subsetDelay);
-
-        } // end animateSingleColumn
-
-        // continue playAnimation, which is called once for each observation (2x for each year)
-        if (isFirstLoad) { // ie is  the first animation on load FIRST ANIMATION
-
-
-            this.nonEmptyDrugs.forEach((DOMDrug) => {
-                transition(DOMDrug, 0);
-            });
-            isFirstLoad = false;
-            //     resolveTrue(duration); */
-        } else { // is not the first animation on load, ie drugs have previous statuses SUBSEQUENT ANIMATIONS
-            let enteringDrugs = Array.from(this.nonEmptyDrugs).filter(DOMDrug => !Object.keys(this.previousStatuses).includes(DOMDrug.id));
-            enteringDrugs.forEach(enteringDrug => {
-                this.previousStatuses[enteringDrug.id] = {
-                    column: 0,
-                    isDiscontinued: false
-                };
-            });
-
-            new Promise(resolve => {
-                animateSingleColumn.call(this, resolve);
-            }).then(function() {
-                resolveTrue(0);
-            });
-        }
+        }*/
     }
 }
