@@ -448,67 +448,57 @@ export default class VizView extends Element {
                 filtered[i].deltaY = filtered[i].previousScreenPosition.top - currentScreenPosition.top;
                 filtered[i].deltaX = filtered[i].previousScreenPosition.left - currentScreenPosition.left;
             }
-            requestAnimationFrame(() => {
                 for ( let i = 0; i < filtered.length; i++ ){
-                    filtered[i].domDrug.style.transform = `translate(${filtered[i].deltaX}px, ${filtered[i].deltaY}px)`;
-                    filtered[i].domDrug.style.display = 'none';
-                    setTimeout(() => {
-                        filtered[i].domDrug.style.display = 'block';
-                        if ( i == filtered.length - 1 ){
-                            setTimeout(() => {
+                    requestAnimationFrame(() => {
+                        filtered[i].domDrug.style.transform = `translate(${filtered[i].deltaX}px, ${filtered[i].deltaY}px)`;
+                        /* need to toggle display of the drugs from none back to block to force browsers to repaint them. otherwise 
+                        the invertion doens't appear correctly and drugs will appear to start their animations from the wrong spot */
+                        filtered[i].domDrug.style.display = 'none';
+                        requestAnimationFrame(() => {
+                            filtered[i].domDrug.style.display = 'block';
+                            if ( i == filtered.length - 1 ){
                                 resolveInvert(true);
-                            })
-                        }
-                    },3000)
+                            }
+                        });
+                    });
                 }
-            });
         });
     }
-    /******* HERE YOU NEED TO DO SOMETHING TO FORCE A REPAINT ********/
-    /// these methods are causing unacceptable flashes. try adding stylesheet to repaint entire page'
     animateDrugs(drugs, resolvePlaceDrugs) {
-        console.log('animateDrugs');
             var movedDrugs = drugs.filter(d => d.moved);
             if (movedDrugs.length > 0) {
-               // setTimeout(() => {
-                    // TO DO. PUT A break point here and watch the boxes fill in after the break point is passed.
-                    // as if the settimeout from inverting is not complete before the animation starts. need to chain
-                    // the async stuff as promises, on after anither or maybe try getting rid of all asyncs
-                    movedDrugs.forEach((drug, i, array) => {
-                        drug.domDrug.style.transitionDelay = i * duration + 'ms';
-                        drug.domDrug.style.transitionDuration = duration + 'ms';
-                        requestAnimationFrame(() => {
-                            drug.domDrug.style.transform = 'translate(0, 0)';
-                            if (i == array.length - 1) {
-                                setTimeout(() => {
-                                    resolvePlaceDrugs(true);
-                                }, array.length * duration);
-                            }
-                        })
-                    });
-            //    },20);
+                movedDrugs.forEach((drug, i, array) => {
+                    drug.domDrug.style.transitionDelay = i * duration + 'ms';
+                    drug.domDrug.style.transitionDuration = duration + 'ms';
+                    requestAnimationFrame(() => {
+                        drug.domDrug.style.transform = 'translate(0, 0)';
+                        if (i == array.length - 1) {
+                            setTimeout(() => {
+                                resolvePlaceDrugs(true);
+                            }, array.length * duration);
+                        }
+                    })
+                });
             } else {
                 resolvePlaceDrugs(true);
             }
     }
     clearPhase(phaseIndex, type) {
         return new Promise(resolveClear => {
-            requestAnimationFrame(() => {
-                this.columns[type][phaseIndex].childNodes.forEach((drugNode, i, array) => {
-                    drugNode.className = `${s.drug} ${s.drugEmpty}`;
-                    drugNode.id = '';
-                    drugNode.removeAttribute('data-tippy-content');
-                    drugNode.innerHTML = '';
-                    if (drugNode._tippy) {
-                        drugNode.removeAttribute('tabindex');
-                        drugNode._tippy.destroy();
-                    }
-                    if ( i == array.length - 1 ){
-                        setTimeout(() => {
-                            resolveClear(true);
-                        }); 
-                    }
-                });
+            this.columns[type][phaseIndex].childNodes.forEach((drugNode, i, array) => {
+                drugNode.className = `${s.drug} ${s.drugEmpty}`;
+                drugNode.id = '';
+                drugNode.removeAttribute('data-tippy-content');
+                drugNode.innerHTML = '';
+                if (drugNode._tippy) {
+                    drugNode.removeAttribute('tabindex');
+                    drugNode._tippy.destroy();
+                }
+                if ( i == array.length - 1 ){
+                   // setTimeout(() => {
+                        resolveClear(true);
+                    //}); 
+                }
             });
         });
     }
