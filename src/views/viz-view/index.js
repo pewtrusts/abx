@@ -157,7 +157,7 @@ export default class VizView extends Element {
         S.setState('year', { year: this.model.years[0], source: 'load' });
     }
     update(msg, data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
-
+        S.setState('isPaused', false);
         // find btn to be deselected and change its appearance
         var toBeDeselectedActive = document.querySelector('.' + s.yearButtonActive); //observationToCheckAgainst = !S.getState('isBackward') ? 0 : 1;
         toBeDeselectedActive.classList.remove(s.yearButtonActive, s.observation, s.observation0, s.observation1)
@@ -237,13 +237,15 @@ export default class VizView extends Element {
     recordMapPosition({type, phaseIndex, slot, drug}){
         drug.previousMapPosition = `${type}-${phaseIndex}-${slot}`;
     }
-    switchYears({ year }) {
+    switchYears({ year, source }) {
         return new Promise(resolveYear => {
             var phaseIndex = headers.length - 1;
             var previousYear = S.getPreviousState('year').year;
             this.isBackward = (+previousYear > year);
             this.disableYearButtons();
-            this.disablePlayButton();
+            if ( source !== 'play' ){
+                this.disablePlayButton();
+            }
 
             function iteratePhase() {
                 //set up a promise for each phase. this way we can pass the resolve function around and resolve it later,
@@ -546,9 +548,11 @@ export default class VizView extends Element {
             if (el.checked) {
                 GTMPush('ABXAnimation|ToggleAnimation|On');
                 this.animateYears = true;
+                this.enablePlayButton();
             } else {
                 GTMPush('ABXAnimation|ToggleAnimation|Off');
                 this.animateYears = false;
+                this.disablePlayButton();
             }
             console.log(this);
         }
@@ -562,12 +566,10 @@ export default class VizView extends Element {
         this.playYearsBind = this.playYears.bind(this);
         var playButton = document.querySelector('.' + s.playButton);
         playButton.addEventListener('click', this.playYearsBind);
+        this.playBtn = playButton;
     }
     pausePlay() {
-        var previousYearButton = document.querySelector('.' + s.yearButtonPrevious);
-        if (previousYearButton) {
-            document.querySelector('.' + s.yearButtonPrevious).classList.remove(s.yearButtonPrevious);
-        }
+        
         this.playBtn.blur();
         this.playBtn.removeEventListener('click', this.pausePlayBind);
         S.setState('isPaused', true);
@@ -601,10 +603,13 @@ export default class VizView extends Element {
             GTMPush('ABXAnimation|Play');
         }*/
         new Promise(resolvePlayYears => {
+            this.showPauseOption();
             var currentYear = S.getState('year').year;
-            if ( +currentYear < this.model.years[this.model.years.length - 1] ){
-                S.setState('year', {year: currentYear + 1, source: 'play'});
+            if ( +currentYear < this.model.years[this.model.years.length - 1] && !S.getState('isPaused') ){
+                S.setState('year', {year: +currentYear + 1, source: 'play'});
             } else {
+                this.removePauseOption();
+                S.setState('isPaused', false);
                 resolvePlayYears(true);
             }
         });
