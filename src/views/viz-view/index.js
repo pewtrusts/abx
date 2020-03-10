@@ -17,7 +17,7 @@ const headers = [
     ['Approved', '&#x2713']
 ];
 
-const duration = 1200;
+const duration = 200;
 const shortDuration = 50;
 
 export default class VizView extends Element {
@@ -154,7 +154,7 @@ export default class VizView extends Element {
         this.discontinuedSpan = document.querySelector('#total-discontinued');
         this.totals = document.querySelector('#abx-totals');
         this.container = document.querySelector('.' + s.container);
-        S.setState('year', { year: this.model.years[0], resolve: null, source: 'load' });
+        S.setState('year', { year: this.model.years[0], source: 'load' });
     }
     update(msg, data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
 
@@ -173,6 +173,13 @@ export default class VizView extends Element {
         }
         if (data.source === 'yearButton') {
             this.switchYears(data);
+        }
+        if (data.source == 'play'){
+            this.switchYears(data).then(() => {
+                setTimeout(() => {
+                    this.playYears();
+                },500);
+            });
         }
     }
     addIdsAndClasses(drugs, year) {
@@ -231,10 +238,12 @@ export default class VizView extends Element {
         drug.previousMapPosition = `${type}-${phaseIndex}-${slot}`;
     }
     switchYears({ year }) {
-        new Promise(resolveYear => {
+        return new Promise(resolveYear => {
             var phaseIndex = headers.length - 1;
             var previousYear = S.getPreviousState('year').year;
             this.isBackward = (+previousYear > year);
+            this.disableYearButtons();
+            this.disablePlayButton();
 
             function iteratePhase() {
                 //set up a promise for each phase. this way we can pass the resolve function around and resolve it later,
@@ -337,6 +346,9 @@ export default class VizView extends Element {
             } // end iteratePhase
             var iteratePhaseBind = iteratePhase.bind(this);
             iteratePhaseBind();
+        }).then(() => {
+            this.enableYearButtons();
+            this.enablePlayButton();
         });
     }
     clearAddedDrugAttributes() {
@@ -420,6 +432,7 @@ export default class VizView extends Element {
                 resolveInvert(true);
             }
             for ( let i = 0; i < filtered.length; i++ ){
+                filtered[i].domDrug.classList.add(s.isTranslated);
                 filtered[i].domDrug.style.transitionDuration = '0s';
                 let currentScreenPosition = filtered[i].domDrug.getBoundingClientRect();
                 filtered[i].deltaY = filtered[i].previousScreenPosition.top - currentScreenPosition.top;
@@ -453,8 +466,8 @@ export default class VizView extends Element {
                             var popperXYZ;
                             if ( !drug.keptSameStatus && !drug.isEntering ){
                                 drug.domDrug._tippy.show();
+                                drug.domDrug.classList.add(s.isMoving);
                                 setTimeout(() => {
-                                    console.log(drug.domDrug._tippy.popper.style.transform);
                                     popperXYZ = drug.domDrug._tippy.popper.style
                                         .transform.match(/translate3d\((.*?)\)/)[1]
                                         .split(',').map(xy => parseInt(xy));
@@ -468,6 +481,8 @@ export default class VizView extends Element {
                             }
                             setTimeout(() => {
                                 drug.domDrug._tippy.hide();
+                                drug.domDrug.classList.remove(s.isTranslated);
+                                drug.domDrug.classList.remove(s.isMoving);
                                 if (i == array.length - 1) {
                                     resolvePlaceDrugs(true);
                                 }
@@ -579,11 +594,23 @@ export default class VizView extends Element {
         });
     }
     playYears() {
+
      /*   if (event === 'reciprocal') {
             GTMPush('ABXAnimation|Replay');
         } else {
             GTMPush('ABXAnimation|Play');
-        }
+        }*/
+        new Promise(resolvePlayYears => {
+            var currentYear = S.getState('year').year;
+            if ( +currentYear < this.model.years[this.model.years.length - 1] ){
+                S.setState('year', {year: currentYear + 1, source: 'play'});
+            } else {
+                resolvePlayYears(true);
+            }
+        });
+
+
+/*
         let thisResolveDelay = this.animateYears ? 0 : 0.625 * duration;
         S.setState('isPaused', false);
         S.setState('isBackward', false);
@@ -714,33 +741,6 @@ export default class VizView extends Element {
         if (this.discontinuedSpan.innerHTML != totalDiscontinued) {
             document.querySelector('#total-discontinued').fadeInContent(totalDiscontinued);
         }
-    }
-    clearAttributesAndDetails() {
-        this.nonEmptyDrugs.forEach(drug => {
-            drug.className = `${s.drug} ${s.drugEmpty}`;
-            drug.id = '';
-            drug.setAttribute('data-tippy-content', '');
-            if (drug._tippy) {
-                drug.removeAttribute('tabindex');
-                drug._tippy.destroy();
-            }
-            // drug.innerText = '';
-        });
-    }
-    invertPositions() {
-        this.nonEmptyDrugs.forEach(drug => {
-            drug.style.transitionDuration = '0s';
-            var lastPosition = drug.getBoundingClientRect(),
-                deltaY = this.firstPositions[drug.id] ? this.firstPositions[drug.id].top - lastPosition.top : -3000,
-                deltaX = this.firstPositions[drug.id] ? this.firstPositions[drug.id].left - lastPosition.left : -3000; // drugs that are entering will not have firstPositions
-            drug.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-            if (deltaY !== 0 || deltaX !== 0) {
-                drug.classList.add(s.isTranslated);
-            }
-            if (!this.firstPositions[drug.id]) {
-                drug.classList.add(s.entering);
-            }
-        });
     }
     highlightColumn() {
        /* if (column > 0) {
