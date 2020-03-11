@@ -167,7 +167,7 @@ export default class VizView extends Element {
                 this.animateYears = false;
                 // this.disablePlayButton();
             }
-            console.log(this);
+            
         }
         var input = document.querySelector('.js-animate-checkbox');
         var handlerBind = handler.bind(this);
@@ -587,7 +587,7 @@ export default class VizView extends Element {
                                 // a drug that stays
                                 drug.previousSlot = i;
                                 let _previousYear = drug.movedFromProcessedColumn ? year : previousYear;
-                                console.log(drug[_previousYear], drug[year]);
+                                
                                 if (drug[year] != drug[_previousYear] && drug[year] != 0) {
                                     // if drug moves columns, record its position on screen
                                     this.recordScreenPosition(drug);
@@ -598,8 +598,8 @@ export default class VizView extends Element {
                                     // put the drug in its new position in the positionMap, ie, the first empty slot of the relevant "column"
                                     this.mapPositions({ type: newType, phaseIndex: newPhaseIndex, slot: this.positionMap[newType][newPhaseIndex].length, drug });
                                     // remove the drug from the original position. should be ok bc we are looping in reverse. shouldn't leave gaps
-                                    let splice = this.positionMap[type][phaseIndex].splice(i, 1);
-                                    console.log(this.positionMap[type][phaseIndex], i, splice);
+                                    this.positionMap[type][phaseIndex].splice(i, 1);
+                                    
                                     drug.movedFromProcessedColumn = true;
                                     drug.moved = true;
 
@@ -655,7 +655,7 @@ export default class VizView extends Element {
                     } else {
                         //gone through the phases and need to place entering drugs
                         let enteringDrugs = this.model.unnestedData.filter(d => d[previousYear] == 0 && d[year] != 0);
-                        console.log('foo', enteringDrugs);
+                        
                         new Promise(resolveEntering => {
                             this.enterDrugs(enteringDrugs, year, resolveEntering)
                         }).then(() => {

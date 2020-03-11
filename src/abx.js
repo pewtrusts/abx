@@ -11,7 +11,7 @@ import data from './data/abx-data.csv';
 
 //views
 import VizView from './views/viz-view/';
-//import VisuallyHidden from './views/visually-hidden/';
+import VisuallyHidden from './views/visually-hidden/';
 //import FiftyStateView from './views/fifty-state/';
 
 // app prototype
@@ -60,7 +60,7 @@ function getRuntimeData(){
                     appContainer.setAttribute('data-data-hash', dataHash);
                 } else if ( process.env.NODE_ENV !== 'development' && dataHash.toString() !== appContainer.getAttribute('data-data-hash') ){
                     appContainer.setAttribute('data-data-mismatch',true);
-                    console.log('data mismatch');
+                    
                     model.isMismatched = true; // set so that components can access this value 
                 }
             },
@@ -80,36 +80,21 @@ function getRuntimeData(){
                     }
                     index++
                 }
-                model.unnestedData = response.data;/*.map(d => { // turn each string value like "1-1d" into an array , [1,1d]
-                    d.id = 'drug-' + d.id;
-                    model.years.forEach(year => {
-                        d[year] = [0].map(() => {
-                            
-                            return {
-                                column: parseInt(d[year]),
-                                isDiscontinued: ( d[year].toString().indexOf('d') !== -1 )
-                            };
-                        });
-                    });
-                    return d;
-                });*/
-               /* model.data = model.years.map(year => {
+                model.unnestedData = response.data;
+                model.nestedByYear = model.years.map(year => {
                     return {
                         year,
-                        observations: [0].map(observation => { // each year has two observations
-                            return [1, 2, 3, 4, 5].map(phase => {
-                                
-                                return {
-                                    phase,
-                                    values: model.unnestedData.filter(d => d[year][observation].column === phase) 
-                                };
-                            });
+                        values: [1, 2, 3, 4, 5].map(phase => {
+                            return {
+                                phase,
+                                values: model.unnestedData.filter(d => parseInt(d[year]) == phase)
+                            };
                         })
                     };
-                });*/
+                });
                 const activeLengths =       [1,2,3,4,5].map(() => model.years.map(() => 0));
                 const discontinuedLengths = [1,2,3,4,5].map(() => model.years.map(() => 0));
-                console.log(activeLengths,discontinuedLengths);
+                
                 model.unnestedData.forEach(drug => {
                     model.years.forEach((year, i) => {
                         var phase = parseInt(drug[year]);
@@ -120,7 +105,7 @@ function getRuntimeData(){
                         }
                     });
                 });
-                console.log(model, activeLengths, discontinuedLengths);
+                
                 // find the maximum number of nondiscontinued drugs in one column at any time. side effect pushes 
                 // number of discontinued drugs to array for max tbd later
                 // these values will be used to determine when stacked drugs need to be collapsed down
@@ -136,13 +121,13 @@ function getRuntimeData(){
                 });*/
                 model.maxActive = Math.max(...activeLengths.map(d => Math.max(...d))) + 4;
                 model.maxDiscontinued = Math.max(...discontinuedLengths.map(d => Math.max(...d)));
-                console.log(model);
+                
                
                 /* push views now that model is complete */
                 
                 views.push(
                    this.createComponent(model, VizView, 'div#viz-view', {renderToSelector: '#abx-visualization', rerenderOnDataMismatch: true, parent: this}),
-            //       this.createComponent(model, VisuallyHidden, 'div#visually-hidden-view', {renderToSelector: '#visually-hidden-container', rerenderOnDataMismatch: true, parent: this})
+                   this.createComponent(model, VisuallyHidden, 'div#visually-hidden-view', {renderToSelector: '#visually-hidden-container', rerenderOnDataMismatch: true, parent: this})
                    // this.createComponent(model, FiftyStateView, 'div#fifty-state-view', {renderToSelector: '#section-states .js-inner-content', rerenderOnDataMismatch: true, parent: this})  
                 );
                 
@@ -166,7 +151,7 @@ export default class ABXApp extends PCTApp {
         getRuntimeData.call(this).then(() => { // bind StateDebt as context `this` for getRuntimeData so that it can acceess this.el, etc
             
             views.forEach(view => {
-                console.log(view);
+                
           /* ? */      view.container.appendChild(view.el); // different here from CapeTown: views aren't appended to app container; some static content
                                                      // is present already. views appended to *their* containers
             });
@@ -185,10 +170,10 @@ export default class ABXApp extends PCTApp {
 /*        if ( module.hot ){
             let that = this;
             module.hot.accept('./views/state-comparison', () => {
-                console.log('accept!', arguments, that);
+                
                 document.querySelector('#section-comparison .js-inner-content').innerHTML = '';
                 var replacement = that.createComponent(model, ComparisonView, 'div#comparison-view', {renderToSelector: '#section-comparison .js-inner-content', rerenderOnDataMismatch: true});
-                console.log(replacement);
+                
                 replacement.container.appendChild(replacement.el);
 
             });
