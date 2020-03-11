@@ -35,8 +35,6 @@ export default class VizView extends Element {
         if (this.prerendered && !this.rerender) {
             return view; // if prerendered and no need to render (no data mismatch)
         }
-
-
         function renderColumns(cont) {
             for (let i = 0; i < 5; i++) {
                 let column = document.createElement('div');
@@ -91,8 +89,6 @@ export default class VizView extends Element {
         inputWrapper.appendChild(label);
         controlContainer.appendChild(inputWrapper);
 
-
-
         view.appendChild(controlContainer);
 
         // container
@@ -128,16 +124,12 @@ export default class VizView extends Element {
         renderColumns.call(this, activeContainer);
         renderColumns.call(this, discontinuedContainer);
 
-
-
         return view;
     }
     init() {
         PS.setSubs([
             ['resize', this.checkHeight.bind(this)],
             ['year', this.update.bind(this)],
-            //  ['isBackward', this.toggleIsBackward.bind(this)],
-            // ['isSameYear', this.toggleIsSameYear.bind(this)]
         ]);
         this.columns = {};
         this.columns.active = document.querySelector('.' + s.activeContainer).querySelectorAll('.' + s.column);
@@ -160,7 +152,7 @@ export default class VizView extends Element {
         S.setState('year', { year: this.model.years[0], source: 'load' });
     }
 
-    // subsequent inits and show/remove methods
+    // *********  subsequent inits and show/remove methods
 
     initializeAnimateOnOff() {
         this.animateYears = true;
@@ -173,7 +165,7 @@ export default class VizView extends Element {
             } else {
                 GTMPush('ABXAnimation|ToggleAnimation|Off');
                 this.animateYears = false;
-               // this.disablePlayButton();
+                // this.disablePlayButton();
             }
             console.log(this);
         }
@@ -218,14 +210,35 @@ export default class VizView extends Element {
             });
         });
     }
-    // remove methods should only remove; add methods should call them; add methods should only add
+
+    //  ********** remove methods should only remove; add methods should call them; add methods should only add
+    disableYearButtons() {
+        this.yearButtons = this.yearButtons || document.querySelectorAll('.' + s.yearButton);
+        this.yearButtons.forEach(function(btn) {
+            btn.setAttribute('disabled', 'disabled');
+        });
+    }
+    disablePlayButton() {
+        this.playBtn = this.playBtn || document.querySelector('.' + s.playButton);
+        this.playBtn.setAttribute('disabled', 'disabled');
+    }
+    enablePlayButton() {
+        this.playBtn = this.playBtn || document.querySelector('.' + s.playButton);
+        this.playBtn.removeAttribute('disabled');
+    }
+    enableYearButtons() {
+        this.yearButtons = this.yearButtons || document.querySelectorAll('.' + s.yearButton);
+        this.yearButtons.forEach(function(btn) {
+            btn.removeAttribute('disabled');
+        });
+    }
     removePauseOption() {
         this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
         this.replayBtn.removeEventListener('click', this.pausePlayBind);
         this.replayBtn.classList.remove(s.pause);
         this.replayBtn.classList.remove(s.willPause);
     }
-    removePlayOption(){
+    removePlayOption() {
         this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
         this.replayBtn.removeEventListener('click', this.playBind);
     }
@@ -242,7 +255,7 @@ export default class VizView extends Element {
         this.replayBtn.classList.add(s.pause);
         this.replayBtn.title = "Pause";
     }
-    showPlayOption(){
+    showPlayOption() {
         this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
         this.removeReplayOption();
         this.removePauseOption();
@@ -257,32 +270,11 @@ export default class VizView extends Element {
         this.replayBtn.classList.add(s.replay);
         this.replayBtn.title = "Replay";
     }
-    update(msg, data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
-        S.setState('isPaused', false);
-        // find btn to be deselected and change its appearance
-        var toBeDeselectedActive = document.querySelector('.' + s.yearButtonActive); //observationToCheckAgainst = !S.getState('isBackward') ? 0 : 1;
-        toBeDeselectedActive.classList.remove(s.yearButtonActive, s.observation, s.observation0, s.observation1)
 
-        // find button that matches new selection and change its appearance
-        var btn = document.querySelector('button[value="' + data.year + '"]');
+    
+    // *********** other 
 
-        //toggle observation 0 or observation 1
-        btn.classList.add(s.yearButtonActive);
 
-        if (data.source === 'load') {
-            this.populateInitialDrugs(data.year);
-        }
-        if (data.source === 'yearButton') {
-            this.switchYears(data);
-        }
-        if ( ['play','replay'].includes(data.source) ){
-            this.switchYears(data).then(() => {
-                setTimeout(() => {
-                    this.playYears();
-                },500);
-            });
-        }
-    }
     addIdsAndClasses(drugs, year) {
         return new Promise(resolve => {
             requestAnimationFrame(() => {
@@ -296,13 +288,231 @@ export default class VizView extends Element {
                     drug.domDrug.setAttribute('data-tippy-content', `<strong>${drug.name}</strong><br />${drug.company}`);
                     drug.domDrug.innerHTML = `<span style="position:absolute;">${drug.id}</span>`;
                     this.setTippys(drug.domDrug);
-                    if ( i == array.length - 1 ){
+                    if (i == array.length - 1) {
                         setTimeout(() => {
                             resolve(true);
                         });
                     }
                 });
             });
+        });
+    }
+    animateDrugs(drugs, resolvePlaceDrugs) {
+        var movedDrugs = drugs.filter(d => d.moved);
+        var totalDelay = 0;
+        if (movedDrugs.length > 0) {
+            movedDrugs.forEach((drug, i, array) => {
+                var _duration = drug.keptSameStatus ? shortDuration : duration;
+                var __duration = drug.keptSameStatus ? _duration / 4 : drug.isEntering ? _duration / 6 : _duration; // use a smaller figure for to add to totalDelay for drugs the keep the same status
+                // so that one doesn't have to wait for the previous to finish before it starts moving
+                drug.domDrug.style.transitionDuration = _duration + 'ms';
+                setTimeout(() => {
+                    requestAnimationFrame(() => {
+                        var popperXYZ;
+                        if (!drug.keptSameStatus && !drug.isEntering) {
+                            drug.domDrug._tippy.show();
+                            drug.domDrug.classList.add(s.isMoving);
+                            setTimeout(() => {
+                                popperXYZ = drug.domDrug._tippy.popper.style
+                                    .transform.match(/translate3d\((.*?)\)/)[1]
+                                    .split(',').map(xy => parseInt(xy));
+                                drug.domDrug._tippy.popper.style.transitionDuration = _duration + 'ms';
+                                drug.domDrug._tippy.popper.style.transitionTimingFunction = 'ease-in-out';
+                                drug.domDrug._tippy.popper.style.transform = `translate3d(${popperXYZ[0] - drug.deltaX}px, ${popperXYZ[1] - drug.deltaY}px, ${popperXYZ[2]}px)`;
+                                drug.domDrug.style.transform = 'translate(0, 0)';
+                            });
+                        } else {
+                            drug.domDrug.style.transform = 'translate(0, 0)';
+                        }
+                        setTimeout(() => {
+                            drug.domDrug._tippy.hide();
+                            drug.domDrug.classList.remove(s.isTranslated);
+                            drug.domDrug.classList.remove(s.isMoving);
+                            if (i == array.length - 1) {
+                                resolvePlaceDrugs(true);
+                            }
+                        }, _duration);
+                    });
+                }, totalDelay);
+                totalDelay += __duration;
+            });
+        } else {
+            resolvePlaceDrugs(true);
+        }
+    }
+    checkHeight() {
+
+        if (window.innerHeight < this.heightNeeded) {
+            document.body.classList.add(s.squat);
+        } else {
+            document.body.classList.remove(s.squat);
+        }
+
+        function adjustCSSVariables() {
+            var root = document.documentElement;
+            var activeMax = Math.floor((this.heightNeeded - this.unitPadding - this.headerHeight) * (this.maxActive / (this.maxActive + this.maxDiscontinued)));
+            root.style.setProperty('--unit-dimension', this.minUnitDimension + 'px');
+            root.style.setProperty('--header-height', this.headerHeight + 'px');
+            root.style.setProperty('--max-container-height', this.heightNeeded + 'px');
+            root.style.setProperty('--active-max-height', activeMax + 'px');
+            root.style.setProperty('--discontinued-max-height', Math.floor(this.heightNeeded - activeMax - this.headerHeight) + 'px');
+
+        }
+        adjustCSSVariables.call(this);
+    }
+    clearAddedDrugAttributes() {
+        this.model.unnestedData.forEach(drug => {
+            delete drug.previousSlot;
+            delete drug.slot;
+            delete drug.phaseIndex;
+            delete drug.moved;
+            delete drug.previousScreenPosition;
+            delete drug.movedFromProcessedColumn;
+            delete drug.movedFromSamePhase;
+            delete drug.previousMapPosition;
+            delete drug.deltaX;
+            delete drug.deltaY;
+            delete drug.isEntering;
+            delete drug.keptSameStatus;
+        });
+    }
+    clearPhase(phaseIndex, type) {
+        return new Promise(resolveClear => {
+            this.columns[type][phaseIndex].childNodes.forEach((drugNode, i, array) => {
+                drugNode.className = `${s.drug} ${s.drugEmpty}`;
+                drugNode.id = '';
+                drugNode.removeAttribute('data-tippy-content');
+                drugNode.innerHTML = '';
+                if (drugNode._tippy) {
+                    drugNode.removeAttribute('tabindex');
+                    drugNode._tippy.destroy();
+                }
+                if (i == array.length - 1) {
+                    resolveClear(true);
+                }
+            });
+        });
+    }
+
+    enterDrugs(enteringDrugs, year, resolveEntering) {
+        enteringDrugs.forEach(drug => {
+            var type = isNaN(drug[year]) ? 'discontinued' : 'active';
+            var phaseIndex = parseInt(drug[year]) - 1;
+            var slot = this.positionMap[type][phaseIndex].length;
+            drug.phaseIndex = phaseIndex;
+            drug.type = type;
+            drug.previousScreenPosition = { top: -3000, left: -3000 };
+            drug.moved = true;
+            drug.slot = slot;
+            drug.isEntering = true;
+            this.mapPositions({ type, phaseIndex, slot, drug });
+        });
+        this.placeDrugs(enteringDrugs.sort(this.sortBySlot).sort(this.sortByPhase), resolveEntering, year);
+    }
+    highlightColumn(i) {
+        this.headers.forEach(h => {
+            h.classList.remove(s.isAnimating);
+        });
+        if (typeof i == 'number') {
+            this.headers[i].classList.add(s.isAnimating);
+        }
+    }
+    invertDrugs(drugs) {
+        return new Promise(resolveInvert => {
+            var filtered = drugs.filter(d => d.moved);
+            if (filtered.length == 0) {
+                resolveInvert(true);
+            }
+            for (let i = 0; i < filtered.length; i++) {
+                filtered[i].domDrug.classList.add(s.isTranslated);
+                filtered[i].domDrug.style.transitionDuration = '0s';
+                let currentScreenPosition = filtered[i].domDrug.getBoundingClientRect();
+                filtered[i].deltaY = filtered[i].previousScreenPosition.top - currentScreenPosition.top;
+                filtered[i].deltaX = filtered[i].previousScreenPosition.left - currentScreenPosition.left;
+            }
+            for (let i = 0; i < filtered.length; i++) {
+                requestAnimationFrame(() => {
+                    filtered[i].domDrug.style.transform = `translate(${filtered[i].deltaX}px, ${filtered[i].deltaY}px)`;
+                    /* need to toggle display of the drugs from none back to block to force browsers to repaint them. otherwise 
+                    the invertion doens't appear correctly and drugs will appear to start their animations from the wrong spot */
+                    filtered[i].domDrug.style.display = 'none';
+                    requestAnimationFrame(() => {
+                        filtered[i].domDrug.style.display = 'block';
+                        if (i == filtered.length - 1) {
+                            resolveInvert(true);
+                        }
+                    });
+                });
+            }
+        });
+    }
+    mapPositions({ type, phaseIndex, slot, drug }) {
+        this.positionMap[type][phaseIndex][slot] = drug;
+    }
+    pausePlay() {
+        GTMPush('ABXAnimation|Pause');
+        this.playBtn.blur();
+        this.playBtn.removeEventListener('click', this.pausePlayBind);
+        S.setState('isPaused', true);
+        this.playBtn.classList.add(s.willPause);
+    }
+    placeDrugs(drugs, resolvePlaceDrugs, year) {
+        if (drugs.length == 0) {
+            resolvePlaceDrugs(true);
+            return;
+        }
+        for (let i = 0; i < drugs.length; i++) {
+            let slot = this.positionMap[drugs[i].type][drugs[i].phaseIndex].indexOf(drugs[i]);
+            let placeholder = this.columns[drugs[i].type][drugs[i].phaseIndex].children[slot];
+            if (!placeholder) { // new method of moving drugs one column at a time may result in interim state of
+                // a column having to many drugs, ie more than the number of placeholders calculated when the 
+                // app first start. here, if placeholder is undefined, create and insert it.
+                let _placeholder = document.createElement('div');
+                _placeholder.classList.add(s.drug, s.drugEmpty);
+                _placeholder.setAttribute('tabindex', 0);
+                _placeholder.setAttribute('data-temporary', true);
+                this.columns[drugs[i].type][drugs[i].phaseIndex].appendChild(_placeholder);
+                placeholder = _placeholder;
+            }
+            drugs[i].domDrug = placeholder;
+        }
+        if (this.animateYears && !this.isBackward) {
+            this.invertDrugs(drugs).then(() => {
+                this.addIdsAndClasses(drugs, year).then(() => {
+                    this.animateDrugs(drugs, resolvePlaceDrugs);
+                });
+            });
+        } else {
+            this.addIdsAndClasses(drugs, year).then(() => {
+                resolvePlaceDrugs(true);
+            });
+        }
+    }
+    play() {
+        this.showPauseOption();
+        this.playYearsBind();
+    }
+    playYears(event, type) {
+
+        if (event == 'replay') {
+            GTMPush('ABXAnimation|Replay');
+        } else {
+            GTMPush('ABXAnimation|Play');
+        }
+        new Promise(resolvePlayYears => {
+            var currentYear = type == 'replay' ? this.model.years[0] - 1 : S.getState('year').year;
+            if (+currentYear < this.model.years[this.model.years.length - 1] && !S.getState('isPaused')) {
+                S.setState('year', { year: +currentYear + 1, source: type || 'play' });
+            } else {
+                this.removePauseOption();
+                if (currentYear == this.model.years[this.model.years.length - 1]) {
+                    this.showReplayOption();
+                } else {
+                    this.showPlayOption();
+                }
+                S.setState('isPaused', false);
+                resolvePlayYears(true);
+            }
         });
     }
     populateInitialDrugs(year) {
@@ -318,8 +528,25 @@ export default class VizView extends Element {
             });
             console.log(this.positionMap);
         });
-      //  this.setTippys();
+        //  this.setTippys();
         this.updateText(year);
+    }
+    recordMapPosition({ type, phaseIndex, slot, drug }) {
+        drug.previousMapPosition = `${type}-${phaseIndex}-${slot}`;
+    }
+    recordScreenPosition(drug) {
+        if (!this.isBackward && this.animateYears) {
+            drug.previousScreenPosition = drug.domDrug.getBoundingClientRect();
+        }
+    }
+    removeTemporaryPlaceholders() {
+        document.querySelectorAll('[data-temporary]').forEach(el => {
+            el.parentElement.removeChild(el);
+        });
+    }
+    replay(e) {
+        this.showPauseOption();
+        this.playYearsBind(e, 'replay');
     }
     setTippys(drug = '[data-tippy-content]') {
         tippy(drug, {
@@ -327,16 +554,11 @@ export default class VizView extends Element {
             distance: 3
         });
     }
-    mapPositions({ type, phaseIndex, slot, drug }) {
-        this.positionMap[type][phaseIndex][slot] = drug;
+    sortBySlot(a, b) {
+        return a.slot - b.slot;
     }
-    recordScreenPosition(drug) {
-        if (!this.isBackward && this.animateYears) {
-            drug.previousScreenPosition = drug.domDrug.getBoundingClientRect();
-        }
-    }
-    recordMapPosition({type, phaseIndex, slot, drug}){
-        drug.previousMapPosition = `${type}-${phaseIndex}-${slot}`;
+    sortByPhase(a, b) {
+        return a.phaseIndex - b.phaseIndex;
     }
     switchYears({ year, source }) {
         return new Promise(resolveYear => {
@@ -344,7 +566,7 @@ export default class VizView extends Element {
             var previousYear = S.getPreviousState('year').year;
             this.isBackward = (+previousYear > year);
             this.disableYearButtons();
-            if ( !['play','replay'].includes(source) ){
+            if (!['play', 'replay'].includes(source)) {
                 this.disablePlayButton();
             }
 
@@ -370,7 +592,7 @@ export default class VizView extends Element {
                                 if (drug[year] != drug[_previousYear] && drug[year] != 0) {
                                     // if drug moves columns, record its position on screen
                                     this.recordScreenPosition(drug);
-                                    this.recordMapPosition({type, phaseIndex, slot: i, drug});
+                                    this.recordMapPosition({ type, phaseIndex, slot: i, drug });
                                     let newType = isNaN(drug[year]) ? 'discontinued' : 'active';
                                     let newPhaseIndex = parseInt(drug[year]) - 1;
                                     // add some attributes to the drug
@@ -390,10 +612,10 @@ export default class VizView extends Element {
                                 } else if (drug[year] != 0) {
                                     // may not need to record its position on screen. expensive computation
                                     drugsThatStay.push(drug);
-                                    this.recordMapPosition({type, phaseIndex, slot: i, drug});
+                                    this.recordMapPosition({ type, phaseIndex, slot: i, drug });
                                 } else { // phase value for the drug this year is zero. ie, moving backward in years
                                     // TO DO : also put in another place "exiting"
-                                    this.recordMapPosition({type, phaseIndex, slot: i, drug});
+                                    this.recordMapPosition({ type, phaseIndex, slot: i, drug });
                                     this.positionMap[type][phaseIndex].splice(i, 1);
                                     //this.clearAddedDrugAttributes(drug);
                                 }
@@ -453,319 +675,39 @@ export default class VizView extends Element {
             } // end iteratePhase
             var iteratePhaseBind = iteratePhase.bind(this);
             //setTimeout(() => {
-                iteratePhaseBind();
-           // }, source == 'replay' ? 2000 : 0);
+            iteratePhaseBind();
+            // }, source == 'replay' ? 2000 : 0);
         }).then(() => {
             this.enableYearButtons();
-           // this.showPlayOption();
+            // this.showPlayOption();
             this.enablePlayButton();
         });
     }
-    clearAddedDrugAttributes() {
-        this.model.unnestedData.forEach(drug => {
-            delete drug.previousSlot;
-            delete drug.slot;
-            delete drug.phaseIndex;
-            delete drug.moved;
-            delete drug.previousScreenPosition;
-            delete drug.movedFromProcessedColumn;
-            delete drug.movedFromSamePhase;
-            delete drug.previousMapPosition;
-            delete drug.deltaX;
-            delete drug.deltaY;
-            delete drug.isEntering;
-            delete drug.keptSameStatus;
-        });
-    }
-    removeTemporaryPlaceholders() {
-        document.querySelectorAll('[data-temporary]').forEach(el => {
-            el.parentElement.removeChild(el);
-        });
-    }
-    sortBySlot(a, b) {
-        return a.slot - b.slot;
-    }
-    sortByPhase(a, b) {
-        return a.phaseIndex - b.phaseIndex;
-    }
-    enterDrugs(enteringDrugs, year, resolveEntering) {
-        enteringDrugs.forEach(drug => {
-            var type = isNaN(drug[year]) ? 'discontinued' : 'active';
-            var phaseIndex = parseInt(drug[year]) - 1;
-            var slot = this.positionMap[type][phaseIndex].length;
-            drug.phaseIndex = phaseIndex;
-            drug.type = type;
-            drug.previousScreenPosition = { top: -3000, left: -3000 };
-            drug.moved = true;
-            drug.slot = slot;
-            drug.isEntering = true;
-            this.mapPositions({ type, phaseIndex, slot, drug });
-        });
-        this.placeDrugs(enteringDrugs.sort(this.sortBySlot).sort(this.sortByPhase), resolveEntering, year);
-    }
-    placeDrugs(drugs, resolvePlaceDrugs, year) {
-        if ( drugs.length == 0 ){
-            resolvePlaceDrugs(true);
-            return;
-        }
-        for ( let i = 0; i < drugs.length; i++ ){
-            let slot = this.positionMap[drugs[i].type][drugs[i].phaseIndex].indexOf(drugs[i]);
-            let placeholder = this.columns[drugs[i].type][drugs[i].phaseIndex].children[slot];
-            if (!placeholder) { // new method of moving drugs one column at a time may result in interim state of
-                // a column having to many drugs, ie more than the number of placeholders calculated when the 
-                // app first start. here, if placeholder is undefined, create and insert it.
-                let _placeholder = document.createElement('div');
-                _placeholder.classList.add(s.drug, s.drugEmpty);
-                _placeholder.setAttribute('tabindex', 0);
-                _placeholder.setAttribute('data-temporary', true);
-                this.columns[drugs[i].type][drugs[i].phaseIndex].appendChild(_placeholder);
-                placeholder = _placeholder;
-            }
-            drugs[i].domDrug = placeholder;
-        }
-        if ( this.animateYears && !this.isBackward ){
-            this.invertDrugs(drugs).then(() => {
-                this.addIdsAndClasses(drugs, year).then(() => {
-                    this.animateDrugs(drugs, resolvePlaceDrugs);
-                });
-            });
-        } else {
-            this.addIdsAndClasses(drugs, year).then(() => {
-                resolvePlaceDrugs(true);
-            });
-        }
-    }
-    invertDrugs(drugs) {
-        return new Promise(resolveInvert => {
-            var filtered = drugs.filter(d => d.moved);
-            if ( filtered.length == 0 ){
-                resolveInvert(true);
-            }
-            for ( let i = 0; i < filtered.length; i++ ){
-                filtered[i].domDrug.classList.add(s.isTranslated);
-                filtered[i].domDrug.style.transitionDuration = '0s';
-                let currentScreenPosition = filtered[i].domDrug.getBoundingClientRect();
-                filtered[i].deltaY = filtered[i].previousScreenPosition.top - currentScreenPosition.top;
-                filtered[i].deltaX = filtered[i].previousScreenPosition.left - currentScreenPosition.left;
-            }
-            for ( let i = 0; i < filtered.length; i++ ){
-                requestAnimationFrame(() => {
-                    filtered[i].domDrug.style.transform = `translate(${filtered[i].deltaX}px, ${filtered[i].deltaY}px)`;
-                    /* need to toggle display of the drugs from none back to block to force browsers to repaint them. otherwise 
-                    the invertion doens't appear correctly and drugs will appear to start their animations from the wrong spot */
-                    filtered[i].domDrug.style.display = 'none';
-                    requestAnimationFrame(() => {
-                        filtered[i].domDrug.style.display = 'block';
-                        if ( i == filtered.length - 1 ){
-                            resolveInvert(true);
-                        }
-                    });
-                });
-            }
-        });
-    }
-    animateDrugs(drugs, resolvePlaceDrugs) {
-            var movedDrugs = drugs.filter(d => d.moved);
-            var totalDelay = 0;
-            if (movedDrugs.length > 0) {
-                movedDrugs.forEach((drug, i, array) => {
-                    var _duration = drug.keptSameStatus ? shortDuration : duration;
-                    var __duration = drug.keptSameStatus ? _duration / 4 : drug.isEntering ? _duration / 6 : _duration; // use a smaller figure for to add to totalDelay for drugs the keep the same status
-                                                                          // so that one doesn't have to wait for the previous to finish before it starts moving
-                    drug.domDrug.style.transitionDuration = _duration + 'ms';
-                    setTimeout(() => {
-                        requestAnimationFrame(() => {
-                            var popperXYZ;
-                            if ( !drug.keptSameStatus && !drug.isEntering ){
-                                drug.domDrug._tippy.show();
-                                drug.domDrug.classList.add(s.isMoving);
-                                setTimeout(() => {
-                                    popperXYZ = drug.domDrug._tippy.popper.style
-                                        .transform.match(/translate3d\((.*?)\)/)[1]
-                                        .split(',').map(xy => parseInt(xy));
-                                    drug.domDrug._tippy.popper.style.transitionDuration = _duration + 'ms';
-                                    drug.domDrug._tippy.popper.style.transitionTimingFunction = 'ease-in-out';
-                                    drug.domDrug._tippy.popper.style.transform = `translate3d(${popperXYZ[0] - drug.deltaX}px, ${popperXYZ[1] - drug.deltaY}px, ${popperXYZ[2]}px)`;
-                                    drug.domDrug.style.transform = 'translate(0, 0)';
-                                });
-                            } else {
-                                drug.domDrug.style.transform = 'translate(0, 0)';
-                            }
-                            setTimeout(() => {
-                                drug.domDrug._tippy.hide();
-                                drug.domDrug.classList.remove(s.isTranslated);
-                                drug.domDrug.classList.remove(s.isMoving);
-                                if (i == array.length - 1) {
-                                    resolvePlaceDrugs(true);
-                                }
-                            }, _duration);
-                        });
-                    },totalDelay);
-                    totalDelay += __duration;
-                });
-            } else {
-                resolvePlaceDrugs(true);
-            }
-    }
-    clearPhase(phaseIndex, type) {
-        return new Promise(resolveClear => {
-            this.columns[type][phaseIndex].childNodes.forEach((drugNode, i, array) => {
-                drugNode.className = `${s.drug} ${s.drugEmpty}`;
-                drugNode.id = '';
-                drugNode.removeAttribute('data-tippy-content');
-                drugNode.innerHTML = '';
-                if (drugNode._tippy) {
-                    drugNode.removeAttribute('tabindex');
-                    drugNode._tippy.destroy();
-                }
-                if ( i == array.length - 1 ){
-                    resolveClear(true);
-                }
-            });
-        });
-    }
-    
-    play(){
-        this.showPauseOption();
-        this.playYearsBind();
-    }
-    pausePlay(){
-        GTMPush('ABXAnimation|Pause');
-        this.playBtn.blur();
-        this.playBtn.removeEventListener('click', this.pausePlayBind);
-        S.setState('isPaused', true);
-        this.playBtn.classList.add(s.willPause);
-    }
-    replay(e){
-        this.showPauseOption();
-        this.playYearsBind(e, 'replay');
-    }
-    disableYearButtons() {
-        this.yearButtons = this.yearButtons || document.querySelectorAll('.' + s.yearButton);
-        this.yearButtons.forEach(function(btn) {
-            btn.setAttribute('disabled', 'disabled');
-        });
-    }
-    disablePlayButton() {
-        this.playBtn = this.playBtn || document.querySelector('.' + s.playButton);
-        this.playBtn.setAttribute('disabled', 'disabled');
-    }
-    enablePlayButton() {
-        this.playBtn = this.playBtn || document.querySelector('.' + s.playButton);
-        this.playBtn.removeAttribute('disabled');
-    }
-    enableYearButtons() {
-        this.yearButtons = this.yearButtons || document.querySelectorAll('.' + s.yearButton);
-        this.yearButtons.forEach(function(btn) {
-            btn.removeAttribute('disabled');
-        });
-    }
-    playYears(event, type) {
-
-        if (event == 'replay') {
-            GTMPush('ABXAnimation|Replay');
-        } else {
-            GTMPush('ABXAnimation|Play');
-        }
-        new Promise(resolvePlayYears => {
-            var currentYear = type == 'replay' ? this.model.years[0] - 1 : S.getState('year').year;
-            if ( +currentYear < this.model.years[this.model.years.length - 1] && !S.getState('isPaused') ){
-                S.setState('year', {year: +currentYear + 1, source: type || 'play'});
-            } else {
-                this.removePauseOption();
-                if ( currentYear == this.model.years[this.model.years.length - 1] ){
-                    this.showReplayOption();
-                } else {
-                    this.showPlayOption();
-                }
-                S.setState('isPaused', false);
-                resolvePlayYears(true);
-            }
-        });
-
-
-/*
-        let thisResolveDelay = this.animateYears ? 0 : 0.625 * duration;
+    update(msg, data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
         S.setState('isPaused', false);
-        S.setState('isBackward', false);
-        // S.setState('isSameYear', false);
-        this.disableYearButtons();
-        this.playBtn = this.playBtn || document.querySelector('.' + s.playButton);
-        this.playBtn.blur();
+        // find btn to be deselected and change its appearance
+        var toBeDeselectedActive = document.querySelector('.' + s.yearButtonActive); //observationToCheckAgainst = !S.getState('isBackward') ? 0 : 1;
+        toBeDeselectedActive.classList.remove(s.yearButtonActive, s.observation, s.observation0, s.observation1)
 
-        function nextPromise() {
-            if (S.getState('isPaused')) {
-                this.enableYearButtons();
-                this.removePauseOption();
-                return;
-            }
-            currentYear++;
-            if (currentYear <= this.model.years[this.model.years.length - 1]) {
-                new Promise(resolve => {
-                    this.setYearState([currentYear, resolve, 0]);
-                }).then(() => {
-                    setTimeout(() => {
-                        nextPromise.call(this);
-                    }, thisResolveDelay);
-                });
+        // find button that matches new selection and change its appearance
+        var btn = document.querySelector('button[value="' + data.year + '"]');
 
-            } else {
-                this.showReplayOption.call(this);
-                this.enableYearButtons();
-            }
+        //toggle observation 0 or observation 1
+        btn.classList.add(s.yearButtonActive);
+
+        if (data.source === 'load') {
+            this.populateInitialDrugs(data.year);
         }
-
-        if (event !== 'reciprocal') {
-            this.showPauseOption();
+        if (data.source === 'yearButton') {
+            this.switchYears(data);
         }
-
-        var currentYear = S.getState('year')[0];
-        if (this.model.years.indexOf(+currentYear) === this.model.years.length - 1) {
-            let _duration = this.animateYears ? duration : 0.625 * duration;
-            this.removeReplayOption();
-            isFirstLoad = true;
-            this.clearAttributesAndDetails();
-            this.setYearState([this.model.years[0], null, 0], true);
-            setTimeout(() => {
-                this.playYears('reciprocal');
-            }, _duration);
-        } else {
-            new Promise((resolve) => {
-                if (S.getState('isPaused')) {
-                    this.enableYearButtons();
-                    resolve(false);
-                } else {
-                    //setTimeout(() => {
-                    resolve(true);
-                    //}, thisResolveDelay);
-                }
-            }).then(resolution => {
-                if (!S.getState('isPaused') && resolution === true) {
-                    nextPromise.call(this);
-                }
+        if (['play', 'replay'].includes(data.source)) {
+            this.switchYears(data).then(() => {
+                setTimeout(() => {
+                    this.playYears();
+                }, 500);
             });
-        }*/
-    }
-   
-    checkHeight() {
-
-        if (window.innerHeight < this.heightNeeded) {
-            document.body.classList.add(s.squat);
-        } else {
-            document.body.classList.remove(s.squat);
         }
-
-        function adjustCSSVariables() {
-            var root = document.documentElement;
-            var activeMax = Math.floor((this.heightNeeded - this.unitPadding - this.headerHeight) * (this.maxActive / (this.maxActive + this.maxDiscontinued)));
-            root.style.setProperty('--unit-dimension', this.minUnitDimension + 'px');
-            root.style.setProperty('--header-height', this.headerHeight + 'px');
-            root.style.setProperty('--max-container-height', this.heightNeeded + 'px');
-            root.style.setProperty('--active-max-height', activeMax + 'px');
-            root.style.setProperty('--discontinued-max-height', Math.floor(this.heightNeeded - activeMax - this.headerHeight) + 'px');
-
-        }
-        adjustCSSVariables.call(this);
     }
     updateText(year) {
         var totalNonzero = this.model.unnestedData.filter(d => parseInt(d[year]) !== 0),
@@ -783,13 +725,5 @@ export default class VizView extends Element {
         if (this.discontinuedSpan.innerHTML != totalDiscontinued) {
             document.querySelector('#total-discontinued').fadeInContent(totalDiscontinued);
         }
-    }
-    highlightColumn(i) {
-         this.headers.forEach(h => {
-            h.classList.remove(s.isAnimating);
-         });
-         if ( typeof i == 'number' ){
-             this.headers[i].classList.add(s.isAnimating);
-         }
     }
 }
