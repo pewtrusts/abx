@@ -17,7 +17,7 @@ const headers = [
     ['Approved', '&#x2713']
 ];
 
-const duration = 1200;
+const duration = 200;
 const shortDuration = 100;
 
 export default class VizView extends Element {
@@ -142,6 +142,7 @@ export default class VizView extends Element {
         this.columns = {};
         this.columns.active = document.querySelector('.' + s.activeContainer).querySelectorAll('.' + s.column);
         this.columns.discontinued = document.querySelector('.' + s.discontinuedContainer).querySelectorAll('.' + s.column);
+        this.headers = document.querySelectorAll('.' + s.headerDiv);
         this.positionMap = {
             active: headers.map(() => []),
             discontinued: headers.map(() => [])
@@ -154,7 +155,106 @@ export default class VizView extends Element {
         this.discontinuedSpan = document.querySelector('#total-discontinued');
         this.totals = document.querySelector('#abx-totals');
         this.container = document.querySelector('.' + s.container);
+        this.replayBind = this.replay.bind(this);
+        this.pausePlayBind = this.pausePlay.bind(this);
         S.setState('year', { year: this.model.years[0], source: 'load' });
+    }
+
+    // subsequent inits and show/remove methods
+
+    initializeAnimateOnOff() {
+        this.animateYears = true;
+
+        function handler(el) {
+            if (el.checked) {
+                GTMPush('ABXAnimation|ToggleAnimation|On');
+                this.animateYears = true;
+                //this.enablePlayButton();
+            } else {
+                GTMPush('ABXAnimation|ToggleAnimation|Off');
+                this.animateYears = false;
+               // this.disablePlayButton();
+            }
+            console.log(this);
+        }
+        var input = document.querySelector('.js-animate-checkbox');
+        var handlerBind = handler.bind(this);
+        input.addEventListener('change', function() {
+            handlerBind(this);
+        });
+    }
+    initializePlayButton() {
+        this.playYearsBind = this.playYears.bind(this);
+        this.playBind = this.play.bind(this);
+        var playButton = document.querySelector('.' + s.playButton);
+        playButton.addEventListener('click', this.playBind);
+        this.playBtn = playButton;
+    }
+    initializeYearButtons() {
+        document.querySelectorAll('.' + s.yearButton).forEach(button => {
+
+            var _this = this;
+            button.addEventListener('click', function() {
+                var currentYear = S.getState('year')[0];
+                if (currentYear != this.value) { // is not the already selected button
+                    GTMPush('ABXAnimation|Year|' + this.value);
+                    S.setState('isPaused', false);
+                    this.blur();
+                    _this.disablePlayButton();
+                    _this.removeReplayOption();
+                    if (+this.value > +currentYear) {
+                        S.setState('isBackward', false);
+                        new Promise(() => {
+                            S.setState('year', { year: this.value, resolve: null, source: 'yearButton' });
+                        });
+                    } else {
+                        S.setState('isBackward', true);
+                        new Promise(() => {
+                            S.setState('year', { year: this.value, resolve: null, source: 'yearButton' });
+                        })
+                    }
+                }
+            });
+        });
+    }
+    // remove methods should only remove; add methods should call them; add methods should only add
+    removePauseOption() {
+        this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
+        this.replayBtn.removeEventListener('click', this.pausePlayBind);
+        this.replayBtn.classList.remove(s.pause);
+        this.replayBtn.classList.remove(s.willPause);
+    }
+    removePlayOption(){
+        this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
+        this.replayBtn.removeEventListener('click', this.playBind);
+    }
+    removeReplayOption() {
+        this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
+        this.replayBtn.classList.remove(s.replay);
+        this.replayBtn.removeEventListener('click', this.replayBind);
+    }
+    showPauseOption() {
+        this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
+        this.removeReplayOption();
+        this.removePlayOption();
+        this.replayBtn.addEventListener('click', this.pausePlayBind);
+        this.replayBtn.classList.add(s.pause);
+        this.replayBtn.title = "Pause";
+    }
+    showPlayOption(){
+        this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
+        this.removeReplayOption();
+        this.removePauseOption();
+        this.replayBtn.addEventListener('click', this.playBind);
+        this.replayBtn.title = 'Play';
+    }
+    showReplayOption() {
+        this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
+        this.removePauseOption();
+        this.removePlayOption();
+        this.replayBtn.addEventListener('click', this.replayBind);
+        this.replayBtn.classList.add(s.replay);
+        this.replayBtn.title = "Replay";
     }
     update(msg, data) { // here data is an array. [0]: year; [1]: null or `resolve` from the Promise. needs to resolve true when all transitions of current update are finished . 3. observation index
         S.setState('isPaused', false);
@@ -249,7 +349,8 @@ export default class VizView extends Element {
 
             function iteratePhase() {
                 //set up a promise for each phase. this way we can pass the resolve function around and resolve it later,
-                // after animation has finish orsooner if there is no animation
+                // after animation has finish or sooner if there is no animation
+                this.highlightColumn(phaseIndex);
                 new Promise(resolvePhase => {
                     // TO DO : need to animate each type separately, resolve a promise when done
                     function iterateType(type) {
@@ -342,6 +443,10 @@ export default class VizView extends Element {
                             this.clearAddedDrugAttributes();
                             setTimeout(() => {
                                 resolveYear(true);
+                                this.highlightColumn();
+                                if ( year == this.model.years[this.model.years.length - 1] ){
+                                    this.showReplayOption();
+                                }
                             }, year == this.model.years[0] && source == 'replay' ? 500 : 0);
                         });
                     }
@@ -520,66 +625,21 @@ export default class VizView extends Element {
             });
         });
     }
-    initializeYearButtons() {
-        document.querySelectorAll('.' + s.yearButton).forEach(button => {
-
-            var _this = this;
-            button.addEventListener('click', function() {
-                var currentYear = S.getState('year')[0];
-                if (currentYear != this.value) { // is not the already selected button
-                    GTMPush('ABXAnimation|Year|' + this.value);
-                    S.setState('isPaused', false);
-                    this.blur();
-                    _this.disablePlayButton();
-                    _this.removeReplayOption();
-                    if (+this.value > +currentYear) {
-                        S.setState('isBackward', false);
-                        new Promise(() => {
-                            S.setState('year', { year: this.value, resolve: null, source: 'yearButton' });
-                        });
-                    } else {
-                        S.setState('isBackward', true);
-                        new Promise(() => {
-                            S.setState('year', { year: this.value, resolve: null, source: 'yearButton' });
-                        })
-                    }
-                }
-            });
-        });
+    
+    play(){
+        this.showPauseOption();
+        this.playYearsBind();
     }
-    initializeAnimateOnOff() {
-        this.animateYears = true;
-
-        function handler(el) {
-            if (el.checked) {
-                GTMPush('ABXAnimation|ToggleAnimation|On');
-                this.animateYears = true;
-                //this.enablePlayButton();
-            } else {
-                GTMPush('ABXAnimation|ToggleAnimation|Off');
-                this.animateYears = false;
-               // this.disablePlayButton();
-            }
-            console.log(this);
-        }
-        var input = document.querySelector('.js-animate-checkbox');
-        var handlerBind = handler.bind(this);
-        input.addEventListener('change', function() {
-            handlerBind(this);
-        });
-    }
-    initializePlayButton() {
-        this.playYearsBind = this.playYears.bind(this);
-        var playButton = document.querySelector('.' + s.playButton);
-        playButton.addEventListener('click', this.playYearsBind);
-        this.playBtn = playButton;
-    }
-    pausePlay() {
+    pausePlay(){
         GTMPush('ABXAnimation|Pause');
         this.playBtn.blur();
         this.playBtn.removeEventListener('click', this.pausePlayBind);
         S.setState('isPaused', true);
         this.playBtn.classList.add(s.willPause);
+    }
+    replay(e){
+        this.showPauseOption();
+        this.playYearsBind(e, 'replay');
     }
     disableYearButtons() {
         this.yearButtons = this.yearButtons || document.querySelectorAll('.' + s.yearButton);
@@ -609,17 +669,13 @@ export default class VizView extends Element {
             GTMPush('ABXAnimation|Play');
         }
         new Promise(resolvePlayYears => {
-            this.showPauseOption();
             var currentYear = type == 'replay' ? this.model.years[0] - 1 : S.getState('year').year;
             if ( +currentYear < this.model.years[this.model.years.length - 1] && !S.getState('isPaused') ){
                 S.setState('year', {year: +currentYear + 1, source: type || 'play'});
             } else {
-                this.removePauseOption();
+               // this.removePauseOption();
                 S.setState('isPaused', false);
                 resolvePlayYears(true);
-                if ( currentYear == this.model.years[this.model.years.length - 1] ){
-                    this.showReplayOption();
-                }
             }
         });
 
@@ -686,41 +742,7 @@ export default class VizView extends Element {
             });
         }*/
     }
-    showReplayOption() {
-        this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
-        this.replayBtn.removeEventListener('click', this.pausePlayBind);
-        this.replayBtn.addEventListener('click', e => {
-            this.playYearsBind(e, 'replay');
-        });
-        this.replayBtn.classList.add(s.replay);
-        this.replayBtn.classList.remove(s.pause);
-        this.replayBtn.classList.remove(s.willPause);
-        this.replayBtn.title = "Replay";
-    }
-    showPauseOption() {
-        this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
-        this.pausePlayBind = this.pausePlay.bind(this);
-        this.removeReplayOption();
-        this.replayBtn.removeEventListener('click', this.playYearsBind);
-        this.replayBtn.addEventListener('click', this.pausePlayBind);
-        this.replayBtn.classList.add(s.pause);
-        this.replayBtn.classList.remove(s.replay);
-        this.replayBtn.title = "Pause";
-    }
-    removePauseOption() {
-        console.log('removing pause option');
-        this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
-        this.replayBtn.removeEventListener('click', this.pausePlayBind);
-        this.replayBtn.addEventListener('click', this.playYearsBind);
-        this.replayBtn.classList.remove(s.pause);
-        this.replayBtn.classList.remove(s.willPause);
-        this.replayBtn.title = "Play";
-    }
-    removeReplayOption() {
-        this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
-        this.replayBtn.classList.remove(s.replay);
-        //this.replayBtn.title = "Play";
-    }
+   
     checkHeight() {
 
         if (window.innerHeight < this.heightNeeded) {
@@ -758,14 +780,12 @@ export default class VizView extends Element {
             document.querySelector('#total-discontinued').fadeInContent(totalDiscontinued);
         }
     }
-    highlightColumn() {
-       /* if (column > 0) {
-            let header = document.querySelectorAll('.' + s.headerDiv)[column - 1];
-            if (bool) {
-                header.classList.add(s.isAnimating);
-            } else {
-                header.classList.remove(s.isAnimating);
-            }
-        }*/
+    highlightColumn(i) {
+         this.headers.forEach(h => {
+            h.classList.remove(s.isAnimating);
+         });
+         if ( typeof i == 'number' ){
+             this.headers[i].classList.add(s.isAnimating);
+         }
     }
 }
