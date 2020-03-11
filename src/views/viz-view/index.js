@@ -286,7 +286,7 @@ export default class VizView extends Element {
                         drug.domDrug.classList.add(s.isDiscontinued);
                     }
                     drug.domDrug.setAttribute('data-tippy-content', `<strong>${drug.name}</strong><br />${drug.company}`);
-                    drug.domDrug.innerHTML = `<span style="position:absolute;">${drug.id}</span>`;
+                   // drug.domDrug.innerHTML = `<span style="position:absolute;">${drug.id}</span>`;
                     this.setTippys(drug.domDrug);
                     if (i == array.length - 1) {
                         setTimeout(() => {
@@ -526,7 +526,6 @@ export default class VizView extends Element {
                 });
                 this.addIdsAndClasses(phaseMatches, year);
             });
-            console.log(this.positionMap);
         });
         //  this.setTippys();
         this.updateText(year);
