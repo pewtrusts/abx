@@ -17,8 +17,8 @@ const headers = [
     ['Approved', '&#x2713']
 ];
 
-const duration = 200;
-const shortDuration = 50;
+const duration = 1200;
+const shortDuration = 100;
 
 export default class VizView extends Element {
     prerender() { // this prerender is called as part of the super constructor
@@ -465,7 +465,9 @@ export default class VizView extends Element {
             var totalDelay = 0;
             if (movedDrugs.length > 0) {
                 movedDrugs.forEach((drug, i, array) => {
-                    var _duration = drug.keptSameStatus ? shortDuration : duration; 
+                    var _duration = drug.keptSameStatus ? shortDuration : duration;
+                    var __duration = drug.keptSameStatus ? _duration / 4 : drug.isEntering ? _duration / 6 : _duration; // use a smaller figure for to add to totalDelay for drugs the keep the same status
+                                                                          // so that one doesn't have to wait for the previous to finish before it starts moving
                     drug.domDrug.style.transitionDuration = _duration + 'ms';
                     setTimeout(() => {
                         requestAnimationFrame(() => {
@@ -495,7 +497,7 @@ export default class VizView extends Element {
                             }, _duration);
                         });
                     },totalDelay);
-                    totalDelay += _duration;
+                    totalDelay += __duration;
                 });
             } else {
                 resolvePlaceDrugs(true);
@@ -573,7 +575,7 @@ export default class VizView extends Element {
         this.playBtn = playButton;
     }
     pausePlay() {
-        
+        GTMPush('ABXAnimation|Pause');
         this.playBtn.blur();
         this.playBtn.removeEventListener('click', this.pausePlayBind);
         S.setState('isPaused', true);
