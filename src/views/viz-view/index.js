@@ -378,7 +378,7 @@ export default class VizView extends Element {
     }
     clearPhase(phaseIndex, type) {
         return new Promise(resolveClear => {
-            this.columns[type][phaseIndex].childNodes.forEach((drugNode, i, array) => {
+            Array.from(this.columns[type][phaseIndex].children).forEach((drugNode, i, array) => {
                 drugNode.className = `${s.drug} ${s.drugEmpty}`;
                 drugNode.id = '';
                 drugNode.removeAttribute('data-tippy-content');
@@ -435,9 +435,9 @@ export default class VizView extends Element {
                     filtered[i].domDrug.style.transform = `translate(${filtered[i].deltaX}px, ${filtered[i].deltaY}px)`;
                     /* need to toggle display of the drugs from none back to block to force browsers to repaint them. otherwise 
                     the invertion doens't appear correctly and drugs will appear to start their animations from the wrong spot */
-                    filtered[i].domDrug.style.display = 'none';
+                    filtered[i].domDrug.style.opacity = 0.99;
                     requestAnimationFrame(() => {
-                        filtered[i].domDrug.style.display = 'block';
+                        filtered[i].domDrug.style.opacity = 1;
                         if (i == filtered.length - 1) {
                             resolveInvert(true);
                         }
