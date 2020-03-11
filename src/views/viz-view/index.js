@@ -17,7 +17,7 @@ const headers = [
     ['Approved', '&#x2713']
 ];
 
-const duration = 200;
+const duration = 1200;
 const shortDuration = 100;
 
 export default class VizView extends Element {
