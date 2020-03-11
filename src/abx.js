@@ -11,7 +11,7 @@ import data from './data/abx-data.csv';
 
 //views
 import VizView from './views/viz-view/';
-import VisuallyHidden from './views/visually-hidden/';
+//import VisuallyHidden from './views/visually-hidden/';
 //import FiftyStateView from './views/fifty-state/';
 
 // app prototype
@@ -80,7 +80,7 @@ function getRuntimeData(){
                     }
                     index++
                 }
-                model.unnestedData = response.data.map(d => { // turn each string value like "1-1d" into an array , [1,1d]
+                model.unnestedData = response.data;/*.map(d => { // turn each string value like "1-1d" into an array , [1,1d]
                     d.id = 'drug-' + d.id;
                     model.years.forEach(year => {
                         d[year] = [0].map(() => {
@@ -92,8 +92,8 @@ function getRuntimeData(){
                         });
                     });
                     return d;
-                });
-                model.data = model.years.map(year => {
+                });*/
+               /* model.data = model.years.map(year => {
                     return {
                         year,
                         observations: [0].map(observation => { // each year has two observations
@@ -106,31 +106,43 @@ function getRuntimeData(){
                             });
                         })
                     };
+                });*/
+                const activeLengths =       [1,2,3,4,5].map(() => model.years.map(() => 0));
+                const discontinuedLengths = [1,2,3,4,5].map(() => model.years.map(() => 0));
+                console.log(activeLengths,discontinuedLengths);
+                model.unnestedData.forEach(drug => {
+                    model.years.forEach((year, i) => {
+                        var phase = parseInt(drug[year]);
+                        if ( isNaN(drug[year]) && drug[year].charAt(1) === 'd' ){
+                            discontinuedLengths[phase - 1][i]++;
+                        } else if ( drug[year] !== 0 ){
+                            activeLengths[phase - 1][i]++;
+                        }
+                    });
                 });
-                console.log(model);
-                const activeLengths = [];
-                const discontinuedLengths = [];
+                console.log(model, activeLengths, discontinuedLengths);
                 // find the maximum number of nondiscontinued drugs in one column at any time. side effect pushes 
                 // number of discontinued drugs to array for max tbd later
                 // these values will be used to determine when stacked drugs need to be collapsed down
                 // for smaller screens
-                model.data.forEach(d => {
+
+              /*  model.data.forEach(d => {
                     d.observations.forEach((obs,i) => {
                         obs.forEach(phase => {
                             activeLengths.push(phase.values.filter(drug => drug[d.year][i].isDiscontinued !== true).length);
                             discontinuedLengths.push(phase.values.filter(drug => drug[d.year][i].isDiscontinued === true).length);
                         });
                     });
-                });
-                model.maxActive = Math.max(...activeLengths);
-                model.maxDiscontinued = Math.max(...discontinuedLengths);
+                });*/
+                model.maxActive = Math.max(...activeLengths.map(d => Math.max(...d))) + 4;
+                model.maxDiscontinued = Math.max(...discontinuedLengths.map(d => Math.max(...d)));
                 console.log(model);
                
                 /* push views now that model is complete */
                 
                 views.push(
                    this.createComponent(model, VizView, 'div#viz-view', {renderToSelector: '#abx-visualization', rerenderOnDataMismatch: true, parent: this}),
-                   this.createComponent(model, VisuallyHidden, 'div#visually-hidden-view', {renderToSelector: '#visually-hidden-container', rerenderOnDataMismatch: true, parent: this})
+            //       this.createComponent(model, VisuallyHidden, 'div#visually-hidden-view', {renderToSelector: '#visually-hidden-container', rerenderOnDataMismatch: true, parent: this})
                    // this.createComponent(model, FiftyStateView, 'div#fifty-state-view', {renderToSelector: '#section-states .js-inner-content', rerenderOnDataMismatch: true, parent: this})  
                 );
                 
