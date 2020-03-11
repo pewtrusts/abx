@@ -195,6 +195,7 @@ export default class VizView extends Element {
 
             var _this = this;
             button.addEventListener('click', function() {
+                _this.showPlayOption();
                 var currentYear = S.getState('year')[0];
                 if (currentYear != this.value) { // is not the already selected button
                     GTMPush('ABXAnimation|Year|' + this.value);
@@ -444,9 +445,6 @@ export default class VizView extends Element {
                             setTimeout(() => {
                                 resolveYear(true);
                                 this.highlightColumn();
-                                if ( year == this.model.years[this.model.years.length - 1] ){
-                                    this.showReplayOption();
-                                }
                             }, year == this.model.years[0] && source == 'replay' ? 500 : 0);
                         });
                     }
@@ -459,6 +457,7 @@ export default class VizView extends Element {
            // }, source == 'replay' ? 2000 : 0);
         }).then(() => {
             this.enableYearButtons();
+           // this.showPlayOption();
             this.enablePlayButton();
         });
     }
@@ -673,7 +672,12 @@ export default class VizView extends Element {
             if ( +currentYear < this.model.years[this.model.years.length - 1] && !S.getState('isPaused') ){
                 S.setState('year', {year: +currentYear + 1, source: type || 'play'});
             } else {
-               // this.removePauseOption();
+                this.removePauseOption();
+                if ( currentYear == this.model.years[this.model.years.length - 1] ){
+                    this.showReplayOption();
+                } else {
+                    this.showPlayOption();
+                }
                 S.setState('isPaused', false);
                 resolvePlayYears(true);
             }
