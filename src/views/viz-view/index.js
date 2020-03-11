@@ -174,7 +174,7 @@ export default class VizView extends Element {
         if (data.source === 'yearButton') {
             this.switchYears(data);
         }
-        if (data.source == 'play'){
+        if ( ['play','replay'].includes(data.source) ){
             this.switchYears(data).then(() => {
                 setTimeout(() => {
                     this.playYears();
@@ -243,7 +243,7 @@ export default class VizView extends Element {
             var previousYear = S.getPreviousState('year').year;
             this.isBackward = (+previousYear > year);
             this.disableYearButtons();
-            if ( source !== 'play' ){
+            if ( !['play','replay'].includes(source) ){
                 this.disablePlayButton();
             }
 
@@ -340,14 +340,18 @@ export default class VizView extends Element {
                             this.updateText(year);
                             this.removeTemporaryPlaceholders();
                             this.clearAddedDrugAttributes();
-                            resolveYear(true);
+                            setTimeout(() => {
+                                resolveYear(true);
+                            }, year == this.model.years[0] && source == 'replay' ? 500 : 0);
                         });
                     }
                 }); // end Promise resolvePhase
 
             } // end iteratePhase
             var iteratePhaseBind = iteratePhase.bind(this);
-            iteratePhaseBind();
+            //setTimeout(() => {
+                iteratePhaseBind();
+           // }, source == 'replay' ? 2000 : 0);
         }).then(() => {
             this.enableYearButtons();
             this.enablePlayButton();
@@ -548,11 +552,11 @@ export default class VizView extends Element {
             if (el.checked) {
                 GTMPush('ABXAnimation|ToggleAnimation|On');
                 this.animateYears = true;
-                this.enablePlayButton();
+                //this.enablePlayButton();
             } else {
                 GTMPush('ABXAnimation|ToggleAnimation|Off');
                 this.animateYears = false;
-                this.disablePlayButton();
+               // this.disablePlayButton();
             }
             console.log(this);
         }
@@ -595,22 +599,25 @@ export default class VizView extends Element {
             btn.removeAttribute('disabled');
         });
     }
-    playYears() {
+    playYears(event, type) {
 
-     /*   if (event === 'reciprocal') {
+        if (event == 'replay') {
             GTMPush('ABXAnimation|Replay');
         } else {
             GTMPush('ABXAnimation|Play');
-        }*/
+        }
         new Promise(resolvePlayYears => {
             this.showPauseOption();
-            var currentYear = S.getState('year').year;
+            var currentYear = type == 'replay' ? this.model.years[0] - 1 : S.getState('year').year;
             if ( +currentYear < this.model.years[this.model.years.length - 1] && !S.getState('isPaused') ){
-                S.setState('year', {year: +currentYear + 1, source: 'play'});
+                S.setState('year', {year: +currentYear + 1, source: type || 'play'});
             } else {
                 this.removePauseOption();
                 S.setState('isPaused', false);
                 resolvePlayYears(true);
+                if ( currentYear == this.model.years[this.model.years.length - 1] ){
+                    this.showReplayOption();
+                }
             }
         });
 
@@ -680,7 +687,9 @@ export default class VizView extends Element {
     showReplayOption() {
         this.replayBtn = this.replayBtn || document.querySelector('.' + s.playButton);
         this.replayBtn.removeEventListener('click', this.pausePlayBind);
-        this.replayBtn.addEventListener('click', this.playYearsBind);
+        this.replayBtn.addEventListener('click', e => {
+            this.playYearsBind(e, 'replay');
+        });
         this.replayBtn.classList.add(s.replay);
         this.replayBtn.classList.remove(s.pause);
         this.replayBtn.classList.remove(s.willPause);
