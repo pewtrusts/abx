@@ -7,7 +7,7 @@ import { stateModule as S } from 'stateful-dead';
 import { publishWindowResize } from '@Utils';
 
 //data ( CSVs loaded by file-loader for use by Papaparse at build and runtime. that's set in webpack.common.js )
-import data from './data/abx-data.csv';
+import data from './data/abx-data-2020.csv';
 
 //views
 import VizView from './views/viz-view/';
