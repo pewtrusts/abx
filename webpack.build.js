@@ -69,7 +69,7 @@ module.exports = env => {
             })
         ],
         output: {
-            filename: '[name].js?v=[hash:6]',
+            filename: '[name]-2021.js?v=[hash:6]',
             path: path.resolve(__dirname, 'dist'),
            // publicPath
         }

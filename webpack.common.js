@@ -22,7 +22,7 @@ module.exports = env => { // module.exports is function now to pass in env varia
                             test: /\.csv$/,
                             loader: 'file-loader',
                             options: {
-                                name: 'data/[name].[ext]?v=[hash:6]', 
+                                name: 'data-2021/[name].[ext]?v=[hash:6]', 
                             }
                         },
                         {
