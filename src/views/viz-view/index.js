@@ -20,6 +20,8 @@ const headers = [
 const duration = 1200;
 const shortDuration = 100;
 
+const _dataLayer = window.dataLayer || null;
+
 export default class VizView extends Element {
     prerender() { // this prerender is called as part of the super constructor
         /* any children need to be instatiated here */
@@ -159,11 +161,15 @@ export default class VizView extends Element {
 
         function handler(el) {
             if (el.checked) {
-                GTMPush('ABXAnimation|ToggleAnimation|On');
+                if (_dataLayer){
+                    GTMPush('ABXAnimation|ToggleAnimation|On');
+                }
                 this.animateYears = true;
                 //this.enablePlayButton();
             } else {
-                GTMPush('ABXAnimation|ToggleAnimation|Off');
+                if (_dataLayer){
+                    GTMPush('ABXAnimation|ToggleAnimation|Off');
+                }
                 this.animateYears = false;
                 // this.disablePlayButton();
             }
@@ -190,7 +196,9 @@ export default class VizView extends Element {
                 _this.showPlayOption();
                 var currentYear = S.getState('year')[0];
                 if (currentYear != this.value) { // is not the already selected button
-                    GTMPush('ABXAnimation|Year|' + this.value);
+                    if (_dataLayer){
+                        GTMPush('ABXAnimation|Year|' + this.value);
+                    }
                     S.setState('isPaused', false);
                     this.blur();
                     _this.disablePlayButton();
@@ -450,7 +458,9 @@ export default class VizView extends Element {
         this.positionMap[type][phaseIndex][slot] = drug;
     }
     pausePlay() {
-        GTMPush('ABXAnimation|Pause');
+        if (_dataLayer){
+            GTMPush('ABXAnimation|Pause');
+        }
         this.playBtn.blur();
         this.playBtn.removeEventListener('click', this.pausePlayBind);
         S.setState('isPaused', true);
@@ -495,9 +505,13 @@ export default class VizView extends Element {
     playYears(event, type) {
 
         if (event == 'replay') {
-            GTMPush('ABXAnimation|Replay');
+            if (_dataLayer){
+                GTMPush('ABXAnimation|Replay');
+            }
         } else {
-            GTMPush('ABXAnimation|Play');
+            if (_dataLayer){
+                GTMPush('ABXAnimation|Play');
+            }
         }
         new Promise(resolvePlayYears => {
             var currentYear = type == 'replay' ? this.model.years[0] - 1 : S.getState('year').year;
